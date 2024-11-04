@@ -1,0 +1,31 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    padding: 20px;
+    gap: 20px; /* Space between elements */
+    max-width: 800px; /* Optional: Set a max width for content */
+    margin: auto; /* Center container */
+  }
+  
+  table {
+    width: 100%; /* Make the table full width */
+    border-collapse: collapse;
+    margin-bottom: 20px; /* Add space below the table */
+  }
+  
+  th, td {
+    padding: 10px; /* Add padding to cells */
+    border: 1px solid #ccc; /* Optional: Add border to table cells */
+  }
+  
+  input, select {
+    width: 100%; /* Make input fields full width */
+    padding: 5px; /* Add padding inside input fields */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+  h3, h4 {
+    margin-top: 20px; /* Add space above headings */
+  }
+  

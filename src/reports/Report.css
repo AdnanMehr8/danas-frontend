@@ -1,0 +1,9 @@
+@media print {
+    .MuiButton-root {
+        display: none !important; /* Hide the button on print */
+    }
+    /* Ensure page height matches letter size */
+    body {
+        min-height: 11in; /* Set for standard letter size */
+    }
+}
