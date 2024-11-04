@@ -155,7 +155,7 @@ const DispensingSulpeol = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/dispensing", {
+      const response = await fetch("https://danas-backend.vercel.app/api/dispensing", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

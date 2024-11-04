@@ -254,7 +254,7 @@ const Coating = () => {
     console.log("Record data to be sent:", record);
 
     try {
-      const response = await fetch("http://localhost:5000/api/coating", {
+      const response = await fetch("https://danas-backend.vercel.app/api/coating", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

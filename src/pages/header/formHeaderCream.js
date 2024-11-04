@@ -51,7 +51,7 @@ const FormHeaderCream = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/batch-info", {
+      const response = await fetch("https://danas-backend.vercel.app/api/batch-info", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

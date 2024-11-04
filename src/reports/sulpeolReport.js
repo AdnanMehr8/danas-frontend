@@ -68,7 +68,7 @@ const ReportSulpeol = () => {
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/batch-info/${batchInfoId}`
+        `https://danas-backend.vercel.app/api/batch-info/${batchInfoId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -83,7 +83,7 @@ const ReportSulpeol = () => {
   const fetchLatestRecordDispensing = async (dispensingId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/dispensing/${dispensingId}`
+        `https://danas-backend.vercel.app/api/dispensing/${dispensingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -98,7 +98,7 @@ const ReportSulpeol = () => {
   const fetchLatestRecordMixing = async (mixingId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/mixing/${mixingId}`
+        `https://danas-backend.vercel.app/api/mixing/${mixingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -113,7 +113,7 @@ const ReportSulpeol = () => {
   const fetchLatestRecordCompression = async (compressionID) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/compression/${compressionID}`
+        `https://danas-backend.vercel.app/api/compression/${compressionID}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

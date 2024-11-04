@@ -352,7 +352,7 @@ const Compression = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/compression", {
+      const response = await fetch("https://danas-backend.vercel.app/api/compression", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

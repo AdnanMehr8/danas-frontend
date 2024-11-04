@@ -23,7 +23,7 @@ const CategoryProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products");
+        const response = await axios.get("https://danas-backend.vercel.app/api/products");
         const categorizedProducts = categorizeProducts(response.data);
         setProducts(categorizedProducts);
       } catch (err) {
