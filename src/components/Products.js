@@ -15,7 +15,7 @@ const ProductList = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://danas-backend.vercel.app/api/products"); // Adjust the URL as necessary
+        const response = await axios.get("http://localhost:5000/api/products"); // Adjust the URL as necessary
         setProducts(response.data);
       } catch (err) {
         setError("Error fetching products");

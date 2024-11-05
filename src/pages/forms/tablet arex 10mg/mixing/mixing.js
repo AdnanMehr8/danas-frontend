@@ -14,6 +14,7 @@ const Mixing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.mixing);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -102,17 +103,10 @@ const Mixing = () => {
           !batchRecord.previousProduct ||
           !batchRecord.previousProductBatchNo ||
           !batchRecord.signature ||
-          !checkboxes.documents ||
-          !checkboxes.rawMaterial ||
-          !checkboxes.remnantOfPreviousProduct ||
-          !checkboxes.area ||
-          !checkboxes.mixer ||
-          !checkboxes.otherEquipments ||
-          !checkboxes.scoops ||
-          !checkboxes.pallets ||
+          !checkboxes ||
           !tempAndHumidity.temperature ||
           !tempAndHumidity.humidity ||
-          !mixingRemarks ||
+          !tempAndHumidity.mixingRemarks ||
           !authorization.authorizedForUse ||
           !authorization.dateAndTime
         ) {
@@ -238,7 +232,7 @@ const Mixing = () => {
     }
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/mixing", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/mixing`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -267,7 +261,6 @@ const Mixing = () => {
         ) {
           const nextProcess = processes[currentProcessIndex + 1];
           localStorage.removeItem("activeTabMixing");
-          localStorage.removeItem("mixingRecord");
 
           navigate(`/${nextProcess}`);
         } else {

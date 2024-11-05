@@ -25,16 +25,14 @@ const initialState = {
     signature: "",
   },
   checkboxes: {
-    cartons: "notApplicable",
-    documents: "notApplicable",
-    rawMaterial: "notApplicable",
-    remnantOfPreviousProduct: "notApplicable",
-    area: "notApplicable",
-    weighingBalance: "notApplicable",
-    dispensingBoard: "notApplicable",
-    scoops: "notApplicable",
-    pallets: "notApplicable",
-    machineUsed: "",
+    remnants: {
+      labels: [],
+      values: {}
+    },
+    cleanliness: {
+      labels: [],
+      values: {}
+    }
   },
   tempAndHumidity: {
     temperature: "",

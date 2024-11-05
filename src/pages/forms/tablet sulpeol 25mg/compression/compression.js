@@ -20,6 +20,7 @@ const CompressionSulpeol = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.scompression);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -111,17 +112,10 @@ const CompressionSulpeol = () => {
           !batchRecord.previousProduct ||
           !batchRecord.previousProductBatchNo ||
           !batchRecord.signature ||
-          !checkboxes.pallets ||
-          !checkboxes.documents ||
-          !checkboxes.powderOrTabletOfPreviousBatch ||
-          !checkboxes.remnantOfPreviousProduct ||
-          !checkboxes.area ||
-          !checkboxes.compressionMachine ||
-          !checkboxes.containerOrDrums ||
-          !checkboxes.scoops ||
+          !checkboxes ||
           !tempAndHumidity.temperature ||
           !tempAndHumidity.humidity ||
-          !compressionRemarks ||
+          !tempAndHumidity.compressionRemarks ||
           !authorization.authorizedForUse ||
           !authorization.dateAndTime
         ) {
@@ -353,7 +347,7 @@ const CompressionSulpeol = () => {
     }
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/compression", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -20,15 +20,6 @@ const initialState = {
     verifiedBy: "",
     vDate: "",
   }),
-  // batchInfo: {
-  //   productName: "",
-  //   batchNo: "",
-  //   batchSize: "",
-  //   noOfPacks: "",
-  //   noOfTablets: "",
-  //   packsSize: "",
-  //   expiryDate: "",
-  // },
   batchRecord: {
     department: "",
     currentProduct: "",
@@ -41,16 +32,16 @@ const initialState = {
     signature: "",
   },
   checkboxes: {
-    cartons: "notApplicable",
-    documents: "notApplicable",
-    rawMaterial: "notApplicable",
-    remnantOfPreviousProduct: "notApplicable",
-    area: "notApplicable",
-    creamOrOintmentmixer: "notApplicable",
-    containers: "notApplicable",
-    jugs: "notApplicable",
-    pallets: "notApplicable",
+    remnants: {
+      labels: [],
+      values: {}
+    },
+    cleanliness: {
+      labels: [],
+      values: {}
+    }
   },
+ 
   tempAndHumidity: {
     temperature: "",
     humidity: "",

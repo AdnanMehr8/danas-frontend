@@ -55,11 +55,12 @@ const ReportCream = () => {
   const dispensingId = localStorage.getItem("sc-dispensingId");
   const mixingId = localStorage.getItem("sc-mixingId");
   const compressionID = localStorage.getItem("sc-compressionID");
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/batch-info/${batchInfoId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/batch-info/${batchInfoId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -74,7 +75,7 @@ const ReportCream = () => {
   const fetchLatestRecordDispensing = async (dispensingId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/dispensing/${dispensingId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/dispensing/${dispensingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -89,7 +90,7 @@ const ReportCream = () => {
   const fetchLatestRecordMixing = async (mixingId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/mixing/${mixingId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/mixing/${mixingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -104,7 +105,7 @@ const ReportCream = () => {
   const fetchLatestRecordCompression = async (compressionID) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/compression/${compressionID}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/compression/${compressionID}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -118,13 +119,36 @@ const ReportCream = () => {
 
 
   useEffect(() => {
-    if (batchInfoId || dispensingId || mixingId || compressionID ) {
-      fetchLatestRecordBatchInfo(batchInfoId);
-      fetchLatestRecordDispensing(dispensingId);
-      fetchLatestRecordMixing(mixingId);
-      fetchLatestRecordCompression(compressionID);
-    }
-  }, [dispensingId, dispatch]);
+    const fetchAndClearStorage = async () => {
+        if (batchInfoId || dispensingId || mixingId || compressionID ) {
+            await fetchLatestRecordBatchInfo(batchInfoId);
+            await fetchLatestRecordDispensing(dispensingId);
+            await fetchLatestRecordMixing(mixingId);
+            await fetchLatestRecordCompression(compressionID);
+
+          // Check if localStorage items exist and remove them
+           if (localStorage.getItem("batchInfo")) {
+            console.log("Removing batchInfo");
+            localStorage.removeItem("batchInfo");
+            }
+            if (localStorage.getItem("sc-dispensing")) {
+                console.log("Removing sc-dispensing");
+                localStorage.removeItem("sc-dispensing");
+            }
+            if (localStorage.getItem("sc-mixingRecord")) {
+                console.log("Removing sc-mixingRecord");
+                localStorage.removeItem("sc-mixingRecord");
+            }
+            if (localStorage.getItem("sc-compressionRecord")) {
+                console.log("Removing sc-compressionRecord");
+                localStorage.removeItem("sc-compressionRecord");
+            }
+        }
+    };
+    
+    fetchAndClearStorage();
+}, [batchInfoId, dispensingId, mixingId, compressionID, dispatch]);
+
 
   const totalPages = 18;
 

@@ -19,6 +19,7 @@ const Compression = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.compression);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -110,17 +111,10 @@ const Compression = () => {
           !batchRecord.previousProduct ||
           !batchRecord.previousProductBatchNo ||
           !batchRecord.signature ||
-          !checkboxes.pallets ||
-          !checkboxes.cartons ||
-          !checkboxes.powderOrTabletOfPreviousBatch ||
-          !checkboxes.remnantOfPreviousProduct ||
-          !checkboxes.area ||
-          !checkboxes.compressionMachine ||
-          !checkboxes.containerOrDrums ||
-          !checkboxes.scoops ||
+          !checkboxes ||
           !tempAndHumidity.temperature ||
           !tempAndHumidity.humidity ||
-          !compressionRemarks ||
+          !tempAndHumidity.compressionRemarks ||
           !authorization.authorizedForUse ||
           !authorization.dateAndTime
         ) {
@@ -352,7 +346,7 @@ const Compression = () => {
     }
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/compression", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -381,7 +375,6 @@ const Compression = () => {
         ) {
           const nextProcess = processes[currentProcessIndex + 1];
           localStorage.removeItem("activeTabCompression");
-          localStorage.removeItem("compressionRecord");
 
           navigate(`/${nextProcess}`);
         } else {

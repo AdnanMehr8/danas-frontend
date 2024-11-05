@@ -16,6 +16,7 @@ const CompressionCream = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.sccompression);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -104,17 +105,10 @@ const CompressionCream = () => {
           !batchRecord.previousProduct ||
           !batchRecord.previousProductBatchNo ||
           !batchRecord.signature ||
-          !checkboxes.pallets ||
-          !checkboxes.documents ||
-          !checkboxes.tubesOrBottles ||
-          !checkboxes.remnantOfPreviousProduct ||
-          !checkboxes.area ||
-          !checkboxes.fullingMachine ||
-          !checkboxes.containers ||
-          !checkboxes.jugs ||
+          !checkboxes ||
           !tempAndHumidity.temperature ||
           !tempAndHumidity.humidity ||
-          !compressionRemarks ||
+          !tempAndHumidity.compressionRemarks ||
           !authorization.authorizedForUse ||
           !authorization.dateAndTime
         ) {
@@ -258,7 +252,7 @@ const CompressionCream = () => {
     }
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/compression", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

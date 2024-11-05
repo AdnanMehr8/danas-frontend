@@ -4,6 +4,7 @@ import { setBatchInfo } from "../store/batchInfoSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Box, CircularProgress } from "@mui/material";
+import { api } from "../api/api";
 
 const categories = [
   { id: 1, name: "Injections" },
@@ -19,11 +20,11 @@ const CategoryProductList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  const product = process.env.REACT_APP_INTERNAL_API_PATH;
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("https://danas-backend.vercel.app/api/products");
+        const response = await axios.get(`${product}/api/products`);
         const categorizedProducts = categorizeProducts(response.data);
         setProducts(categorizedProducts);
       } catch (err) {

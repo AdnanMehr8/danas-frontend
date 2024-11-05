@@ -5,11 +5,12 @@ const EquipmentTable = () => {
   const [equipmentData, setEquipmentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   useEffect(() => {
     const fetchEquipmentData = async () => {
       try {
-        const response = await axios.get("https://danas-backend.vercel.app/api/equipment");
+        const response = await axios.get(`${REACT_APP_INTERNAL_API_PATH}/api/equipment`);
         setEquipmentData(response.data);
       } catch (err) {
         setError(err.message);

@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Card, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setMixingRecord } from "../../../../store/mixingSlice";
-import { FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
+import { FormControlLabel, Radio, Button, RadioGroup, TextField } from "@mui/material";
+import { Plus, Trash2 } from "lucide-react";
 
 const BatchManufacturingFormPage5 = () => {
   const dispatch = useDispatch();
   const mixing = useSelector((state) => state.mixing);
-
+  const [newLabels, setNewLabels] = useState({
+    remnants: "",
+    cleanliness: ""
+  });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -34,20 +38,139 @@ const BatchManufacturingFormPage5 = () => {
           tempAndHumidity: { ...mixing.tempAndHumidity, [name]: value },
         })
       );
-    } else if (name === "mixingRemarks") {
-      dispatch(setMixingRecord({ ...mixing, mixingRemarks: value }));
-    }
+    } 
   };
 
-  const handleCheckboxChange = (e) => {
-    const { name, value } = e.target;
+  const handleCheckboxChange = (section, label, value) => {
     dispatch(
       setMixingRecord({
         ...mixing,
-        checkboxes: { ...mixing.checkboxes, [name]: value },
+        checkboxes: {
+          ...mixing.checkboxes,
+          [section]: {
+            ...mixing.checkboxes[section],
+            values: {
+              ...mixing.checkboxes[section]?.values,
+              [label]: value
+            }
+          }
+        }
       })
     );
   };
+
+  const handleAddLabel = (section) => {
+    const newLabel = newLabels[section].trim();
+    if (newLabel) {
+      dispatch(
+        setMixingRecord({
+          ...mixing,
+          checkboxes: {
+            ...mixing.checkboxes,
+            [section]: {
+              ...mixing.checkboxes[section],
+              labels: [...(mixing.checkboxes[section]?.labels || []), newLabel]
+            }
+          }
+        })
+      );
+      setNewLabels(prev => ({
+        ...prev,
+        [section]: ""
+      }));
+    }
+  };
+
+  const handleDeleteLabel = (section, labelToDelete) => {
+    const updatedLabels = mixing.checkboxes[section]?.labels.filter(
+      label => label !== labelToDelete
+    );
+    const updatedValues = { ...mixing.checkboxes[section]?.values };
+    delete updatedValues[labelToDelete];
+
+    dispatch(
+      setMixingRecord({
+        ...mixing,
+        checkboxes: {
+          ...mixing.checkboxes,
+          [section]: {
+            ...mixing.checkboxes[section],
+            labels: updatedLabels,
+            values: updatedValues
+          }
+        }
+      })
+    );
+  };
+
+  const renderCheckboxSection = (title, section) => (
+    <div className="flex justify-center items-center mb-4">
+      <div className="mt-6 w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h5 className="text-lg font-semibold">{title}</h5>
+          <div className="flex gap-2">
+            <TextField
+              size="small"
+              value={newLabels[section]}
+              onChange={(e) => setNewLabels(prev => ({
+                ...prev,
+                [section]: e.target.value
+              }))}
+              placeholder="Enter new label"
+              className="w-48"
+            />
+            <Button
+              variant="contained"
+              onClick={() => handleAddLabel(section)}
+              className="bg-blue-500 hover:bg-blue-600"
+              startIcon={<Plus className="w-4 h-4" />}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {(mixing.checkboxes[section]?.labels || []).map((label) => (
+            <div key={label} className="flex flex-col items-center border rounded-lg p-3 relative">
+              <Button
+                onClick={() => handleDeleteLabel(section, label)}
+                className="absolute top-1 right-1 text-red-500 hover:text-red-700"
+                size="small"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+              <h6 className="mb-2 text-center">{label}</h6>
+              <RadioGroup
+                row
+                value={mixing.checkboxes[section]?.values?.[label] || ""}
+                onChange={(e) => handleCheckboxChange(section, label, e.target.value)}
+                style={{ justifyContent: "center" }}
+
+              >
+                <FormControlLabel
+                  value="satisfactory"
+                  control={<Radio />}
+                  label="✔️"
+                />
+                <FormControlLabel
+                  value="unsatisfactory"
+                  control={<Radio />}
+                  label="❌"
+                />
+                <FormControlLabel
+                  value="notApplicable"
+                  control={<Radio />}
+                  label="—"
+                />
+              </RadioGroup>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
 
   return (
     <Card className="max-w-4xl mx-auto p-4 ">
@@ -176,93 +299,16 @@ const BatchManufacturingFormPage5 = () => {
             </tr>
           </tbody>
         </table>
-
-        <div className="flex justify-center items-center mb-4">
-          <div className="mt-6">
-            <h5 className="text-lg font-semibold mb-4">
-              Ensure that there should be no remnants of the Previous Batch
-              Dispensed related to the following:
-            </h5>
-            <div className="grid grid-cols-2 gap-4 text-center">
-              {["documents", "rawMaterial", "remnantOfPreviousProduct"].map(
-                (item) => (
-                  <div key={item} className="flex flex-col items-center">
-                    <h6 className="mb-2">
-                      {item.charAt(0).toUpperCase() +
-                        item.slice(1).replace(/([A-Z])/g, " $1")}
-                    </h6>
-                    <RadioGroup
-                      row
-                      name={item}
-                      value={mixing.checkboxes[item]}
-                      onChange={handleCheckboxChange}
-                      style={{ justifyContent: "center" }}
-                    >
-                      <FormControlLabel
-                        value="satisfactory"
-                        control={<Radio />}
-                        label="✔️"
-                      />
-                      <FormControlLabel
-                        value="unsatisfactory"
-                        control={<Radio />}
-                        label="❌"
-                      />
-                      <FormControlLabel
-                        value="notApplicable"
-                        control={<Radio />}
-                        label="—"
-                      />
-                    </RadioGroup>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex justify-center items-center mb-4">
-          <div className="mt-6">
-            <h5 className="text-lg font-semibold mb-4">
-              Check the cleanliness of the following:
-            </h5>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              {["area", "mixer", "otherEquipments", "scoops", "pallets"].map(
-                (item) => (
-                  <div key={item} className="flex flex-col items-center">
-                    <h6 className="mb-2">
-                      {item.charAt(0).toUpperCase() +
-                        item.slice(1).replace(/([A-Z])/g, " $1")}
-                    </h6>
-                    <RadioGroup
-                      row
-                      name={item}
-                      value={mixing.checkboxes[item]}
-                      onChange={handleCheckboxChange}
-                      style={{ justifyContent: "center" }}
-                    >
-                      <FormControlLabel
-                        value="satisfactory"
-                        control={<Radio />}
-                        label="✔️"
-                      />
-                      <FormControlLabel
-                        value="unsatisfactory"
-                        control={<Radio />}
-                        label="❌"
-                      />
-                      <FormControlLabel
-                        value="notApplicable"
-                        control={<Radio />}
-                        label="—"
-                      />
-                    </RadioGroup>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        </div>
+        {renderCheckboxSection(
+          "Ensure that there should be no remnants of the Previous Batch Dispensed related to the following:", 
+          "remnants"
+        )}
+        
+        {renderCheckboxSection(
+          "Check the cleanliness of the following:", 
+          "cleanliness"
+        )}
+        
         <h4>• Check the Temperature & Humidity of the Area:-</h4>
         <table className="w-full mb-4" style={{ textAlign: "center" }}>
           <tbody>
@@ -301,7 +347,7 @@ const BatchManufacturingFormPage5 = () => {
                   fullWidth
                   multiline
                   name="mixingRemarks"
-                  value={mixing.mixingRemarks || ""}
+                  value={mixing.tempAndHumidity.mixingRemarks || ""}
                   onChange={handleInputChange}
                 />
               </td>

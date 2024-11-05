@@ -15,6 +15,7 @@ const Coating = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.coating);
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -104,17 +105,10 @@ const Coating = () => {
           !batchRecord.previousProduct ||
           !batchRecord.previousProductBatchNo ||
           !batchRecord.signature ||
-          !checkboxes.documents ||
-          !checkboxes.tabletsCoatingMaterial ||
-          !checkboxes.remnantOfPreviousProduct ||
-          !checkboxes.area ||
-          !checkboxes.coatingMachine ||
-          !checkboxes.containerOrDrums ||
-          !checkboxes.scoops ||
-          !checkboxes.pallets ||
+          !checkboxes ||
           !tempAndHumidity.temperature ||
           !tempAndHumidity.humidity ||
-          !coatingRemarks ||
+          !tempAndHumidity.coatingRemarks ||
           !authorization.authorizedForUse ||
           !authorization.dateAndTime
         ) {
@@ -254,7 +248,7 @@ const Coating = () => {
     console.log("Record data to be sent:", record);
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/coating", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/coating`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +277,6 @@ const Coating = () => {
         ) {
           const nextProcess = processes[currentProcessIndex + 1];
           localStorage.removeItem("activeTabCoating");
-          localStorage.removeItem("coatingRecord");
 
           navigate(`/${nextProcess}`);
         } else {

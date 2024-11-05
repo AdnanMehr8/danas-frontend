@@ -9,6 +9,7 @@ const FormHeaderSulpeol = () => {
   const batchInfo = useSelector((state) => state.batchInfo);
   const navigate = useNavigate();
   const location = useLocation();
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   useEffect(() => {
     const storedRecord = JSON.parse(localStorage.getItem("batchInfo"));
@@ -51,7 +52,7 @@ const FormHeaderSulpeol = () => {
     }
 
     try {
-      const response = await fetch("https://danas-backend.vercel.app/api/batch-info", {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/batch-info`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

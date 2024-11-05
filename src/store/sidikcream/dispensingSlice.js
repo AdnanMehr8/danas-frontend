@@ -24,17 +24,16 @@ const initialState = {
     previousProductBatchNo: "",
     signature: "",
   },
+  
   checkboxes: {
-    cartons: "notApplicable",
-    documents: "notApplicable",
-    rawMaterial: "notApplicable",
-    remnantOfPreviousProduct: "notApplicable",
-    area: "notApplicable",
-    weighingBalance: "notApplicable",
-    dispensingBoard: "notApplicable",
-    scoops: "notApplicable",
-    pallets: "notApplicable",
-    machineUsed: "",
+    remnants: {
+      labels: [],
+      values: {}
+    },
+    cleanliness: {
+      labels: [],
+      values: {}
+    }
   },
   tempAndHumidity: {
     temperature: "",
@@ -79,12 +78,16 @@ export const dispensingSlice = createSlice({
                 tempAndHumidity,
                 remarks,
                 authorization,
+                labels
             } = action.payload;
 
             // Update state with the payload
-            // state.batchInfo = { ...state.batchInfo, ...batchInfo };
+        // state.batchInfo = { ...state.batchInfo, ...batchInfo };
+            
             state.batchRecord = { ...state.batchRecord, ...batchRecord };
             state.checkboxes = { ...state.checkboxes, ...checkboxes };
+            state.labels = { ...state.labels, ...labels };
+            
             state.tempAndHumidity = { ...state.tempAndHumidity, ...tempAndHumidity };
             // state.weighingRecord = weighingRecordRaw;
             state.weighingRecordRaw = action.payload.weighingRecordRaw || state.weighingRecordRaw;

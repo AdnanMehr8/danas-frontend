@@ -44,20 +44,20 @@ const initialState = {
     signature: "",
   },
   checkboxes: {
-    cartons: "notApplicable",
-    powderOrTabletOfPreviousBatch: "notApplicable",
-    remnantOfPreviousProduct: "notApplicable",
-    area: "notApplicable",
-    compressionMachine: "notApplicable",
-    containerOrDrums: "notApplicable",
-    scoops: "notApplicable",
-    pallets: "notApplicable",
+    remnants: {
+      labels: [],
+      values: {}
+    },
+    cleanliness: {
+      labels: [],
+      values: {}
+    }
   },
   tempAndHumidity: {
     temperature: "",
     humidity: "",
+    compressionRemarks: "",
   },
-  compressionRemarks: "",
   authorization: {
     authorizedForUse: "",
     dateAndTime: null,

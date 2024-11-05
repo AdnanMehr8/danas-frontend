@@ -1,9 +1,9 @@
 import axios from "axios";
 
 export const api = axios.create({
-  // baseURL: process.env.REACT_APP_INTERNAL_API_PATH,
+  baseURL: process.env.REACT_APP_INTERNAL_API_PATH,
   // baseURL: "http://localhost:5000",
-  baseURL: "https://danas-backend.vercel.app/",
+  // baseURL: "https://danas-backend.vercel.app/",
 
   withCredentials: true,
   headers: {

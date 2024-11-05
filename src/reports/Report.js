@@ -84,11 +84,12 @@ const Report = () => {
   const mixingId = localStorage.getItem("mixingId");
   const compressionID = localStorage.getItem("compressionID");
   const coatingId = localStorage.getItem("coatingId");
+  const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/batch-info/${batchInfoId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/batch-info/${batchInfoId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -103,7 +104,7 @@ const Report = () => {
   const fetchLatestRecordDispensing = async (dispensingId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/dispensing/${dispensingId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/dispensing/${dispensingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -118,7 +119,7 @@ const Report = () => {
   const fetchLatestRecordMixing = async (mixingId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/mixing/${mixingId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/mixing/${mixingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -133,7 +134,7 @@ const Report = () => {
   const fetchLatestRecordCompression = async (compressionID) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/compression/${compressionID}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/compression/${compressionID}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -148,7 +149,7 @@ const Report = () => {
   const fetchLatestRecordCoating = async (coatingId) => {
     try {
       const response = await fetch(
-        `https://danas-backend.vercel.app/api/coating/${coatingId}`
+        `${REACT_APP_INTERNAL_API_PATH}/api/coating/${coatingId}`
       );
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -161,14 +162,40 @@ const Report = () => {
   };
 
   useEffect(() => {
-    if (batchInfoId || dispensingId || mixingId || compressionID || coatingId) {
-      fetchLatestRecordBatchInfo(batchInfoId);
-      fetchLatestRecordDispensing(dispensingId);
-      fetchLatestRecordMixing(mixingId);
-      fetchLatestRecordCompression(compressionID);
-      fetchLatestRecordCoating(coatingId);
-    }
-  }, [dispensingId, dispatch]);
+    const fetchAndClearStorage = async () => {
+        if (batchInfoId || dispensingId || mixingId || compressionID || coatingId) {
+            await fetchLatestRecordBatchInfo(batchInfoId);
+            await fetchLatestRecordDispensing(dispensingId);
+            await fetchLatestRecordMixing(mixingId);
+            await fetchLatestRecordCompression(compressionID);
+            await fetchLatestRecordCoating(coatingId);
+
+            // Check if localStorage items exist and remove them
+            if (localStorage.getItem("batchInfo")) {
+              console.log("Removing batchInfo");
+              localStorage.removeItem("batchInfo");
+              }
+            if (localStorage.getItem("dispensing")) {
+                console.log("Removing dispensing");
+                localStorage.removeItem("dispensing");
+            }
+            if (localStorage.getItem("mixingRecord")) {
+                console.log("Removing mixingRecord");
+                localStorage.removeItem("mixingRecord");
+            }
+            if (localStorage.getItem("compressionRecord")) {
+                console.log("Removing compressionRecord");
+                localStorage.removeItem("compressionRecord");
+            }
+            if (localStorage.getItem("coatingRecord")) {
+                console.log("Removing coatingRecord");
+                localStorage.removeItem("coatingRecord");
+            }
+        }
+    };
+    
+    fetchAndClearStorage();
+}, [batchInfoId, dispensingId, mixingId, compressionID, coatingId, dispatch]);
 
   const totalPages = 23;
 
