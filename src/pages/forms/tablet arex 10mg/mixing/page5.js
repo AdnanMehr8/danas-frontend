@@ -116,7 +116,6 @@ const BatchManufacturingFormPage5 = () => {
                 ...prev,
                 [section]: e.target.value
               }))}
-              placeholder="Enter new label"
               className="w-48"
             />
             <Button
@@ -132,7 +131,7 @@ const BatchManufacturingFormPage5 = () => {
         
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {(mixing.checkboxes[section]?.labels || []).map((label) => (
-            <div key={label} className="flex flex-col items-center border rounded-lg p-3 relative">
+            <div key={label} className="flex flex-col items-center rounded-lg p-3 relative">
               <Button
                 onClick={() => handleDeleteLabel(section, label)}
                 className="absolute top-1 right-1 text-red-500 hover:text-red-700"
