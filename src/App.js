@@ -42,6 +42,11 @@ import MixingCream from "./pages/forms/SIDIK H CREAM/mixing/mixing";
 import CompressionCream from "./pages/forms/SIDIK H CREAM/compression/compression";
 import FormHeaderCream from "./pages/header/formHeaderCream";
 import ReportCream from "./reports/creamReport";
+import BatchPackingFormPage1 from "./pages/forms/tablet arex 10mg/printing/page1";
+import BatchPackingFormPage2 from "./pages/forms/tablet arex 10mg/printing/page2";
+import BatchPackingFormPage3 from "./pages/forms/tablet arex 10mg/printing/page3";
+import BatchPackingFormPage4 from "./pages/forms/tablet arex 10mg/printing/page4";
+import BatchPackingFormPage5 from "./pages/forms/tablet arex 10mg/printing/page5";
 
 
 const App = () => {
@@ -110,7 +115,18 @@ const App = () => {
             </Protected>
           }
         />
-        <Route path="/chat" element={<Chat />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/p1" element={<BatchPackingFormPage1 />} />
+          <Route path="/p2" element={<BatchPackingFormPage2 />} />
+          <Route path="/p3" element={<BatchPackingFormPage3 />} />
+          <Route path="/p4" element={<BatchPackingFormPage4 />} />
+          <Route path="/p5" element={<BatchPackingFormPage5 />} />
+
+          
+          
+          
+          
+          
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </div>
