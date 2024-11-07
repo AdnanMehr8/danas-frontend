@@ -233,6 +233,14 @@ const BatchPackingFormPage1 = () => {
                     )
                   }
                 />
+                     <Form.Control
+                  type="date"
+                  name="packingStoreSupervisorDate"
+                  value={row.packingStoreSupervisorDate || ""}
+                  onChange={(e) =>
+                    handleWeighingprintingChange(index, "packingStoreSupervisorDate", e.target.value)
+                  }
+                />
               </td>
               <td>
                 <Form.Control
@@ -244,6 +252,14 @@ const BatchPackingFormPage1 = () => {
                       "packingSupervisor",
                       e.target.value
                     )
+                  }
+                />
+                                    <Form.Control
+                  type="date"
+                  name="packingSupervisorDate"
+                  value={row.packingSupervisorDate || ""}
+                  onChange={(e) =>
+                    handleWeighingprintingChange(index, "packingSupervisorDate", e.target.value)
                   }
                 />
               </td>

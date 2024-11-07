@@ -11,15 +11,16 @@ const initialState = {
     expiryDate: "",
     mfgLicense: "",
     productRegNo: "",
-    validFrom: ""
+    validFrom: "",
+    mrpRs: ""
   },
 };
 
-export const batchInfoSlice = createSlice({
-  name: "batchInfo",
+export const batchInfoSlicePacking = createSlice({
+  name: "batchInfoPacking",
   initialState,
   reducers: {
-    setBatchInfo: (state, action) => {
+    setBatchPInfo: (state, action) => {
       console.log("Dispatching setBatchInfo with payload:", action.payload);
       const { batch } = action.payload;
 
@@ -27,16 +28,16 @@ export const batchInfoSlice = createSlice({
       state.batch = { ...state.batch, ...batch };
 
       // Save to local storage
-      localStorage.setItem("batchInfo", JSON.stringify(state));
-      console.log("Stored batchInfo in local storage:", state);
+      localStorage.setItem("batchInfoPacking", JSON.stringify(state));
+      console.log("Stored batchInfoPacking in local storage:", state);
     },
-    resetBatchInfo: (state) => {
+    resetBatchPInfo: (state) => {
       // Reset the state to initial values
       return initialState;
     },
-    loadBatchInfoFromStorage: (state) => {
-      const batchInfo = JSON.parse(localStorage.getItem("batchInfo"));
-      console.log("Loaded batchInfo from local storage:", batchInfo); // Debug log
+    loadBatchInfoPFromStorage: (state) => {
+      const batchInfo = JSON.parse(localStorage.getItem("batchInfoPacking"));
+      console.log("Loaded batchInfoPacking from local storage:", batchInfo); // Debug log
       if (batchInfo) {
         // Update state with the loaded batchInfo
         Object.assign(state, batchInfo);
@@ -45,7 +46,7 @@ export const batchInfoSlice = createSlice({
   },
 });
 
-export const { setBatchInfo, resetBatchInfo, loadBatchInfoFromStorage } =
-  batchInfoSlice.actions;
+export const { setBatchPInfo, resetBatchPInfo, loadBatchInfoPFromStorage } =
+batchInfoSlicePacking.actions;
 
-export default batchInfoSlice.reducer;
+export default batchInfoSlicePacking.reducer;

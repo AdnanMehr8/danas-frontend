@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Box, CircularProgress } from "@mui/material";
 import { api } from "../api/api";
+import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
 
 const categories = [
   { id: 1, name: "Injections" },
@@ -104,6 +105,15 @@ const CategoryProductList = () => {
   const handleProductClick = (productName, packsSize) => {
     dispatch(
       setBatchInfo({
+        batch: {
+          productName,
+          packsSize,
+        },
+      })
+    );
+
+    dispatch(
+      setBatchPInfo({
         batch: {
           productName,
           packsSize,

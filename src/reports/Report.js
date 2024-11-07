@@ -6,8 +6,13 @@ import { setCoatingRecord } from "../store/coatingSlice";
 import { setDispensing } from "../store/dispensingSlice";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import FormHeader from "../pages/header/formHeader";
+import FormHeaderPacking from "../pages/header/formHeaderPacking";
 import "./Report.css";
 import { setBatchInfo } from "../store/batchInfoSlice";
+import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
+import { setPrinting } from "../store/printingSlice";
+import { setBlistering } from "../store/blisteringSlice";
+import { setPacking } from "../store/packingSlice";
 
 // Lazy load the form pages
 const BatchManufacturingFormPage1 = React.lazy(() =>
@@ -77,13 +82,85 @@ const BatchManufacturingFormPage23 = React.lazy(() =>
   import("../pages/forms/tablet arex 10mg/coating/page23")
 );
 
-const Report = () => {
+const BatchPackingFormPage1 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/printing/page1")
+);
+
+const BatchPackingFormPage2 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/printing/page2")
+);
+
+
+const BatchPackingFormPage3 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/printing/page3")
+);
+
+const BatchPackingFormPage4 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/printing/page4")
+);
+
+const BatchPackingFormPage5 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/printing/page5")
+);
+
+const BatchPackingFormPage6 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/blistering/page6")
+);
+
+const BatchPackingFormPage7 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/blistering/page7")
+);
+
+const BatchPackingFormPage8 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/blistering/page8")
+);
+
+const BatchPackingFormPage9 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/blistering/page9")
+);
+
+const BatchPackingFormPage10 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page10")
+);
+
+const BatchPackingFormPage11 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page11")
+);
+
+const BatchPackingFormPage12 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page12")
+);
+
+const BatchPackingFormPage13 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page13")
+);
+
+const BatchPackingFormPage14 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page14")
+);
+
+const BatchPackingFormPage15 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page15")
+);
+
+const BatchPackingFormPage16 = React.lazy(() =>
+  import("../pages/forms/tablet arex 10mg/packing/page16")
+);
+
+
+
+const Report = ({ isPackingForm }) => {
   const dispatch = useDispatch();
   const batchInfoId = localStorage.getItem("batchInfoId");
   const dispensingId = localStorage.getItem("dispensingId");
   const mixingId = localStorage.getItem("mixingId");
   const compressionID = localStorage.getItem("compressionID");
   const coatingId = localStorage.getItem("coatingId");
+  const batchInfoPackingId = localStorage.getItem("batchInfoPackingId");
+  const printingId = localStorage.getItem("printingId");
+  const blisteringId = localStorage.getItem("blisteringId");
+  const packingId = localStorage.getItem("packingId");
+
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
@@ -96,6 +173,21 @@ const Report = () => {
       }
       const latestRecord = await response.json();
       dispatch(setBatchInfo(latestRecord)); // Update the Redux store with the latest record
+    } catch (error) {
+      console.error("Error fetching latest dispensing record:", error);
+    }
+  };
+
+  const fetchLatestRecordPackingBatchInfo = async (batchInfoPackingId) => {
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/batch-info-packing/${batchInfoPackingId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const latestRecord = await response.json();
+      dispatch(setBatchPInfo(latestRecord)); // Update the Redux store with the latest record
     } catch (error) {
       console.error("Error fetching latest dispensing record:", error);
     }
@@ -161,15 +253,63 @@ const Report = () => {
     }
   };
 
+  const fetchLatestRecordPrinting = async (printingId) => {
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/printing/${printingId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const latestRecord = await response.json();
+      dispatch(setPrinting(latestRecord)); // Update the Redux store with the latest record
+    } catch (error) {
+      console.error("Error fetching latest coating record:", error);
+    }
+  };
+
+  const fetchLatestRecordBlistering = async (blisteringId) => {
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/blistering/${blisteringId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const latestRecord = await response.json();
+      dispatch(setBlistering(latestRecord)); // Update the Redux store with the latest record
+    } catch (error) {
+      console.error("Error fetching latest coating record:", error);
+    }
+  };
+
+  const fetchLatestRecordPacking = async (packingId) => {
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/packing/${packingId}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const latestRecord = await response.json();
+      dispatch(setPacking(latestRecord)); // Update the Redux store with the latest record
+    } catch (error) {
+      console.error("Error fetching latest coating record:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchAndClearStorage = async () => {
-        if (batchInfoId || dispensingId || mixingId || compressionID || coatingId) {
+        if (batchInfoId || dispensingId || mixingId || compressionID || coatingId || batchInfoPackingId || printingId || blisteringId || packingId) {
             await fetchLatestRecordBatchInfo(batchInfoId);
             await fetchLatestRecordDispensing(dispensingId);
             await fetchLatestRecordMixing(mixingId);
             await fetchLatestRecordCompression(compressionID);
             await fetchLatestRecordCoating(coatingId);
-
+          await fetchLatestRecordPackingBatchInfo(batchInfoPackingId);
+          await fetchLatestRecordPrinting(printingId);
+          await fetchLatestRecordBlistering(blisteringId);
+          await fetchLatestRecordPacking(packingId);
             // Check if localStorage items exist and remove them
             if (localStorage.getItem("batchInfo")) {
               console.log("Removing batchInfo");
@@ -191,14 +331,29 @@ const Report = () => {
                 console.log("Removing coatingRecord");
                 localStorage.removeItem("coatingRecord");
             }
+            if (localStorage.getItem("batchInfoPacking")) {
+              console.log("Removing batchInfoPacking");
+              localStorage.removeItem("batchInfoPacking");
+          }
+          if (localStorage.getItem("printing")) {
+            console.log("Removing printing");
+            localStorage.removeItem("printing");
+          }
+          if (localStorage.getItem("blistering")) {
+            console.log("Removing blistering");
+            localStorage.removeItem("blistering");
+          }
+          if (localStorage.getItem("packing")) {
+            console.log("Removing packing");
+            localStorage.removeItem("packing");
+        }
         }
     };
     
     fetchAndClearStorage();
-}, [batchInfoId, dispensingId, mixingId, compressionID, coatingId, dispatch]);
+}, [batchInfoId, dispensingId, mixingId, compressionID, coatingId, batchInfoPackingId, printingId, blisteringId, packingId, dispatch]);
 
   const totalPages = 23;
-
   const renderPageWithFooter = (PageComponent, pageNumber) => (
     <Box
       sx={{
@@ -263,7 +418,71 @@ const Report = () => {
       </Typography>
     </Box>
   );
+  const totalPagesPacking = 16;
+  const renderPageWithFooterPacking = (PageComponent, pageNumber) => (
+    <Box
+      sx={{
+        border: "2px solid black",
+        padding: "15px",
+        marginBottom: "20px",
+        position: "relative",
+        minHeight: "100vh", // Ensure full-page height for the content
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        // Add styles to hide input borders, TextField borders, buttons, and icons
+        "& input, & textarea, & select": {
+          border: "none",
+          outline: "none",
+          backgroundColor: "transparent",
+        },
+        "& button, & .MuiButton-root": {
+          display: "none",
+        },
 
+        // Hide TextField borders (both outlined and standard variants)
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            border: "none", // Hides the border for outlined variant
+          },
+        },
+        "& .MuiInput-underline:before, & .MuiInput-underline:after": {
+          borderBottom: "none", // Hides the underline border for standard variant
+        },
+        // Hide the "Actions" column
+        "& .actions-column": {
+          display: "none", // Adjust this class based on your table structure
+        },
+        // Remove borders from React Bootstrap Card
+        "& .card": {
+          border: "none", // Hides the border for the Card
+          boxShadow: "none", // Optionally remove shadow
+        },
+      }}
+    >
+      <div>
+        <FormHeaderPacking />
+        <PageComponent />
+      </div>
+      <Typography
+        variant="body2"
+        sx={{
+          fontWeight: "bold",
+          paddingTop: "10px",
+          marginTop: "20px",
+          display: "flex",
+          paddingLeft: "40px",
+        }}
+      >
+        <Typography variant="h5" component="span" sx={{ fontWeight: "bold" }}>
+          DANAS PHARMACEUTICAL PVT LTD
+        </Typography>
+        <span style={{ marginLeft: "200px" }}>
+          Page {pageNumber} of {totalPagesPacking}
+        </span>
+      </Typography>
+    </Box>
+  );
   return (
     <div>
       <Button
@@ -304,7 +523,31 @@ const Report = () => {
         {renderPageWithFooter(BatchManufacturingFormPage21, 21)}
         {renderPageWithFooter(BatchManufacturingFormPage22, 22)}
         {renderPageWithFooter(BatchManufacturingFormPage23, 23)}
+        {renderPageWithFooterPacking(BatchPackingFormPage1, 1)}
+        {renderPageWithFooterPacking(BatchPackingFormPage2, 2)}
+        {renderPageWithFooterPacking(BatchPackingFormPage3, 3)}
+        {renderPageWithFooterPacking(BatchPackingFormPage4, 4)}
+        {renderPageWithFooterPacking(BatchPackingFormPage5, 5)}
+        {renderPageWithFooterPacking(BatchPackingFormPage6, 6)}
+        {renderPageWithFooterPacking(BatchPackingFormPage7, 7)}
+        {renderPageWithFooterPacking(BatchPackingFormPage8, 8)}
+        {renderPageWithFooterPacking(BatchPackingFormPage9, 9)}
+        {renderPageWithFooterPacking(BatchPackingFormPage10, 10)}
+        {renderPageWithFooterPacking(BatchPackingFormPage11, 11)}
+        {renderPageWithFooterPacking(BatchPackingFormPage12, 12)}
+        {renderPageWithFooterPacking(BatchPackingFormPage13, 13)}
+        {renderPageWithFooterPacking(BatchPackingFormPage14, 14)}
+        {renderPageWithFooterPacking(BatchPackingFormPage15, 15)}
+        {renderPageWithFooterPacking(BatchPackingFormPage16, 16)}
       </Suspense>
+      <Button
+        variant="contained"
+        onClick={() => window.print()}
+        className="mt-3"
+        style={{ display: "block" }}
+      >
+        Print Page
+      </Button>
     </div>
   );
 };

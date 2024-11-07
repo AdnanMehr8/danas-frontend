@@ -373,6 +373,10 @@ import Dispensing from "../pages/forms/tablet arex 10mg/dispensing/dispensing";
 import Mixing from "../pages/forms/tablet arex 10mg/mixing/mixing";
 import Compression from "../pages/forms/tablet arex 10mg/compression/compression";
 import Coating from "../pages/forms/tablet arex 10mg/coating/coating";
+import FormHeaderPacking from "../pages/header/formHeaderPacking";
+import Printing from "../pages/forms/tablet arex 10mg/printing/printing";
+import Blistering from "../pages/forms/tablet arex 10mg/blistering/blistering";
+import Packaging from "../pages/forms/tablet arex 10mg/packing/packing";
 import Report from "../reports/Report";
 
 // Sulpeol specific components
@@ -388,7 +392,7 @@ const DraggableList = () => {
   const isCream = batchInfo?.productName?.toLowerCase().includes('cream');
 
   // Define process lists based on product type
-  const regularProcesses = ["dispensing", "mixing", "compression", "coating", "report"];
+  const regularProcesses = ["dispensing", "mixing", "compression", "coating", "form-header-packing", "printing", "blistering", "packing", "report"];
   const sulpeolProcesses = ["dispensing-sulpeol", "mixing-sulpeol", "compression-sulpeol", "report-sulpeol"];
   const creamProcesses = ["dispensing-cream", "mixing-cream", "compression-cream", "report-cream"];
 

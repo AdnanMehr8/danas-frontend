@@ -47,6 +47,22 @@ import BatchPackingFormPage2 from "./pages/forms/tablet arex 10mg/printing/page2
 import BatchPackingFormPage3 from "./pages/forms/tablet arex 10mg/printing/page3";
 import BatchPackingFormPage4 from "./pages/forms/tablet arex 10mg/printing/page4";
 import BatchPackingFormPage5 from "./pages/forms/tablet arex 10mg/printing/page5";
+import BatchPackingFormPage6 from "./pages/forms/tablet arex 10mg/blistering/page6";
+import BatchPackingFormPage7 from "./pages/forms/tablet arex 10mg/blistering/page7";
+import BatchPackingFormPage8 from "./pages/forms/tablet arex 10mg/blistering/page8";
+import BatchPackingFormPage9 from "./pages/forms/tablet arex 10mg/blistering/page9";
+import BatchPackingFormPage13 from "./pages/forms/tablet arex 10mg/packing/page13";
+import Batch from "./pages/forms/tablet arex 10mg/packing/page15";
+import BatchPackingFormPage16 from "./pages/forms/tablet arex 10mg/packing/page16";
+import BatchPackingFormPage10 from "./pages/forms/tablet arex 10mg/packing/page10";
+import BatchPackingFormPage11 from "./pages/forms/tablet arex 10mg/packing/page11";
+import BatchPackingFormPage12 from "./pages/forms/tablet arex 10mg/packing/page12";
+import BatchPackingFormPage14 from "./pages/forms/tablet arex 10mg/packing/page14";
+import BatchPackingFormPage15 from "./pages/forms/tablet arex 10mg/packing/page15";
+import Printing from "./pages/forms/tablet arex 10mg/printing/printing";
+import Blistering from "./pages/forms/tablet arex 10mg/blistering/blistering";
+import Packing from "./pages/forms/tablet arex 10mg/packing/packing";
+import FormHeaderPacking from "./pages/header/formHeaderPacking";
 
 
 const App = () => {
@@ -79,6 +95,7 @@ const App = () => {
         <Route path="/form-header" element={<FormHeader />} />
         <Route path="/form-header-sulpeol" element={<FormHeaderSulpeol />} />
         <Route path="/form-header-cream" element={<FormHeaderCream />} />
+        <Route path="/form-header-packing" element={<FormHeaderPacking />} />
         <Route path="/machines" element={<EquipmentTable />} />
         <Route path="/products" element={<ProductList />} />
         
@@ -87,6 +104,9 @@ const App = () => {
         <Route path="/mixing" element={<Mixing />} />
         <Route path="/compression" element={<Compression />} />
         <Route path="/coating" element={<Coating />} />
+        <Route path="/printing" element={<Printing />} />
+        <Route path="/blistering" element={<Blistering />} />
+        <Route path="/packing" element={<Packing />} />
         <Route path="/report" element={<Report />} />
         
         {/* sulpeol routes */}
@@ -116,11 +136,14 @@ const App = () => {
           }
         />
           <Route path="/chat" element={<Chat />} />
-          <Route path="/p1" element={<BatchPackingFormPage1 />} />
-          <Route path="/p2" element={<BatchPackingFormPage2 />} />
-          <Route path="/p3" element={<BatchPackingFormPage3 />} />
-          <Route path="/p4" element={<BatchPackingFormPage4 />} />
-          <Route path="/p5" element={<BatchPackingFormPage5 />} />
+          <Route path="/p1" element={<BatchPackingFormPage7 />} />
+          <Route path="/p2" element={<BatchPackingFormPage11 />} />
+          <Route path="/p3" element={<BatchPackingFormPage12 />} />
+          <Route path="/p4" element={<BatchPackingFormPage13 />} />
+          <Route path="/p5" element={<BatchPackingFormPage14 />} />
+          <Route path="/p6" element={<BatchPackingFormPage15 />} />
+          <Route path="/p7" element={<BatchPackingFormPage16 />} />
+
 
           
           

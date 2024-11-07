@@ -1,31 +1,28 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPrinting } from "../../../../store/printingSlice";
+import { setBlistering } from "../../../../store/blisteringSlice";
 import { TextField } from "@mui/material";
 
-const BatchPackingFormPage3 = () => {
+const BatchPackingFormPage7 = () => {
   const dispatch = useDispatch();
-  const { tailLineClearancePrinting, tailLineClearancePrinting2} = useSelector((state) => state.printing);
+  const { tailLineClearanceBlistering, tailLineClearanceBlistering2} = useSelector((state) => state.blistering);
 
 
   const handleFirstChange = (field, value) => {
     dispatch(
-      setPrinting({
-
-          ...tailLineClearancePrinting,
-          tailLineClearancePrinting: { ...tailLineClearancePrinting, [field]: value },
-
+      setBlistering({
+          ...tailLineClearanceBlistering,
+          tailLineClearanceBlistering: { ...tailLineClearanceBlistering, [field]: value }
       })
     );
   };
 
   const handleSecondChange = (field, value) => {
     dispatch(
-      setPrinting({
+      setBlistering({
 
-          ...tailLineClearancePrinting2,
-          tailLineClearancePrinting2: { ...tailLineClearancePrinting2, [field]: value },
-
+          ...tailLineClearanceBlistering2,
+          tailLineClearanceBlistering2: { ...tailLineClearanceBlistering2, [field]: value },
       })
     );
   };
@@ -47,7 +44,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.previousProduct || ""}
+                  value={tailLineClearanceBlistering.previousProduct || ""}
                   onChange={(e) => handleFirstChange("previousProduct", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -58,7 +55,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.previousProductBatchNo || ""}
+                  value={tailLineClearanceBlistering.previousProductBatchNo || ""}
                   onChange={(e) =>
                     handleFirstChange("previousProductBatchNo", e.target.value)
                   }
@@ -73,7 +70,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.lineProduct || ""}
+                  value={tailLineClearanceBlistering.lineProduct || ""}
                   onChange={(e) => handleFirstChange("lineProduct", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -84,7 +81,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.lineProductBatchNo || ""}
+                  value={tailLineClearanceBlistering.lineProductBatchNo || ""}
                   onChange={(e) =>
                     handleFirstChange("lineProductBatchNo", e.target.value)
                   }
@@ -99,7 +96,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="date"
-                  value={tailLineClearancePrinting.mfg || ""}
+                  value={tailLineClearanceBlistering.mfg || ""}
                   onChange={(e) => handleFirstChange("mfg", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -110,7 +107,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="date"
-                  value={tailLineClearancePrinting.exp || ""}
+                  value={tailLineClearanceBlistering.exp || ""}
                   onChange={(e) =>
                     handleFirstChange("exp", e.target.value)
                   }
@@ -125,7 +122,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.price || ""}
+                  value={tailLineClearanceBlistering.price || ""}
                   onChange={(e) => handleFirstChange("price", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -136,7 +133,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="datetime-local"
-                  value={tailLineClearancePrinting.date || ""}
+                  value={tailLineClearanceBlistering.date || ""}
                   onChange={(e) =>
                     handleFirstChange("date", e.target.value)
                   }
@@ -151,13 +148,13 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.productionSignature || ""}
+                  value={tailLineClearanceBlistering.productionSignature || ""}
                   onChange={(e) => handleFirstChange("productionSignature", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
                   <input
                   type="date"
-                  value={tailLineClearancePrinting.pDate || ""}
+                  value={tailLineClearanceBlistering.pDate || ""}
                   onChange={(e) => handleFirstChange("pDate", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -168,7 +165,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting.qaSignature || ""}
+                  value={tailLineClearanceBlistering.qaSignature || ""}
                   onChange={(e) =>
                     handleFirstChange("qaSignature", e.target.value)
                   }
@@ -176,7 +173,7 @@ const BatchPackingFormPage3 = () => {
                 />
                    <input
                   type="date"
-                  value={tailLineClearancePrinting.qaDate || ""}
+                  value={tailLineClearanceBlistering.qaDate || ""}
                   onChange={(e) => handleFirstChange("qaDate", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -196,7 +193,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.previousProduct || ""}
+                  value={tailLineClearanceBlistering2.previousProduct || ""}
                   onChange={(e) => handleSecondChange("previousProduct", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -207,7 +204,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.previousProductBatchNo || ""}
+                  value={tailLineClearanceBlistering2.previousProductBatchNo || ""}
                   onChange={(e) =>
                     handleSecondChange("previousProductBatchNo", e.target.value)
                   }
@@ -222,7 +219,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.lineProduct || ""}
+                  value={tailLineClearanceBlistering2.lineProduct || ""}
                   onChange={(e) => handleSecondChange("lineProduct", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -233,7 +230,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.lineProductBatchNo || ""}
+                  value={tailLineClearanceBlistering2.lineProductBatchNo || ""}
                   onChange={(e) =>
                     handleSecondChange("lineProductBatchNo", e.target.value)
                   }
@@ -248,7 +245,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="date"
-                  value={tailLineClearancePrinting2.mfg || ""}
+                  value={tailLineClearanceBlistering2.mfg || ""}
                   onChange={(e) => handleSecondChange("mfg", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -259,7 +256,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="date"
-                  value={tailLineClearancePrinting2.exp || ""}
+                  value={tailLineClearanceBlistering2.exp || ""}
                   onChange={(e) =>
                     handleSecondChange("exp", e.target.value)
                   }
@@ -274,7 +271,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.price || ""}
+                  value={tailLineClearanceBlistering2.price || ""}
                   onChange={(e) => handleSecondChange("price", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -285,7 +282,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="datetime-local"
-                  value={tailLineClearancePrinting2.date || ""}
+                  value={tailLineClearanceBlistering2.date || ""}
                   onChange={(e) =>
                     handleSecondChange("date", e.target.value)
                   }
@@ -300,13 +297,13 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.productionSignature || ""}
+                  value={tailLineClearanceBlistering2.productionSignature || ""}
                   onChange={(e) => handleSecondChange("productionSignature", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
                   <input
                   type="date"
-                  value={tailLineClearancePrinting2.pDate || ""}
+                  value={tailLineClearanceBlistering2.pDate || ""}
                   onChange={(e) => handleSecondChange("pDate", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -317,7 +314,7 @@ const BatchPackingFormPage3 = () => {
               <td colSpan="2">
                 <input
                   type="text"
-                  value={tailLineClearancePrinting2.qaSignature || ""}
+                  value={tailLineClearanceBlistering2.qaSignature || ""}
                   onChange={(e) =>
                     handleSecondChange("qaSignature", e.target.value)
                   }
@@ -325,7 +322,7 @@ const BatchPackingFormPage3 = () => {
                 />
                     <input
                   type="date"
-                  value={tailLineClearancePrinting2.qaDate || ""}
+                  value={tailLineClearanceBlistering2.qaDate || ""}
                   onChange={(e) => handleSecondChange("qaDate", e.target.value)}
                   className="ml-2 border border-gray-300 p-1"
                 />
@@ -338,4 +335,4 @@ const BatchPackingFormPage3 = () => {
   );
 };
 
-export default BatchPackingFormPage3;
+export default BatchPackingFormPage7;

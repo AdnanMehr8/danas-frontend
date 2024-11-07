@@ -2,25 +2,24 @@ import React from "react";
 import {
   Card,
   CardContent,
-  TextField,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setPrinting } from "../../../../store/printingSlice";
+import { setBlistering } from "../../../../store/blisteringSlice";
 
-const BatchPackingFormPage4 = () => {
+const BatchPackingFormPage8 = () => {
   const dispatch = useDispatch();
-  const printingRecord = useSelector((state) => state.printing);
+  const blisteringRecord = useSelector((state) => state.blistering);
 
   const handleInputChange = (name, value) => {
     // Update instructions state
     const updatedPrecautions = {
-      ...printingRecord.instructions,
+      ...blisteringRecord.instructions,
       [name]: value,
     };
 
     dispatch(
-      setPrinting({
-        ...printingRecord,
+      setBlistering({
+        ...blisteringRecord,
         instructions: updatedPrecautions,
       })
     );
@@ -46,41 +45,42 @@ const BatchPackingFormPage4 = () => {
               <tbody>
                 <tr>
                   <td>
-                    <strong>Coding Operator: </strong>
+                    <strong>Blister Operator: </strong>
                   </td>
                   <td colSpan="2">
                     <input
                       type="text"
-                      value={printingRecord.instructions.codingOperator || ""}
-                      onChange={(e) => handleInputChange("codingOperator", e.target.value)}
+                      value={blisteringRecord.instructions.blisterOperator || ""}
+                      onChange={(e) => handleInputChange("blisterOperator", e.target.value)}
                       className="ml-2 border border-gray-300 p-1"
                     />
                   </td>
-                  <td>
-                    <strong>Coding Checker: </strong>
-                  </td>
-                  <td colSpan="2">
-                    <input
-                      type="text"
-                      value={printingRecord.instructions.codingChecker || ""}
-                      onChange={(e) =>
-                        handleInputChange("codingChecker", e.target.value)
-                      }
-                      className="ml-2 border border-gray-300 p-1"
-                    />
-                  </td>
+            
                 </tr>
                 <tr>
-                  <td colSpan="3"></td> {/* Empty cells to align Production Officer under Coding Checker */}
                   <td>
-                    <strong>Production Officer: </strong>
+                    <strong>Helper: </strong>
+                  </td>
+                  <td colSpan="2">
+                    <input
+                      type="text"
+                      value={blisteringRecord.instructions.helper || ""}
+                      onChange={(e) => handleInputChange("helper", e.target.value)}
+                      className="ml-2 border border-gray-300 p-1"
+                    />
+                  </td>
+            
+                </tr>
+                <tr>
+                  <td>
+                    <strong>Production Pharmacist: </strong>
                   </td>
                   <td>
                     <input
                       type="text"
-                      value={printingRecord.instructions.productionOfficer || ""}
+                      value={blisteringRecord.instructions.productionPharmacist || ""}
                       onChange={(e) =>
-                        handleInputChange("productionOfficer", e.target.value)
+                        handleInputChange("productionPharmacist", e.target.value)
                       }
                       className="ml-2 border border-gray-300 p-1"
                     />
@@ -90,18 +90,9 @@ const BatchPackingFormPage4 = () => {
             </table>
           </div>
         </div>
-
-        <div style={{marginTop: "7rem"}}>
-          <TextField
-            label="Paste UC stamp Or label Stamp" // Remove label since "REMARKS:" is already displayed
-            multiline
-            fullWidth
-            rows={19}
-          />
-        </div>
       </CardContent>
     </Card>
   );
 };
 
-export default BatchPackingFormPage4;
+export default BatchPackingFormPage8;
