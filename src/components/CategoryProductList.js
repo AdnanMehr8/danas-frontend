@@ -649,6 +649,7 @@ const categories = [
   { id: 2, name: "Tablets", subCategories: ["Coated", "Non-Coated"] },
   { id: 3, name: "Capsules" },
   { id: 4, name: "Creams" },
+  { id: 5, name: "Gels" },
 ];
 
 const CategoryProductList = () => {
@@ -659,7 +660,8 @@ const CategoryProductList = () => {
     1: [],
     2: { Coated: [], "Non-Coated": [] },
     3: [],
-    4: []
+    4: [],
+    5: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -671,44 +673,6 @@ const CategoryProductList = () => {
 
   const product = process.env.REACT_APP_INTERNAL_API_PATH;
 
-  // const fetchProducts = useCallback(async () => {
-  //   try {
-  //     setLoading(true);
-  //     const response = await axios.get(`${product}/api/products`);
-      
-  //     const categorized = {
-  //       1: [],
-  //       2: { Coated: [], "Non-Coated": [] },
-  //       3: [],
-  //       4: []
-  //     };
-
-  //     response.data.forEach(item => {
-  //       if (item.productList && Array.isArray(item.productList)) {
-  //         item.productList.forEach(product => {
-  //           const categoryId = parseInt(item.categoryId);
-            
-  //           if (categoryId === 2) {
-  //             if (product.description.toLowerCase().includes("coated")) {
-  //               categorized[2].Coated.push(product);
-  //             } else {
-  //               categorized[2]["Non-Coated"].push(product);
-  //             }
-  //           } else if (categorized[categoryId]) {
-  //             categorized[categoryId].push(product);
-  //           }
-  //         });
-  //       }
-  //     });
-
-  //     setProducts(categorized);
-  //   } catch (err) {
-  //     console.error("Error fetching products:", err);
-  //     setError("Error fetching products");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [product]);
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
@@ -718,7 +682,8 @@ const CategoryProductList = () => {
         1: [],
         2: { Coated: [], "Non-Coated": [] },
         3: [],
-        4: []
+        4: [],
+        5: []
       };
   
       response.data.forEach((item) => {
@@ -814,67 +779,6 @@ const CategoryProductList = () => {
     }
   }, [newProduct, selectedCategoryId, product, loading]);
   
-  // const handleAddProduct = useCallback(async () => {
-  //   if (!newProduct.description || !newProduct.packSize) {
-  //     setError("Please fill in all fields");
-  //     return;
-  //   }
-  // // Prevent adding while already loading
-  // if (loading) return;
-  //   try {
-  //     setLoading(true);
-      
-  //     const fullDescription = selectedCategoryId === 2 
-  //       ? `${newProduct.description} ${newProduct.subCategory}`
-  //       : newProduct.description;
-
-  //     const productData = {
-  //       categoryId: selectedCategoryId.toString(),
-  //       productList: [{
-  //         description: fullDescription,
-  //         packSize: newProduct.packSize
-  //       }]
-  //     };
-
-  //     const response = await axios.post(`${product}/api/products`, productData);
-
-  //     setProducts(prevProducts => {
-  //       const newProducts = { ...prevProducts };
-  //       const newProductData = {
-  //         ...response.data.productList[0],
-  //         _id: response.data.productList[0]._id
-  //       };
-
-  //       if (selectedCategoryId === 2) {
-  //         const subCategory = newProduct.subCategory;
-  //         newProducts[2][subCategory] = [
-  //           ...newProducts[2][subCategory],
-  //           newProductData
-  //         ].sort((a, b) => a.description.localeCompare(b.description));
-  //       } else {
-  //         newProducts[selectedCategoryId] = [
-  //           ...newProducts[selectedCategoryId],
-  //           newProductData
-  //         ].sort((a, b) => a.description.localeCompare(b.description));
-  //       }
-        
-  //       return newProducts;
-  //     });
-
-  //     setNewProduct({
-  //       description: "",
-  //       packSize: "",
-  //       subCategory: "Coated"
-  //     });
-  //     setError("");
-  //   } catch (err) {
-  //     console.error("Error adding product:", err);
-  //     setError("Error adding product: " + (err.response?.data?.message || err.message));
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [newProduct, selectedCategoryId, product]);
-
   const handleProductClick = (productName, packsSize) => {
     dispatch(setBatchInfo({ batch: { productName, packsSize } }));
     dispatch(setBatchPInfo({ batch: { productName, packsSize } }));
