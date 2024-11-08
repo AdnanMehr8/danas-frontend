@@ -143,7 +143,7 @@ checkSheet: {
         },
         qaObservations: Array(8).fill({
             parameter: "",
-            statusMixing: "", // OK or Not OK
+            statusPacking: "", // OK or Not OK
             remarks: "",
         }),
         qaOfficer: "",

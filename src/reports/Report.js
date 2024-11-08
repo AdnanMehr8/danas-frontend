@@ -160,7 +160,47 @@ const Report = ({ isPackingForm }) => {
   const printingId = localStorage.getItem("printingId");
   const blisteringId = localStorage.getItem("blisteringId");
   const packingId = localStorage.getItem("packingId");
-
+  const formPages = [
+    BatchManufacturingFormPage1,
+    BatchManufacturingFormPage2,
+    BatchManufacturingFormPage3,
+    BatchManufacturingFormPage3,
+    BatchManufacturingFormPage4,
+    BatchManufacturingFormPage5,
+    BatchManufacturingFormPage6,
+    BatchManufacturingFormPage7,
+    BatchManufacturingFormPage8,
+    BatchManufacturingFormPage9,
+    BatchManufacturingFormPage10,
+    BatchManufacturingFormPage11,
+    BatchManufacturingFormPage12,
+    BatchManufacturingFormPage13,
+    BatchManufacturingFormPage14,
+    BatchManufacturingFormPage15,
+    BatchManufacturingFormPage17,
+    BatchManufacturingFormPage18,
+    BatchManufacturingFormPage19,
+    BatchManufacturingFormPage20,
+    BatchManufacturingFormPage21,
+    BatchManufacturingFormPage22,
+    BatchManufacturingFormPage23,
+    BatchPackingFormPage1,
+    BatchPackingFormPage2,
+    BatchPackingFormPage3,
+    BatchPackingFormPage4,
+    BatchPackingFormPage5,
+    BatchPackingFormPage6,
+    BatchPackingFormPage7,
+    BatchPackingFormPage8,
+    BatchPackingFormPage9,
+    BatchPackingFormPage10,
+    BatchPackingFormPage11,
+    BatchPackingFormPage12,
+    BatchPackingFormPage13,
+    BatchPackingFormPage14,
+    BatchPackingFormPage15,
+    BatchPackingFormPage16,
+]
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
@@ -353,7 +393,9 @@ const Report = ({ isPackingForm }) => {
     fetchAndClearStorage();
 }, [batchInfoId, dispensingId, mixingId, compressionID, coatingId, batchInfoPackingId, printingId, blisteringId, packingId, dispatch]);
 
-  const totalPages = 23;
+
+  // Get the total count of pages
+const totalPages = formPages.length;
   const renderPageWithFooter = (PageComponent, pageNumber) => (
     <Box
       sx={{
@@ -396,7 +438,26 @@ const Report = ({ isPackingForm }) => {
       }}
     >
       <div>
-        <FormHeader />
+       {/* Conditionally render FormHeaderPacking only for BatchPackingForms */}
+       {PageComponent === BatchPackingFormPage1 || 
+       PageComponent === BatchPackingFormPage2 || 
+          PageComponent === BatchPackingFormPage3 || 
+        PageComponent === BatchPackingFormPage4 ||
+        PageComponent === BatchPackingFormPage5 ||
+        PageComponent === BatchPackingFormPage6 ||
+        PageComponent === BatchPackingFormPage7 ||
+        PageComponent === BatchPackingFormPage8 ||
+        PageComponent === BatchPackingFormPage9 ||
+        PageComponent === BatchPackingFormPage10 ||
+        PageComponent === BatchPackingFormPage11 ||
+        PageComponent === BatchPackingFormPage12 ||
+        PageComponent === BatchPackingFormPage13 ||
+        PageComponent === BatchPackingFormPage14 ||
+        PageComponent === BatchPackingFormPage15 ||
+        PageComponent === BatchPackingFormPage16 
+        ? <FormHeaderPacking />
+        : <FormHeader />
+      }
         <PageComponent />
       </div>
       <Typography
@@ -418,72 +479,8 @@ const Report = ({ isPackingForm }) => {
       </Typography>
     </Box>
   );
-  const totalPagesPacking = 16;
-  const renderPageWithFooterPacking = (PageComponent, pageNumber) => (
-    <Box
-      sx={{
-        border: "2px solid black",
-        padding: "15px",
-        marginBottom: "20px",
-        position: "relative",
-        minHeight: "100vh", // Ensure full-page height for the content
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        // Add styles to hide input borders, TextField borders, buttons, and icons
-        "& input, & textarea, & select": {
-          border: "none",
-          outline: "none",
-          backgroundColor: "transparent",
-        },
-        "& button, & .MuiButton-root": {
-          display: "none",
-        },
 
-        // Hide TextField borders (both outlined and standard variants)
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            border: "none", // Hides the border for outlined variant
-          },
-        },
-        "& .MuiInput-underline:before, & .MuiInput-underline:after": {
-          borderBottom: "none", // Hides the underline border for standard variant
-        },
-        // Hide the "Actions" column
-        "& .actions-column": {
-          display: "none", // Adjust this class based on your table structure
-        },
-        // Remove borders from React Bootstrap Card
-        "& .card": {
-          border: "none", // Hides the border for the Card
-          boxShadow: "none", // Optionally remove shadow
-        },
-      }}
-    >
-      <div>
-        <FormHeaderPacking />
-        <PageComponent />
-      </div>
-      <Typography
-        variant="body2"
-        sx={{
-          fontWeight: "bold",
-          paddingTop: "10px",
-          marginTop: "20px",
-          display: "flex",
-          paddingLeft: "40px",
-        }}
-      >
-        <Typography variant="h5" component="span" sx={{ fontWeight: "bold" }}>
-          DANAS PHARMACEUTICAL PVT LTD
-        </Typography>
-        <span style={{ marginLeft: "200px" }}>
-          Page {pageNumber} of {totalPagesPacking}
-        </span>
-      </Typography>
-    </Box>
-  );
-  return (
+   return (
     <div>
       <Button
         variant="contained"
@@ -501,44 +498,9 @@ const Report = ({ isPackingForm }) => {
           </Box>
         }
       >
-        {renderPageWithFooter(BatchManufacturingFormPage1, 1)}
-        {renderPageWithFooter(BatchManufacturingFormPage2, 2)}
-        {renderPageWithFooter(BatchManufacturingFormPage3, 3)}
-        {renderPageWithFooter(BatchManufacturingFormPage4, 4)}
-        {renderPageWithFooter(BatchManufacturingFormPage5, 5)}
-        {renderPageWithFooter(BatchManufacturingFormPage6, 6)}
-        {renderPageWithFooter(BatchManufacturingFormPage7, 7)}
-        {renderPageWithFooter(BatchManufacturingFormPage8, 8)}
-        {renderPageWithFooter(BatchManufacturingFormPage9, 9)}
-        {renderPageWithFooter(BatchManufacturingFormPage10, 10)}
-        {renderPageWithFooter(BatchManufacturingFormPage11, 11)}
-        {renderPageWithFooter(BatchManufacturingFormPage12, 12)}
-        {renderPageWithFooter(BatchManufacturingFormPage13, 13)}
-        {renderPageWithFooter(BatchManufacturingFormPage14, 14)}
-        {renderPageWithFooter(BatchManufacturingFormPage15, 15)}
-        {renderPageWithFooter(BatchManufacturingFormPage17, 17)}
-        {renderPageWithFooter(BatchManufacturingFormPage18, 18)}
-        {renderPageWithFooter(BatchManufacturingFormPage19, 19)}
-        {renderPageWithFooter(BatchManufacturingFormPage20, 20)}
-        {renderPageWithFooter(BatchManufacturingFormPage21, 21)}
-        {renderPageWithFooter(BatchManufacturingFormPage22, 22)}
-        {renderPageWithFooter(BatchManufacturingFormPage23, 23)}
-        {renderPageWithFooterPacking(BatchPackingFormPage1, 1)}
-        {renderPageWithFooterPacking(BatchPackingFormPage2, 2)}
-        {renderPageWithFooterPacking(BatchPackingFormPage3, 3)}
-        {renderPageWithFooterPacking(BatchPackingFormPage4, 4)}
-        {renderPageWithFooterPacking(BatchPackingFormPage5, 5)}
-        {renderPageWithFooterPacking(BatchPackingFormPage6, 6)}
-        {renderPageWithFooterPacking(BatchPackingFormPage7, 7)}
-        {renderPageWithFooterPacking(BatchPackingFormPage8, 8)}
-        {renderPageWithFooterPacking(BatchPackingFormPage9, 9)}
-        {renderPageWithFooterPacking(BatchPackingFormPage10, 10)}
-        {renderPageWithFooterPacking(BatchPackingFormPage11, 11)}
-        {renderPageWithFooterPacking(BatchPackingFormPage12, 12)}
-        {renderPageWithFooterPacking(BatchPackingFormPage13, 13)}
-        {renderPageWithFooterPacking(BatchPackingFormPage14, 14)}
-        {renderPageWithFooterPacking(BatchPackingFormPage15, 15)}
-        {renderPageWithFooterPacking(BatchPackingFormPage16, 16)}
+         {formPages.map((PageComponent, index) =>
+          renderPageWithFooter(PageComponent, index + 1)
+        )}
       </Suspense>
       <Button
         variant="contained"

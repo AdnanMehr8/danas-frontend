@@ -368,11 +368,11 @@ const BatchPackingFormPage14 = () => {
                     <input
                       style={{ width: "100px" }}
                       type="radio"
-                      name={`statusMixing-${index}`}
+                      name={`statusPacking-${index}`}
                       value="OK"
-                      checked={observation.statusMixing === "OK"}
+                      checked={observation.statusPacking === "OK"}
                       onChange={() =>
-                        handleObservationChange(index, "statusMixing", "OK")
+                        handleObservationChange(index, "statusPacking", "OK")
                       }
                     />
                   </td>
