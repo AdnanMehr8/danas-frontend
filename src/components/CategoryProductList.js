@@ -787,7 +787,7 @@ const CategoryProductList = () => {
       navigate("/form-header-sulpeol");
     } else if (productName.toLowerCase().includes("cream")) {
       navigate("/form-header-cream");
-    } else {
+    } else if (productName.toLowerCase().includes("arex")){
       navigate("/form-header");
     }
   };
