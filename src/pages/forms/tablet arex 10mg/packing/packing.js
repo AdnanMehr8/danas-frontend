@@ -29,7 +29,7 @@ const Packing = () => {
     false,
     false,
     false,
-    false,
+    // false,
   ]); // Control which tabs are enabled
 
   useEffect(() => {
@@ -150,7 +150,7 @@ const Packing = () => {
         }
         break;
 
-      case 4:
+      case 3:
         if (
           !checkSheet.labels.every(
             (label) =>
@@ -177,7 +177,7 @@ const Packing = () => {
         }
         break;
       
-        case 5:
+        case 4:
           if (
             !requestForAnalysisPacking.batchInfo.product ||
             !requestForAnalysisPacking.batchInfo.qcNumber ||
@@ -210,7 +210,7 @@ const Packing = () => {
           }
           break;
     
-      case 6:
+      case 5:
         if (
           !reconcilliationSheet.labels.every(
             (label) =>
@@ -224,23 +224,8 @@ const Packing = () => {
           return false;
         }
         break;
-        
-        case 7:
-          if (
-            !reconcilliationSheet.labels.every(
-              (label) =>
-                label.description &&
-                label.reconcillation 
-            ) ||
-            !reconcilliationSheet.productionManager ||
-            !reconcilliationSheet.remarks 
-          ) {
-            alert("Please fill required fields on this page before proceeding.");
-            return false;
-          }
-          break;
-           
-          case 8:
+
+          case 6:
             if (
               !stockTransferReport.labels.every(
                 (label) =>

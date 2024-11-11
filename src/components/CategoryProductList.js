@@ -638,8 +638,14 @@ import {
   Select, 
   MenuItem, 
   Button,
-  Typography 
+  Typography,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from "@mui/material";
+import { Delete } from "@mui/icons-material";
 import { setBatchInfo } from "../store/batchInfoSlice";
 import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
 
@@ -670,6 +676,8 @@ const CategoryProductList = () => {
     packSize: "",
     subCategory: "Coated",
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const product = process.env.REACT_APP_INTERNAL_API_PATH;
 
@@ -690,17 +698,26 @@ const CategoryProductList = () => {
         const categoryId = parseInt(item.categoryId);
   
         if (categoryId === 2) {
-          // For Tablets (ID: 2), use subCategory to sort into Coated and Non-Coated
+          // Store products with their parent document _id
           item.productList.forEach((product) => {
+            const productWithParentId = {
+              ...product,
+              parentId: item._id  // Store the parent document's _id
+            };
+            
             if (product.subCategory === "Coated") {
-              categorized[2].Coated.push(product);
+              categorized[2].Coated.push(productWithParentId);
             } else if (product.subCategory === "Non-Coated") {
-              categorized[2]["Non-Coated"].push(product);
+              categorized[2]["Non-Coated"].push(productWithParentId);
             }
           });
         } else if (categorized[categoryId]) {
-          // For other categories, add directly to the category
-          categorized[categoryId] = [...categorized[categoryId], ...item.productList];
+          // Add parent _id to each product in other categories
+          const productsWithParentId = item.productList.map(product => ({
+            ...product,
+            parentId: item._id
+          }));
+          categorized[categoryId] = [...categorized[categoryId], ...productsWithParentId];
         }
       });
   
@@ -712,10 +729,56 @@ const CategoryProductList = () => {
       setLoading(false);
     }
   }, [product]);
-  
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+const handleDeleteClick = (event, product) => {
+  event.stopPropagation();
+  setProductToDelete({
+    parentId: product.parentId,  // This is the main document's _id
+    description: product.description,
+    subCategory: product.subCategory
+  });
+  setDeleteDialogOpen(true);
+};
+
+const handleDeleteConfirm = async () => {
+  if (!productToDelete) return;
+
+  try {
+    setLoading(true);
+    // Use the parent document's _id for deletion
+    await axios.delete(`${product}/api/products/${productToDelete.parentId}`);
+
+    setProducts(prevProducts => {
+      const newProducts = { ...prevProducts };
+      
+      if (selectedCategoryId === 2) {
+        const subCategory = productToDelete.subCategory;
+        newProducts[2][subCategory] = newProducts[2][subCategory].filter(
+          p => p.parentId !== productToDelete.parentId
+        );
+      } else {
+        newProducts[selectedCategoryId] = newProducts[selectedCategoryId].filter(
+          p => p.parentId !== productToDelete.parentId
+        );
+      }
+      
+      return newProducts;
+    });
+
+    setDeleteDialogOpen(false);
+    setProductToDelete(null);
+  } catch (err) {
+    console.error("Error deleting product:", err);
+    setError("Error deleting product: " + (err.response?.data?.message || err.message));
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleAddProduct = useCallback(async () => {
     if (!newProduct.description || !newProduct.packSize) {
       setError("Please fill in all fields");
@@ -779,19 +842,34 @@ const CategoryProductList = () => {
     }
   }, [newProduct, selectedCategoryId, product, loading]);
   
-  const handleProductClick = (productName, packsSize) => {
-    dispatch(setBatchInfo({ batch: { productName, packsSize } }));
-    dispatch(setBatchPInfo({ batch: { productName, packsSize } }));
+  // const handleProductClick = (productName, packsSize) => {
+  //   dispatch(setBatchInfo({ batch: { productName, packsSize } }));
+  //   dispatch(setBatchPInfo({ batch: { productName, packsSize } }));
 
-    if (productName.toLowerCase().includes("sulpeol")) {
+  //   if (productName.toLowerCase().includes("sulpeol")) {
+  //     navigate("/form-header-sulpeol");
+  //   } else if (productName.toLowerCase().includes("cream")) {
+  //     navigate("/form-header-cream");
+  //   } else if (productName.toLowerCase().includes("arex")){
+  //     navigate("/form-header");
+  //   }
+  // };
+  const handleProductClick = (productName, packsSize) => {
+    // Use only the product description without the subcategory
+    const productNameToDisplay = productName.split(' ')[0];  // Assumes the description is space-separated
+    
+    dispatch(setBatchInfo({ batch: { productName: productNameToDisplay, packsSize } }));
+    dispatch(setBatchPInfo({ batch: { productName: productNameToDisplay, packsSize } }));
+  
+    if (productNameToDisplay.toLowerCase().includes("sulpeol")) {
       navigate("/form-header-sulpeol");
-    } else if (productName.toLowerCase().includes("cream")) {
+    } else if (productNameToDisplay.toLowerCase().includes("cream")) {
       navigate("/form-header-cream");
-    } else if (productName.toLowerCase().includes("arex")){
+    } else if (productNameToDisplay.toLowerCase().includes("arex")) {
       navigate("/form-header");
     }
   };
-
+  
   if (loading && !Object.keys(products).length) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -799,6 +877,35 @@ const CategoryProductList = () => {
       </Box>
     );
   }
+
+  const ProductListItem = ({ product, showSubCategory }) => (
+    <li
+      style={{ 
+        cursor: "pointer", 
+        padding: "8px", 
+        margin: "4px 0", 
+        borderRadius: "4px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: "#f5f5f5"
+      }}
+    >
+      <div 
+        onClick={() => handleProductClick(product.description, product.packSize)}
+        style={{ flex: 1, padding: "4px" }}
+      >
+        {product.description}
+      </div>
+      <IconButton
+        size="small"
+        onClick={(e) => handleDeleteClick(e, product)}
+        sx={{ color: "error.main" }}
+      >
+        <Delete />
+      </IconButton>
+    </li>
+  );
 
   return (
     <div style={{ display: "flex", padding: "20px" }}>
@@ -826,6 +933,12 @@ const CategoryProductList = () => {
 
       <div style={{ flex: "2" }}>
         <Typography variant="h5" gutterBottom>Products</Typography>
+         {/* Show message if no category is selected */}
+  {!selectedCategoryId && (
+    <Typography variant="body1" color="textSecondary">
+      Please select a category to see the products.
+    </Typography>
+  )}
         {selectedCategoryId && (
           <Box sx={{ marginBottom: 3 }}>
             <Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
@@ -864,52 +977,67 @@ const CategoryProductList = () => {
             )}
           </Box>
         )}
-
-        {selectedCategoryId && (
+{selectedCategoryId && (
           <div>
             {selectedCategoryId === 2 ? (
               <>
                 <Typography variant="h6">Coated Tablets</Typography>
                 <ul style={{ listStyle: "none", padding: 0 }}>
                   {products[2].Coated.map((product) => (
-                    <li
-                      key={product._id}
-                      onClick={() => handleProductClick(product.description, product.packSize)}
-                      style={{ cursor: "pointer", padding: "8px", margin: "4px 0", borderRadius: "4px" }}
-                    >
-                      {product.description}
-                    </li>
+                    <ProductListItem 
+                      key={product._id} 
+                      product={product} 
+                      showSubCategory={true}
+                    />
                   ))}
                 </ul>
 
                 <Typography variant="h6" sx={{ mt: 2 }}>Non-Coated Tablets</Typography>
                 <ul style={{ listStyle: "none", padding: 0 }}>
                   {products[2]["Non-Coated"].map((product) => (
-                    <li
-                      key={product._id}
-                      onClick={() => handleProductClick(product.description, product.packSize)}
-                      style={{ cursor: "pointer", padding: "8px", margin: "4px 0", borderRadius: "4px" }}
-                    >
-                      {product.description}
-                    </li>
+                    <ProductListItem 
+                      key={product._id} 
+                      product={product} 
+                      showSubCategory={true}
+                    />
                   ))}
                 </ul>
               </>
             ) : (
               <ul style={{ listStyle: "none", padding: 0 }}>
                 {products[selectedCategoryId].map((product) => (
-                  <li
-                    key={product._id}
-                    onClick={() => handleProductClick(product.description, product.packSize)}
-                    style={{ cursor: "pointer", padding: "8px", margin: "4px 0", borderRadius: "4px" }}
-                  >
-                    {product.description}
-                  </li>
+                  <ProductListItem 
+                    key={product._id} 
+                    product={product} 
+                    showSubCategory={false}
+                  />
                 ))}
-                </ul>
+              </ul>
             )}
           </div>
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            Are you sure you want to delete {productToDelete?.description}?
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+            <Button 
+              onClick={handleDeleteConfirm} 
+              color="error" 
+              variant="contained"
+              disabled={loading}
+            >
+              {loading ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );
