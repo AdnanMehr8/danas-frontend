@@ -63,6 +63,9 @@ import Printing from "./pages/forms/tablet arex 10mg/printing/printing";
 import Blistering from "./pages/forms/tablet arex 10mg/blistering/blistering";
 import Packing from "./pages/forms/tablet arex 10mg/packing/packing";
 import FormHeaderPacking from "./pages/header/formHeaderPacking";
+import HomePage from "./pages/home-page/homePage";
+import Categories from "./pages/home-page/homePage";
+import Home from "./pages/home-page/homePage";
 
 
 const App = () => {
@@ -143,6 +146,8 @@ const App = () => {
           <Route path="/p5" element={<BatchPackingFormPage14 />} />
           <Route path="/p6" element={<BatchPackingFormPage15 />} />
           <Route path="/p7" element={<BatchPackingFormPage16 />} />
+          <Route path="/h" element={<Home />} />
+
 
 
           
