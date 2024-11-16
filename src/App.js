@@ -66,6 +66,12 @@ import FormHeaderPacking from "./pages/header/formHeaderPacking";
 import HomePage from "./pages/home-page/homePage";
 import Categories from "./pages/home-page/homePage";
 import Home from "./pages/home-page/homePage";
+import DashboardLayout from "./components/DashboardLayout";
+import BatchRecordsTable from "./pages/All-Batches/BatchRecords";
+import Processes from "./components/Processes";
+import CatAndProducts from "./components/CatAndProducts";
+import Departments from "./components/Departments";
+
 
 
 const App = () => {
@@ -94,13 +100,30 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<CategoryProductList />} />
+        <Route path="/report" element={<Report />} />
+        <Route path="/report-sulpeol" element={<ReportSulpeol />} />
+        <Route path="/report-cream" element={<ReportCream />} />
+        
+        <Route 
+  path="/" 
+  element={
+    <Protected
+      isAuth={isAuth}
+      userRole={userRole}
+      requiredRole="admin"
+    >
+      <DashboardLayout />
+    </Protected>
+  }
+>
+        {/* <Route path="/" element={<DashboardLayout />}> */}
+        {/* <Route path="/" element={<CategoryProductList />} /> */}
         <Route path="/form-header" element={<FormHeader />} />
         <Route path="/form-header-sulpeol" element={<FormHeaderSulpeol />} />
         <Route path="/form-header-cream" element={<FormHeaderCream />} />
         <Route path="/form-header-packing" element={<FormHeaderPacking />} />
         <Route path="/machines" element={<EquipmentTable />} />
-        <Route path="/products" element={<ProductList />} />
+        <Route path="/products" element={<CatAndProducts />} />
         
         {/* Arex Routes */}
         <Route path="/dispensing" element={<Dispensing />} />
@@ -110,21 +133,20 @@ const App = () => {
         <Route path="/printing" element={<Printing />} />
         <Route path="/blistering" element={<Blistering />} />
         <Route path="/packing" element={<Packing />} />
-        <Route path="/report" element={<Report />} />
         
         {/* sulpeol routes */}
         <Route path="/dispensing-sulpeol" element={<DispensingSulpeol />} />
         <Route path="/mixing-sulpeol" element={<MixingSulpeol />} />
         <Route path="/compression-sulpeol" element={<CompressionSulpeol />} />
-        <Route path="/report-sulpeol" element={<ReportSulpeol />} />
 
         {/* cream routes */}
         <Route path="/dispensing-cream" element={<DispensingCream />} />
         <Route path="/mixing-cream" element={<MixingCream />} />
         <Route path="/compression-cream" element={<CompressionCream />} />
-        <Route path="/report-cream" element={<ReportCream />} />
           
         <Route path="/dragProcesses" element={<DraggableList />} />
+        <Route path="/processes" element={<Processes />} />
+        
 
         <Route
           path="/dashboard"
@@ -144,8 +166,11 @@ const App = () => {
           <Route path="/p3" element={<BatchPackingFormPage12 />} />
           <Route path="/p4" element={<BatchPackingFormPage13 />} />
           <Route path="/p5" element={<BatchPackingFormPage14 />} />
-          <Route path="/p6" element={<BatchPackingFormPage15 />} />
-          <Route path="/p7" element={<BatchPackingFormPage16 />} />
+          <Route path="/batch-plan" element={<BatchRecordsTable />} />
+          <Route path="/batch-record" element={<CategoryProductList />} />
+          <Route path="/departments" element={<Departments />} />
+          
+          
           <Route path="/h" element={<Home />} />
 
 
@@ -155,7 +180,8 @@ const App = () => {
           
           
           
-        <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            </Route>
       </Routes>
     </div>
   );

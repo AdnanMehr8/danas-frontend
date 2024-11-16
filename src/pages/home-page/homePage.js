@@ -84,7 +84,9 @@ import CategoryProductList from '../../components/CategoryProductList';
 import DraggableList from '../../components/practiceDrag';
 import EquipmentTable from '../../components/Machines';
 import Categories from '../../components/Categories';
-
+import { CategoryProvider } from '../../components/CategoriesContext';
+import BatchRecordsTable from '../All-Batches/BatchRecords';
+import Processes from '../../components/Processes';
 // Mock Components for the content area
 const HomeComponent = () => <Typography variant="h4">Home Content</Typography>;
 const BatchRecordsComponent = () => <Typography variant="h4">Batch Records Content</Typography>;
@@ -95,13 +97,28 @@ const Home = () => {
   const [drawerOpen, setDrawerOpen] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
 
+  // Wrap Categories and CategoryProductList with CategoryProvider
+  const wrappedCategoriesComponent = (
+    <CategoryProvider>
+      <Categories />
+    </CategoryProvider>
+  );
+
+  const wrappedProductListComponent = (
+    <CategoryProvider>
+      <CategoryProductList />
+    </CategoryProvider>
+  );
+
   // Sidebar items
   const sidebarItems = [
-    { text: 'Categories', component: <Categories /> },
-    { text: 'Products', component: <CategoryProductList /> },
-    { text: 'Processes', component: <DraggableList /> },
+    // { text: 'Categories', component: <Categories /> },
+    // { text: 'Products', component: <CategoryProductList /> },
+    { text: 'Categories', component: wrappedCategoriesComponent },
+    { text: 'Products', component: wrappedProductListComponent },
+    { text: 'Processes', component: <Processes /> },
     { text: 'Machines', component: <EquipmentTable /> },
-    { text: 'Batch Records', component: <BatchRecordsComponent /> },
+    { text: 'Batch Records', component: <BatchRecordsTable /> },
     { text: 'Reports', component: <ReportsComponent /> },
   ];
 
@@ -193,7 +210,8 @@ const Home = () => {
           p: 3,
           transition: 'margin-left .3s',
           ml: drawerOpen ? '0' : '0', // Adjust margin based on drawer state
-          
+          overflowY: 'auto', // Allow horizontal scrolling if necessary but avoid unnecessary overflow
+          overflowX: 'hidden',
         }}
       >
         <Toolbar />

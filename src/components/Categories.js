@@ -288,7 +288,8 @@
 
 // export default CategoriesManager;
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { CategoryContext } from './CategoriesContext';
 import axios from 'axios';
 import {
   Box,
@@ -310,11 +311,11 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
-const CategoriesManager = ({ 
-  onCategoryUpdate = () => {}, // Provide default empty function
-  selectedCategoryId = null 
+const CategoriesManager = ({
+  onCategoryUpdate = () => {},
+  selectedCategoryId = null
 }) => {
-  const [categories, setCategories] = useState([]);
+  const { categories, setCategories } = useContext(CategoryContext);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogType, setDialogType] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -353,8 +354,7 @@ const CategoriesManager = ({
       setError('');
       const response = await api.get('/api/categories');
       const fetchedCategories = response.data;
-      setCategories(fetchedCategories);
-      // Safely call onCategoryUpdate
+      setCategories(fetchedCategories); // Update context
       if (typeof onCategoryUpdate === 'function') {
         onCategoryUpdate(fetchedCategories);
       }

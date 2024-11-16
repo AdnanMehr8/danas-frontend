@@ -8,12 +8,14 @@ import BatchPackingFormPage6 from "./page6";
 import BatchPackingFormPage7 from "./page7";
 import BatchPackingFormPage8 from "./page8";
 import BatchPackingFormPage9 from "./page9";
+import ProcessBox from "../coated/Coated";
 
 const Blistering = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.blistering);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -228,6 +230,7 @@ const Blistering = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
       <FormHeaderPacking />
       <h1 className="text-center mt-4">Blistering</h1>
 

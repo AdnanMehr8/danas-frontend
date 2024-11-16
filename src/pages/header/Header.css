@@ -43,3 +43,15 @@
         font-size: 1em; /* Further adjust font size */
     }
 }
+/* // Header.css */
+.hover-effect:hover {
+    color: white !important;
+}
+
+.login-btn:hover {
+    background-color: #2980B9 !important;
+}
+
+.signup-btn:hover {
+    background-color: #234B6E !important;
+}

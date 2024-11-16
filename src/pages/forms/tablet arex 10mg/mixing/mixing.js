@@ -9,12 +9,14 @@ import BatchManufacturingFormPage6 from "./page6";
 import BatchManufacturingFormPage7 from "./page7";
 import FormHeader from "../../../header/formHeader";
 import BatchManufacturingFormPage8 from "./page8";
+import ProcessBox from "../coated/Coated";
 
 const Mixing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.mixing);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -274,6 +276,8 @@ const Mixing = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
+
       <FormHeader />
       <h1 className="text-center mt-4">Mixing</h1>
 

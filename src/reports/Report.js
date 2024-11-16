@@ -13,6 +13,8 @@ import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
 import { setPrinting } from "../store/printingSlice";
 import { setBlistering } from "../store/blisteringSlice";
 import { setPacking } from "../store/packingSlice";
+import { Outlet, useOutletContext } from "react-router-dom";
+import BatchRecordsTable from "../pages/All-Batches/BatchRecords";
 
 // Lazy load the form pages
 const BatchManufacturingFormPage1 = React.lazy(() =>
@@ -149,7 +151,7 @@ const BatchPackingFormPage16 = React.lazy(() =>
 
 
 
-const Report = ({ isPackingForm }) => {
+const Report = ({pdfRef, isPackingForm }) => {
   const dispatch = useDispatch();
   const batchInfoId = localStorage.getItem("batchInfoId");
   const dispensingId = localStorage.getItem("dispensingId");
@@ -202,7 +204,14 @@ const Report = ({ isPackingForm }) => {
     BatchPackingFormPage16,
 ]
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  // const { handlePrint } = useOutletContext();
 
+  const handlePrint = () => {
+  
+        window.print(); // Trigger print dialog after a short delay
+ 
+  };
+  
   const fetchLatestRecordBatchInfo = async (batchInfoId) => {
     try {
       const response = await fetch(
@@ -416,6 +425,9 @@ const totalPages = formPages.length;
         "& button, & .MuiButton-root": {
           display: "none",
         },
+        "& Header": {
+          display: "none",
+        },
 
         // Hide TextField borders (both outlined and standard variants)
         "& .MuiOutlinedInput-root": {
@@ -481,14 +493,15 @@ const totalPages = formPages.length;
   );
 
    return (
-    <div>
+    <div ref={pdfRef}>
       <Button
         variant="contained"
-        onClick={() => window.print()}
+        //  onClick={() => window.print()}
+         onClick={handlePrint}
         className="mt-3"
         style={{ display: "block" }}
       >
-        Print Page
+        Print
       </Button>
 
       <Suspense
@@ -504,12 +517,15 @@ const totalPages = formPages.length;
       </Suspense>
       <Button
         variant="contained"
-        onClick={() => window.print()}
+        //  onClick={() => window.print()}
+         onClick={handlePrint}
+         
         className="mt-3"
         style={{ display: "block" }}
       >
-        Print Page
-      </Button>
+        Print
+       </Button>
+       {/* <Outlet context={handlePrint} /> */}
     </div>
   );
 };

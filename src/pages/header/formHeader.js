@@ -12,11 +12,24 @@ const FormHeader = () => {
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
 
   useEffect(() => {
-    const storedRecord = JSON.parse(localStorage.getItem("batchInfo"));
-    if (storedRecord) {
-      dispatch(setBatchInfo(storedRecord));
+    // Get the active batch number
+    const activeBatchNo = localStorage.getItem('activeBatchNo');
+    if (activeBatchNo) {
+      // Load the batch-specific information
+      const storedRecord = JSON.parse(
+        localStorage.getItem(`batchInfo_${activeBatchNo}`)
+      );
+      if (storedRecord) {
+        dispatch(setBatchInfo(storedRecord));
+      }
     }
   }, [dispatch]);
+  // useEffect(() => {
+  //   const storedRecord = JSON.parse(localStorage.getItem("batchInfo"));
+  //   if (storedRecord) {
+  //     dispatch(setBatchInfo(storedRecord));
+  //   }
+  // }, [dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

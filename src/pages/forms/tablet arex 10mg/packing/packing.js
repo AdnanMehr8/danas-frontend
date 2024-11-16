@@ -11,12 +11,14 @@ import BatchPackingFormPage13 from "./page13";
 import BatchPackingFormPage14 from "./page14";
 import BatchPackingFormPage15 from "./page15";
 import BatchPackingFormPage16 from "./page16";
+import ProcessBox from "../coated/Coated";
 
 const Packing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.packing);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -324,6 +326,7 @@ const Packing = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
       <FormHeaderPacking />
       <h1 className="text-center mt-4">Packing</h1>
 

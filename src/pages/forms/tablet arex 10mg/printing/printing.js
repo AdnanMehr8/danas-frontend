@@ -9,12 +9,14 @@ import BatchPackingFormPage3 from "./page3";
 import BatchPackingFormPage4 from "./page4";
 import BatchPackingFormPage5 from "./page5";
 import FormHeaderPacking from "../../../header/formHeaderPacking";
+import ProcessBox from "../coated/Coated";
 
 const Printing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.printing);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -263,6 +265,7 @@ const Printing = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
       <FormHeaderPacking />
       <h1 className="text-center mt-4">Printing</h1>
 

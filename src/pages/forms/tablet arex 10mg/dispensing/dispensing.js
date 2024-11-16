@@ -7,12 +7,14 @@ import BatchManufacturingFormPage2 from "./page2";
 import BatchManufacturingFormPage3 from "./page3";
 import { setDispensing } from "../../../../store/dispensingSlice";
 import FormHeader from "../../../header/formHeader";
+import ProcessBox from "../coated/Coated";
 
 const Dispensing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const dispensing = useSelector((state) => state.dispensing);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -227,6 +229,8 @@ const Dispensing = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
+
       <FormHeader />
       <h1 className="text-center mt-4">Dispensing</h1>
 

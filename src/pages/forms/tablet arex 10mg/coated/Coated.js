@@ -1,0 +1,154 @@
+// // import React from 'react'
+// // import Dispensing from '../dispensing/dispensing'
+// // import Mixing from '../mixing/mixing'
+// // import Compression from '../compression/compression'
+// // import Coating from '../coating/coating'
+
+// // const Coated = () => {
+// //   return (
+// //       <div style={{ width: '100%', overflowX: 'auto', boxSizing: 'border-box' }}>
+// //           <Dispensing />
+// //           <Mixing />
+// //           <Compression />
+// //           <Coating />
+// //     </div>
+// //   )
+// // }
+
+// // export default Coated
+// // import React from 'react';
+// // import { useSelector } from 'react-redux';
+// // import Dispensing from '../dispensing/dispensing';
+// // import Mixing from '../mixing/mixing';
+// // import Compression from '../compression/compression';
+// // import Coating from '../coating/coating';
+// // import Printing from '../printing/printing';
+// // import Blistering from '../blistering/blistering';
+// // import Packing from '../packing/packing';
+// // import DraggableList from '../../../../components/practiceDrag';
+// // const Coated = () => {
+// //   // Get the process order from localStorage
+// //   const processOrder = JSON.parse(localStorage.getItem('processes') || '[]');
+
+// //   // Component mapping object
+// //   const componentMap = {
+// //     'dispensing': Dispensing,
+// //     'mixing': Mixing,
+// //     'compression': Compression,
+// //     'coating': Coating,
+// //     'printing': Printing,
+// //     'blistering': Blistering,
+// //     'packing': Packing,
+// //   };
+
+// //   // Function to render components in order
+// //   const renderOrderedComponents = () => {
+// //     return processOrder
+// //       .filter(process => componentMap[process]) // Only include processes that have matching components
+// //       .map((process, index) => {
+// //         const Component = componentMap[process];
+// //         return <Component key={`${process}-${index}`} />;
+// //       });
+// //   };
+
+// //   return (
+// //     <div style={{ width: '100%', overflowX: 'auto', boxSizing: 'border-box' }}>
+// //       {renderOrderedComponents()}
+// //     </div>
+// //   );
+// // };
+
+// // export default Coated;
+
+// import React from 'react';
+// import { useSelector } from 'react-redux';
+// import Dispensing from '../dispensing/dispensing';
+// import Mixing from '../mixing/mixing';
+// import Compression from '../compression/compression';
+// import Coating from '../coating/coating';
+// import Printing from '../printing/printing';
+// import Blistering from '../blistering/blistering';
+// import Packing from '../packing/packing';
+// import { Card } from '@mui/material';
+
+// const ProcessBox = ({ processes }) => {
+//   return (
+//     <Card className="p-4 mb-6 bg-white shadow-md">
+//       <h2 className="text-lg font-semibold mb-3">Process Flow</h2>
+//       <div className="flex flex-wrap gap-2">
+//         {processes.map((process, index) => (
+//           <div key={process} className="flex items-center">
+//             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md">
+//               {process.charAt(0).toUpperCase() + process.slice(1)}
+//             </span>
+//             {index < processes.length - 1 && (
+//               <span className="mx-2 text-gray-400">→</span>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     </Card>
+//   );
+// };
+
+// // const Coated = () => {
+// //   // Get the process order from localStorage
+// //   const processOrder = JSON.parse(localStorage.getItem('processes') || '[]');
+
+// //   // Component mapping object
+// //   const componentMap = {
+// //     'dispensing': Dispensing,
+// //     'mixing': Mixing,
+// //     'compression': Compression,
+// //     'coating': Coating,
+// //     'printing': Printing,
+// //     'blistering': Blistering,
+// //     'packing': Packing,
+// //   };
+
+// //   // Function to render components in order
+// //   const renderOrderedComponents = () => {
+// //     return processOrder
+// //       .filter(process => componentMap[process])
+// //       .map((process, index) => {
+// //         const Component = componentMap[process];
+// //         return <Component key={`${process}-${index}`} />;
+// //       });
+// //   };
+
+// //   return (
+// //     <div className="w-full overflow-x-auto box-border p-4">
+//       // <ProcessBox processes={processOrder} />
+// //       <div className="space-y-6">
+// //         {renderOrderedComponents()}
+// //       </div>
+// //     </div>
+// //   );
+// // };
+
+// export default ProcessBox;
+
+import React from 'react';
+import { Card } from '@mui/material';
+
+const ProcessBox = ({ processes }) => {
+  return (
+    <Card className="p-4 mb-6 bg-white shadow-md">
+      <h2 className="text-lg font-semibold mb-3">Process Flow</h2>
+      <div className="flex items-center"> {/* Ensure items are centered in a single row */}
+        {processes.map((process, index) => (
+          <React.Fragment key={process}>
+            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md">
+              {process.charAt(0).toUpperCase() + process.slice(1)}
+            </span>
+            {index < processes.length - 1 && (
+              <span className="mx-2 text-gray-400">→</span>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+    </Card>
+  );
+};
+
+export default ProcessBox;

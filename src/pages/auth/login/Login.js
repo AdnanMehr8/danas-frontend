@@ -41,7 +41,7 @@ const Login = () => {
             auth: true,
           })
         );
-        navigate("/dashboard");
+        navigate("/batch-plan");
       } else {
         setError(response.data.message || "Login failed. Please try again.");
       }

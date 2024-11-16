@@ -14,12 +14,14 @@ import BatchManufacturingFormPage14 from "./page14";
 import BatchManufacturingFormPage15 from "./page15";
 import BatchManufacturingFormPage17 from "./page17";
 import BatchManufacturingFormPage18 from "./page18";
+import ProcessBox from "../coated/Coated";
 
 const Compression = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.compression);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -388,6 +390,8 @@ const Compression = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
+
       <FormHeader />
       <h1 className="text-center mt-4">Compression</h1>
 
