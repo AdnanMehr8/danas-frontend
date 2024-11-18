@@ -71,6 +71,7 @@ import BatchRecordsTable from "./pages/All-Batches/BatchRecords";
 import Processes from "./components/Processes";
 import CatAndProducts from "./components/CatAndProducts";
 import Departments from "./components/Departments";
+import { PermissionsTable, RolesTable } from "./components/PermissionsAndRoles";
 
 
 
@@ -104,7 +105,7 @@ const App = () => {
         <Route path="/report-sulpeol" element={<ReportSulpeol />} />
         <Route path="/report-cream" element={<ReportCream />} />
         
-        <Route 
+        {/* <Route 
   path="/" 
   element={
     <Protected
@@ -115,8 +116,8 @@ const App = () => {
       <DashboardLayout />
     </Protected>
   }
->
-        {/* <Route path="/" element={<DashboardLayout />}> */}
+> */}
+        <Route path="/" element={<DashboardLayout />}>
         {/* <Route path="/" element={<CategoryProductList />} /> */}
         <Route path="/form-header" element={<FormHeader />} />
         <Route path="/form-header-sulpeol" element={<FormHeaderSulpeol />} />
@@ -135,9 +136,11 @@ const App = () => {
         <Route path="/packing" element={<Packing />} />
         
         {/* sulpeol routes */}
-        <Route path="/dispensing-sulpeol" element={<DispensingSulpeol />} />
-        <Route path="/mixing-sulpeol" element={<MixingSulpeol />} />
-        <Route path="/compression-sulpeol" element={<CompressionSulpeol />} />
+        {/* <Route path="/dispensing-sulpeol" element={<DispensingSulpeol />} /> */}
+        <Route path="/dispensing-non-coated" element={<DispensingSulpeol />} />
+        
+        <Route path="/mixing-non-coated" element={<MixingSulpeol />} />
+        <Route path="/compression-non-coated" element={<CompressionSulpeol />} />
 
         {/* cream routes */}
         <Route path="/dispensing-cream" element={<DispensingCream />} />
@@ -169,6 +172,8 @@ const App = () => {
           <Route path="/batch-plan" element={<BatchRecordsTable />} />
           <Route path="/batch-record" element={<CategoryProductList />} />
           <Route path="/departments" element={<Departments />} />
+          <Route path="/permissions" element={<PermissionsTable />} />
+          <Route path="/roles" element={<RolesTable />} />
           
           
           <Route path="/h" element={<Home />} />

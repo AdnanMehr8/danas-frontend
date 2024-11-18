@@ -524,7 +524,7 @@ const styles = {
     pageContainer: {
       display: 'flex',
       padding: '1.5rem',
-      backgroundColor: '#f8fafc',
+      // backgroundColor: '#f8fafc',
       minHeight: 'calc(100vh - 64px)', // Adjust based on your header height
       gap: '2rem'
     },

@@ -86,6 +86,8 @@ const FormHeader = () => {
       }
       
       navigate("/dragProcesses");
+      // navigate("/processes");
+      
       
     } catch (error) {
       console.error("Error creating batchInfo:", error);

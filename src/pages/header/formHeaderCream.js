@@ -71,8 +71,8 @@ const FormHeaderCream = () => {
         localStorage.setItem("s-batchInfoId", data._id);
         console.log("BatchInfo ID stored in localStorage:", data._id);
       }
-
-      navigate("/dragProcesses");
+navigate("/dragProcesses");
+// navigate("/processes");
     } catch (error) {
       console.error("Error creating batchInfo:", error);
     }

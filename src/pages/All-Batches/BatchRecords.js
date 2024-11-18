@@ -1101,12 +1101,13 @@ const BatchRecordsTable = () => {
     
     // Dispatch to Redux store
     dispatch(setBatchInfo(batchInfo));
+    navigate('/batch-record');
     
-    if (record.batch.productName.toLowerCase().includes('coated')) {
-      navigate('/batch-record');
-    } else {
-      console.log(`Editing batch ${record.batch.batchNo}`, record);
-    }
+    // if (record.batch.productName.toLowerCase().includes('coated')) {
+    //   navigate('/batch-record');
+    // } else {
+    //   console.log(`Editing batch ${record.batch.batchNo}`, record);
+    // }
   };
 
   const handleDeleteClick = (record) => {

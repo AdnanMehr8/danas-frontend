@@ -99,3 +99,16 @@ api.interceptors.response.use(
     throw error;
   }
 );
+
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//       if (error.response?.status === 403) {
+//           // Handle permission denied
+//           console.error('Permission denied');
+//         // You might want to show a notification here
+//         alert('Permission Denied')
+//       }
+//       return Promise.reject(error);
+//   }
+// );

@@ -16,6 +16,7 @@ const Coating = () => {
   const dispatch = useDispatch();
   const record = useSelector((state) => state.coating);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const batchInfo = useSelector((state) => state.batchInfo.batch);
 
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue =
@@ -269,24 +270,31 @@ const Coating = () => {
       }
 
       const processes = JSON.parse(localStorage.getItem("processes"));
-      if (processes) {
-        const currentProcessIndex = processes.indexOf("coating");
-        if (
-          currentProcessIndex !== -1 &&
-          currentProcessIndex < processes.length - 1
-        ) {
-          const nextProcess = processes[currentProcessIndex + 1];
-          localStorage.removeItem("activeTabCoating");
+      const currentIndex = processes.findIndex(
+        process => process.name.toLowerCase() === 'coating'
+      );
 
-          navigate(`/${nextProcess}`);
-        } else {
-          console.log("No next process available.");
+      if (currentIndex !== -1 && currentIndex < processes.length - 1) {
+        const nextProcess = processes[currentIndex + 1];
+        
+        // Determine batch type
+        let nextRoute = nextProcess.name.toLowerCase();
+        if (batchInfo?.productName?.toLowerCase().includes('cream')) {
+          nextRoute += '-cream';
+        } else if (batchInfo?.subCategory?.toLowerCase().includes('non-coated')) {
+          nextRoute += '-sulpeol';
         }
+
+        // Clean up and navigate
+        localStorage.removeItem("activeTabCoating");
+        navigate(`/${nextRoute}`);
+      } else {
+        console.log("No next process available.");
       }
     } catch (error) {
       console.error("Error creating batch:", error);
     }
-  };
+  }
 
   return (
     <div>

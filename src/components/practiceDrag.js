@@ -388,7 +388,12 @@
 // const DraggableList = () => {
 //   const navigate = useNavigate();
 //   const batchInfo = useSelector((state) => state.batchInfo.batch);
-//   const isSulpeol = batchInfo?.productName?.toLowerCase().includes('sulpeol');
+//   // const isSulpeol = batchInfo?.productName?.toLowerCase().includes('sulpeol');
+//   const isSulpeol = batchInfo?.subCategory?.toLowerCase() === 'non-coated';
+//   console.log("Batch Info:", batchInfo);
+//   console.log("SubCategory:", batchInfo?.subCategory);
+//   console.log("Is Sulpeol:", isSulpeol);
+  
 //   const isCream = batchInfo?.productName?.toLowerCase().includes('cream');
 
 //   // Define process lists based on product type
@@ -499,78 +504,327 @@
 // export default DraggableList;
 
 
+// import React, { useState, useEffect } from "react";
+// import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+// import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import axios from 'axios';
+
+// const DraggableList = () => {
+//   const navigate = useNavigate();
+//   const batchInfo = useSelector((state) => state.batchInfo.batch);
+//   const [processes, setProcesses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const API_URL = 'http://localhost:5000';
+  
+//   // Fetch processes based on product type and subcategory
+//   useEffect(() => {
+//     const fetchProcesses = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await axios.get(`${API_URL}/api/processes`, {
+//           params: {
+//             productType: batchInfo?.productName?.toLowerCase().includes('cream') ? 'cream' :
+//                           // batchInfo?.subCategory?.toLowerCase().includes ('non-coated') ? 'non-coated' : 'coated',
+//                         batchInfo?.subCategory?.toLowerCase().includes('non-coated') ? 'sulpeol' : 'regular',
+//             // subCategory: batchInfo?.subCategory?.toLowerCase().includes('cream') ? 'cream' :
+//             //               batchInfo?.subCategory?.toLowerCase().includes("non-coated") ? 'non-coated' : 'coated'
+//           // subCategory : isCream ? 'cream' : isNonCoated ? 'non-coated' : 'coated'
+//           }
+//         });
+//         setProcesses(response.data);
+//         setError(null);
+//       } catch (err) {
+//         setError('Failed to load processes');
+//         console.error('Error fetching processes:', err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     if (batchInfo) {
+//       fetchProcesses();
+//     }
+//   }, [batchInfo]);
+
+//   const onDragEnd = async (result) => {
+//     if (!result.destination) return;
+
+//     const reorderedProcesses = Array.from(processes);
+//     const [movedProcess] = reorderedProcesses.splice(result.source.index, 1);
+//     reorderedProcesses.splice(result.destination.index, 0, movedProcess);
+
+//     setProcesses(reorderedProcesses);
+
+//     try {
+//       await axios.put(`${API_URL}/api/processes`, {
+//         processes: reorderedProcesses
+//       });
+//     } catch (error) {
+//       console.error('Error updating process order:', error);
+//       // Optionally revert the UI if the update fails
+//       setProcesses(processes);
+//     }
+//   };
+
+//   const handleSaveAndNext = () => {
+//     if (processes.length > 0) {
+//       navigate(`/${processes[0].name}`);
+//     }
+//   };
+
+//   if (loading) return <div>Loading processes...</div>;
+//   if (error) return <div>Error: {error}</div>;
+
+//   return (
+//     <div className="container mx-auto p-4">
+//       <DragDropContext onDragEnd={onDragEnd}>
+//         <Droppable droppableId="processes">
+//           {(provided) => (
+//             <ul
+//               {...provided.droppableProps}
+//               ref={provided.innerRef}
+//               className="space-y-2"
+//             >
+//               {processes.map((process, index) => (
+//                 <Draggable
+//                   key={process._id}
+//                   draggableId={process._id}
+//                   index={index}
+//                 >
+//                   {(provided) => (
+//                     <li
+//                       ref={provided.innerRef}
+//                       {...provided.draggableProps}
+//                       {...provided.dragHandleProps}
+//                       className="p-4 bg-gray-100 rounded shadow hover:shadow-md transition-shadow"
+//                     >
+//                       {process.displayName || process.name}
+//                     </li>
+//                   )}
+//                 </Draggable>
+//               ))}
+//               {provided.placeholder}
+//             </ul>
+//           )}
+//         </Droppable>
+//       </DragDropContext>
+
+//       <button
+//         onClick={handleSaveAndNext}
+//         className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+//         disabled={processes.length === 0}
+//       >
+//         Save and Continue
+//       </button>
+//     </div>
+//   );
+// };
+
+// export default DraggableList;
+
+// import React, { useState, useEffect } from "react";
+// import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+// import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import axios from 'axios';
+
+// const DraggableList = () => {
+//   const navigate = useNavigate();
+//   const batchInfo = useSelector((state) => state.batchInfo.batch);
+//   const [processes, setProcesses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const API_URL = 'http://localhost:5000';
+  
+//   // Determine batch type
+//   const getBatchType = () => {
+//     if (batchInfo?.productName?.toLowerCase().includes('cream')) {
+//       return 'cream';
+//     } else if (batchInfo?.subCategory?.toLowerCase().includes('non-coated')) {
+//       return 'sulpeol';
+//     }
+//     return 'regular';
+//   };
+
+//   // Fetch processes based on product type and subcategory
+//   useEffect(() => {
+//     const fetchProcesses = async () => {
+//       try {
+//         setLoading(true);
+//         const batchType = getBatchType();
+//         const response = await axios.get(`${API_URL}/api/processes`, {
+//           params: {
+//             productType: batchType
+//           }
+//         });
+//         setProcesses(response.data);
+//         setError(null);
+//       } catch (err) {
+//         setError('Failed to load processes');
+//         console.error('Error fetching processes:', err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     if (batchInfo) {
+//       fetchProcesses();
+//     }
+//   }, [batchInfo]);
+
+//   const onDragEnd = async (result) => {
+//     if (!result.destination) return;
+
+//     const reorderedProcesses = Array.from(processes);
+//     const [movedProcess] = reorderedProcesses.splice(result.source.index, 1);
+//     reorderedProcesses.splice(result.destination.index, 0, movedProcess);
+
+//     setProcesses(reorderedProcesses);
+
+//     try {
+//       await axios.put(`${API_URL}/api/processes`, {
+//         processes: reorderedProcesses
+//       });
+//     } catch (error) {
+//       console.error('Error updating process order:', error);
+//       setProcesses(processes);
+//     }
+//   };
+
+//   const getProcessRoute = (processName, batchType) => {
+//     // Convert process name to lowercase and remove any existing suffixes
+//     const baseName = processName.toLowerCase().replace(/-cream|-sulpeol/g, '');
+    
+//     // Add appropriate suffix based on batch type
+//     switch(batchType) {
+//       case 'cream':
+//         return `${baseName}-cream`;
+//       case 'sulpeol':
+//         return `${baseName}-sulpeol`;
+//       default:
+//         return baseName;
+//     }
+//   };
+
+//   const handleSaveAndNext = () => {
+//     if (processes.length > 0) {
+//       const batchType = getBatchType();
+//       const route = getProcessRoute(processes[0].name, batchType);
+//       navigate(`/${route}`);
+//     }
+//   };
+
+//   if (loading) return <div>Loading processes...</div>;
+//   if (error) return <div>Error: {error}</div>;
+
+//   return (
+//     <div className="container mx-auto p-4">
+//       <div className="mb-4 p-2 bg-blue-100 rounded">
+//         <p>Current Batch Type: {getBatchType()}</p>
+//       </div>
+      
+//       <DragDropContext onDragEnd={onDragEnd}>
+//         <Droppable droppableId="processes">
+//           {(provided) => (
+//             <ul
+//               {...provided.droppableProps}
+//               ref={provided.innerRef}
+//               className="space-y-2"
+//             >
+//               {processes.map((process, index) => (
+//                 <Draggable
+//                   key={process._id}
+//                   draggableId={process._id}
+//                   index={index}
+//                 >
+//                   {(provided) => (
+//                     <li
+//                       ref={provided.innerRef}
+//                       {...provided.draggableProps}
+//                       {...provided.dragHandleProps}
+//                       className="p-4 bg-gray-100 rounded shadow hover:shadow-md transition-shadow"
+//                     >
+//                       {process.displayName || process.name}
+//                     </li>
+//                   )}
+//                 </Draggable>
+//               ))}
+//               {provided.placeholder}
+//             </ul>
+//           )}
+//         </Droppable>
+//       </DragDropContext>
+
+//       <button
+//         onClick={handleSaveAndNext}
+//         className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+//         disabled={processes.length === 0}
+//       >
+//         Save and Continue
+//       </button>
+//     </div>
+//   );
+// };
+
+// export default DraggableList;
+
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-
-// Regular process components
-import Dispensing from "../pages/forms/tablet arex 10mg/dispensing/dispensing";
-import Mixing from "../pages/forms/tablet arex 10mg/mixing/mixing";
-import Compression from "../pages/forms/tablet arex 10mg/compression/compression";
-import Coating from "../pages/forms/tablet arex 10mg/coating/coating";
-import FormHeaderPacking from "../pages/header/formHeaderPacking";
-import Printing from "../pages/forms/tablet arex 10mg/printing/printing";
-import Blistering from "../pages/forms/tablet arex 10mg/blistering/blistering";
-import Packaging from "../pages/forms/tablet arex 10mg/packing/packing";
-import Report from "../reports/Report";
-
-// Sulpeol specific components
-import DispensingSulpeol from "../pages/forms/tablet sulpeol 25mg/dispensing/dispensing";
-import MixingSulpeol from "../pages/forms/tablet sulpeol 25mg/mixing/mixing";
-import CompressionSulpeol from "../pages/forms/tablet sulpeol 25mg/compression/compression";
-import ReportSulpeol from "../reports/sulpeolReport";
+import axios from 'axios';
 
 const DraggableList = () => {
   const navigate = useNavigate();
   const batchInfo = useSelector((state) => state.batchInfo.batch);
-  const productSubCategory = batchInfo?.subCategory;
-  const isCream = batchInfo?.productName?.toLowerCase().includes('cream');
+  const [processes, setProcesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+  
+  const getBatchType = () => {
+    if (batchInfo?.productName?.toLowerCase().includes('cream')) {
+      return 'cream';
+    } else if (batchInfo?.subCategory?.toLowerCase().includes('non-coated')) {
+      // return 'sulpeol';
+      return 'non-coated';
+    }
+    // return 'regular';
+    return 'coated';
+  };
 
-  // Define process lists based on subcategory
-  const regularProcesses = ["dispensing", "mixing", "compression", "coating", "form-header-packing", "printing", "blistering", "packing", "report"];
-  const nonCoatedProcesses = ["dispensing-sulpeol", "mixing-sulpeol", "compression-sulpeol", "report-sulpeol"];
-  const creamProcesses = ["dispensing-cream", "mixing-cream", "compression-cream", "report-cream"];
-
-  const [processes, setProcesses] = useState(() => {
-    const savedProcesses = localStorage.getItem("processes");
-    if (savedProcesses) {
+  // Fetch processes and save to localStorage
+  useEffect(() => {
+    const fetchProcesses = async () => {
       try {
-        return JSON.parse(savedProcesses);
-      } catch {
-        // Return default processes if parsing fails
-        if (isCream) return creamProcesses;
-        if (productSubCategory === "Non-Coated") return nonCoatedProcesses;
-        return regularProcesses;
+        setLoading(true);
+        const batchType = getBatchType();
+        const response = await axios.get(`${API_URL}/api/processes`, {
+          params: {
+            productType: batchType
+          }
+        });
+        const fetchedProcesses = response.data;
+        setProcesses(fetchedProcesses);
+        // Save processes to localStorage
+        localStorage.setItem('processes', JSON.stringify(fetchedProcesses));
+        setError(null);
+      } catch (err) {
+        setError('Failed to load processes');
+        console.error('Error fetching processes:', err);
+      } finally {
+        setLoading(false);
       }
+    };
+
+    if (batchInfo) {
+      fetchProcesses();
     }
-    // Use subcategory to determine processes
-    if (isCream) return creamProcesses;
-    if (productSubCategory === "Non-Coated") return nonCoatedProcesses;
-    return regularProcesses;
-  });
+  }, [batchInfo]);
 
-  // Update processes when product type changes
-  useEffect(() => {
-    let newProcesses;
-    if (isCream) {
-      newProcesses = creamProcesses;
-    } else if (productSubCategory === "Non-Coated") {
-      newProcesses = nonCoatedProcesses;
-    } else {
-      newProcesses = regularProcesses;
-    }
-    
-    setProcesses(newProcesses);
-    localStorage.setItem("processes", JSON.stringify(newProcesses));
-  }, [isCream, productSubCategory]);
-
-  // Save processes to localStorage when they change
-  useEffect(() => {
-    localStorage.setItem("processes", JSON.stringify(processes));
-  }, [processes]);
-
-  const onDragEnd = (result) => {
+  const onDragEnd = async (result) => {
     if (!result.destination) return;
 
     const reorderedProcesses = Array.from(processes);
@@ -578,71 +832,77 @@ const DraggableList = () => {
     reorderedProcesses.splice(result.destination.index, 0, movedProcess);
 
     setProcesses(reorderedProcesses);
+    // Save reordered processes to localStorage
+    localStorage.setItem('processes', JSON.stringify(reorderedProcesses));
+
+    try {
+      await axios.put(`${API_URL}/api/processes`, {
+        processes: reorderedProcesses
+      });
+    } catch (error) {
+      console.error('Error updating process order:', error);
+      setProcesses(processes);
+    }
+  };
+
+  const getProcessRoute = (processName, batchType) => {
+    // Convert process name to lowercase and remove any existing suffixes
+    const baseName = processName.toLowerCase().replace(/-cream|-sulpeol/g, '');
+    
+    // Add appropriate suffix based on batch type
+    switch(batchType) {
+      case 'cream':
+        return `${baseName}-cream`;
+      // case 'sulpeol':
+      //   return `${baseName}-sulpeol`;
+      case 'non-coated':
+        return `${baseName}-non-coated`;
+      default:
+        return baseName;
+    }
   };
 
   const handleSaveAndNext = () => {
-    const firstProcess = processes[0];
-    navigate(`/${firstProcess}`);
+    if (processes.length > 0) {
+      const batchType = getBatchType();
+      const route = getProcessRoute(processes[0].name, batchType);
+      // Save current process index to localStorage
+      localStorage.setItem('currentProcessIndex', '0');
+      navigate(`/${route}`);
+    }
   };
 
-  // Function to display process name without suffixes
-  const getDisplayName = (processId) => {
-    if (typeof processId !== 'string') return '';
-    
-    const processNames = {
-      'dispensing': 'Dispensing',
-      'mixing': 'Mixing',
-      'compression': 'Compression',
-      'coating': 'Coating',
-      'form-header-packing': 'Form Header Packing',
-      'printing': 'Printing',
-      'blistering': 'Blistering',
-      'packing': 'Packing',
-      'report': 'Report',
-      'dispensing-sulpeol': 'Dispensing',
-      'mixing-sulpeol': 'Mixing',
-      'compression-sulpeol': 'Compression',
-      'report-sulpeol': 'Report',
-      'dispensing-cream': 'Dispensing',
-      'mixing-cream': 'Mixing',
-      'compression-cream': 'Compression',
-      'report-cream': 'Report'
-    };
-
-    return processNames[processId] || processId.charAt(0).toUpperCase() + processId.slice(1);
-  };
+  if (loading) return <div>Loading processes...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    <div>
+    <div className="container mx-auto p-4">
+      <div className="mb-4 p-2 bg-blue-100 rounded">
+        <p>Current Batch Type: {getBatchType()}</p>
+      </div>
+      
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="processes">
           {(provided) => (
             <ul
               {...provided.droppableProps}
               ref={provided.innerRef}
-              style={{
-                listStyleType: "none",
-                padding: "0",
-              }}
+              className="space-y-2"
             >
               {processes.map((process, index) => (
-                <Draggable key={process} draggableId={process} index={index}>
+                <Draggable 
+                  key={process._id} 
+                  draggableId={process._id} 
+                  index={index}
+                >
                   {(provided) => (
                     <li
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      style={{
-                        ...provided.draggableProps.style,
-                        padding: "8px",
-                        margin: "4px 0",
-                        backgroundColor: "#f0f0f0",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                      }}
+                      className="p-4 bg-gray-100 rounded shadow hover:shadow-md transition-shadow"
                     >
-                      {getDisplayName(process)}
+                      {process.displayName || process.name}
                     </li>
                   )}
                 </Draggable>
@@ -652,19 +912,13 @@ const DraggableList = () => {
           )}
         </Droppable>
       </DragDropContext>
+
       <button
         onClick={handleSaveAndNext}
-        style={{
-          marginTop: "20px",
-          padding: "10px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
+        className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        disabled={processes.length === 0}
       >
-        Save
+        Save and Continue
       </button>
     </div>
   );

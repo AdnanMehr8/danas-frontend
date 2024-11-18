@@ -128,21 +128,85 @@
 
 // export default ProcessBox;
 
-import React from 'react';
-import { Card } from '@mui/material';
+// import React from 'react';
+// import { Card } from '@mui/material';
 
-const ProcessBox = ({ processes }) => {
+// const ProcessBox = ({ processes }) => {
+//   return (
+    // <Card className="p-4 mb-6 bg-white shadow-md">
+    //   <h2 className="text-lg font-semibold mb-3">Process Flow</h2>
+//       <div className="flex items-center"> {/* Ensure items are centered in a single row */}
+//         {processes.map((process, index) => (
+//           <React.Fragment key={process}>
+//             <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md">
+//               {process.charAt(0).toUpperCase() + process.slice(1)}
+//             </span>
+//             {index < processes.length - 1 && (
+//               <span className="mx-2 text-gray-400">→</span>
+//             )}
+//           </React.Fragment>
+//         ))}
+//       </div>
+//     </Card>
+//   );
+// };
+
+// export default ProcessBox;
+
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from 'axios';
+import { ChevronRight } from "lucide-react";
+import { Card } from "react-bootstrap";
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+
+const ProcessBox = () => {
+  const batchInfo = useSelector((state) => state.batchInfo.batch);
+  const [processes, setProcesses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const API_URL = 'http://localhost:5000';
+  
+  useEffect(() => {
+    const fetchProcesses = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_URL}/api/processes`, {
+          params: {
+            productType: batchInfo?.productName?.toLowerCase().includes('cream') ? 'cream' :
+                        batchInfo?.subCategory?.toLowerCase().includes('non-coated') ? 'non-coated' : 'coated',
+          }
+        });
+        setProcesses(response.data);
+        setError(null);
+      } catch (err) {
+        setError('Failed to load processes');
+        console.error('Error fetching processes:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (batchInfo) {
+      fetchProcesses();
+    }
+  }, [batchInfo]);
+
+  if (loading) return <div>Loading processes...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <Card className="p-4 mb-6 bg-white shadow-md">
       <h2 className="text-lg font-semibold mb-3">Process Flow</h2>
-      <div className="flex items-center"> {/* Ensure items are centered in a single row */}
+      <div className="flex items-center flex-wrap gap-2">
         {processes.map((process, index) => (
-          <React.Fragment key={process}>
-            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md">
-              {process.charAt(0).toUpperCase() + process.slice(1)}
+          <React.Fragment key={process._id}>
+            <span className="px-4 py-2 bg-gray-100 rounded">
+              {process.displayName || process.name}
             </span>
             {index < processes.length - 1 && (
-              <span className="mx-2 text-gray-400">→</span>
+              <ArrowForward className="text-gray-400" size={20} />
+              // <span className="mx-2 text-gray-400">→</span>
             )}
           </React.Fragment>
         ))}

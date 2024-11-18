@@ -11,7 +11,8 @@ const initialState = {
     expiryDate: "",
     mfgLicense: "",
     productRegNo: "",
-    validFrom: ""
+    validFrom: "",
+    subCategory: ""
   },
 };
 

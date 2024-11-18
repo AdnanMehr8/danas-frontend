@@ -14,21 +14,94 @@ import {
   DialogContent,
   TextField,
 } from "@mui/material";
+import { api } from '../api/api';
+
+const url = process.env.REACT_APP_INTERNAL_API_PATH;
+
+// Helper hook for checking permissions
+const usePermissions = () => {
+  const [userRole, setUserRole] = useState(null);
+  const [rolePermissions, setRolePermissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        console.log('User data from localStorage:', userData.role);
+        
+        if (userData?.role) {
+          setUserRole(userData.role);
+          // Admin role bypass logic
+          if (userData.role.toLowerCase() === 'admin') {
+            console.log('Admin role detected, granting all permissions');
+            setRolePermissions([{ module: '*', actions: ['*'] }]); // Wildcard for all permissions
+            return;
+          }
+          const response = await axios.get(`${url}/api/roles/${userData.role}/permissions`);
+          console.log('Fetched permissions:', response.data);
+          setRolePermissions(response.data.permissions);
+        }
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPermissions();
+  }, []);
+
+  const hasPermission = (module, action) => {
+    // Grant all permissions if 'admin' wildcard is present
+    const isAdmin = rolePermissions.some(
+      (permission) => permission.module === '*' && permission.actions.includes('*')
+    );
+    if (isAdmin) {
+      console.log('Admin permission granted for:', { module, action });
+      return true;
+    }
+    
+    console.log('Checking frontend permission:', {
+      module,
+      action,
+      rolePermissions,
+      result: rolePermissions.some(permission => 
+        permission.module === module && 
+        permission.actions.includes(action)
+      )
+    });
+
+    return rolePermissions.some(permission => 
+      permission.module === module && 
+      permission.actions.includes(action)
+    );
+  };
+
+  return { userRole, hasPermission, loading };
+};
 
 const DepartmentManager = () => {
   const [departments, setDepartments] = useState([]);
   const [newDepartment, setNewDepartment] = useState({ name: '', totalUsers: '' });
   const [editingDepartment, setEditingDepartment] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const url = process.env.REACT_APP_INTERNAL_API_PATH;
+  const { hasPermission, loading  } = usePermissions();
+  const [error, setError] = useState(null);
+
+  // useEffect(() => {
+  //   fetchDepartments();
+  // }, []);
 
   useEffect(() => {
-    fetchDepartments();
+    // if (hasPermission('departments', 'read')) {
+      fetchDepartments();
+    // }
   }, []);
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get(`${url}/api/departments`);
+      const response = await api.get(`/api/departments`);
       setDepartments(response.data);
     } catch (error) {
       console.error('Error fetching departments:', error);
@@ -38,7 +111,7 @@ const DepartmentManager = () => {
 
   const handleCreate = async () => {
     try {
-      await axios.post(`${url}/api/departments`, newDepartment);
+      await api.post(`/api/departments`, newDepartment);
       setNewDepartment({ name: '', totalUsers: '' });
       setIsDialogOpen(false);
       fetchDepartments();
@@ -54,7 +127,7 @@ const DepartmentManager = () => {
         return;
       }
 
-      await axios.put(`${url}/api/departments/${editingDepartment._id}`, {
+      await api.put(`/api/departments/${editingDepartment._id}`, {
         name: editingDepartment.departmentList[0].name,
         totalUsers: editingDepartment.departmentList[0].totalUsers
       });
@@ -74,7 +147,7 @@ const DepartmentManager = () => {
 
     if (window.confirm('Are you sure you want to delete this department?')) {
       try {
-        await axios.delete(`${url}/api/departments/${id}`);
+        await api.delete(`/api/departments/${id}`);
         fetchDepartments();
       } catch (error) {
         console.error('Error deleting department:', error);
@@ -91,17 +164,37 @@ const DepartmentManager = () => {
     };
   };
 
+  
+
+  if (!hasPermission('departments', 'read')) {
+    console.log('Permission denied for departments read');
+    return (
+      <div style={{  display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',}}>
+        Access denied!!
+      </div>
+    );
+  }
+  
+
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Department Management</h1>
-        <Button 
-          variant="contained" 
-          color="primary"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          Add Department
-        </Button>
+        {hasPermission('departments', 'create') && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            Add Department
+          </Button>
+        )}
       </div>
 
       <Dialog 
@@ -163,14 +256,14 @@ const DepartmentManager = () => {
                 }
               }}
             />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={editingDepartment ? handleUpdate : handleCreate}
-              style={{ marginTop: '16px' }}
-            >
-              {editingDepartment ? 'Update' : 'Create'}
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={editingDepartment ? handleUpdate : handleCreate}
+                style={{ marginTop: '16px' }}
+              >
+                {editingDepartment ? 'Update' : 'Create'}
+              </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -193,23 +286,27 @@ const DepartmentManager = () => {
                   <TableCell>{totalUsers}</TableCell>
                   <TableCell>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <Button
-                        variant="outlined"
-                        onClick={() => {
-                          setEditingDepartment(department);
-                          setIsDialogOpen(true);
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleDelete(id)}
-                        disabled={!id}
-                      >
-                        Delete
-                      </Button>
+                      {hasPermission('departments', 'update') && (
+                        <Button
+                          variant="outlined"
+                          onClick={() => {
+                            setEditingDepartment(department);
+                            setIsDialogOpen(true);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      )}
+                      {hasPermission('departments', 'delete') && (
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleDelete(id)}
+                          disabled={!id}
+                        >
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
