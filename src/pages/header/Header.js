@@ -88,10 +88,10 @@ const Header = () => {
     return (
         <Navbar 
             style={{
-                backgroundColor: isAuth ? '#2C3E50' : 'white',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                backgroundColor: isAuth ? '#1F2A38   ' : 'white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
                 padding: '0.75rem 1.5rem',
-                borderBottom: '1px solid #eaeaea'
+                // borderBottom: '1px solid #eaeaea'
             }}
         >
             <Container className="d-flex align-items-center justify-content-between" fluid>

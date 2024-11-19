@@ -206,7 +206,7 @@ const BatchPackingFormPage13 = () => {
               </td>
               <td>
                 <Form.Control
-                  type="text"
+                  type="date"
                   value={row.mfgDate}
                   onChange={(e) =>
                     handleInputChange(
@@ -219,7 +219,7 @@ const BatchPackingFormPage13 = () => {
               </td>
               <td>
                 <Form.Control
-                  type="text"
+                  type="date"
                   value={row.expDate}
                   onChange={(e) =>
                     handleInputChange(

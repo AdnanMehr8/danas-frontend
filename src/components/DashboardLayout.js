@@ -475,7 +475,9 @@ const DashboardLayout = () => {
                 display: 'flex', 
                 flex: 1,
                 overflow: 'hidden',
-                minHeight: 0 // Important for Firefox
+                minHeight: 0, // Important for Firefox
+                marginTop: 0,  // Ensure no margin above
+                paddingTop: 0  // Ensure no padding above
             }}>
                 {/* Sidebar */}
                 <div style={{ 

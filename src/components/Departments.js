@@ -94,10 +94,10 @@ const DepartmentManager = () => {
   // }, []);
 
   useEffect(() => {
-    // if (hasPermission('departments', 'read')) {
+    if (hasPermission('departments', 'read')) {
       fetchDepartments();
-    // }
-  }, []);
+    }
+  }, [hasPermission('departments', 'read')]);
 
   const fetchDepartments = async () => {
     try {

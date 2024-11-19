@@ -496,7 +496,7 @@ import { Edit as EditIcon, Delete as DeleteIcon, Eye as EyeIcon, Plus as PlusIco
 
 import { setBatchInfo } from "../store/batchInfoSlice";
 import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
-import './categoryProductList.css'
+
 
 const categories = [
   { id: 1, name: "Injections" },
@@ -525,8 +525,10 @@ const styles = {
       display: 'flex',
       padding: '1.5rem',
       // backgroundColor: '#f8fafc',
-      minHeight: 'calc(100vh - 64px)', // Adjust based on your header height
-      gap: '2rem'
+    // minHeight: 'calc(100vh - 64px)', // Adjust based on your header height
+      height: '100%',
+    gap: '2rem',
+      overflow: 'hidden'
     },
     categorySection: {
       width: '280px',
@@ -534,7 +536,8 @@ const styles = {
       borderRadius: '12px',
       padding: '1.5rem',
       boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-      height: 'fit-content'
+      height: 'fit-content',
+      flexShrink: 0,
     },
     categoryTitle: {
       fontSize: '1.25rem',
@@ -572,13 +575,18 @@ const styles = {
       backgroundColor: 'white',
       borderRadius: '12px',
       padding: '1.5rem',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+      display: 'flex',
+      flexDirection: 'column',
+      minWidth: 0, // Allow content to shrink below its minimum content size
+      overflow: 'hidden',
     },
     header: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: '2rem'
+      marginBottom: '2rem',
+      flexShrink: 0,
     },
     addButton: {
       backgroundColor: '#3498DB',
@@ -588,10 +596,25 @@ const styles = {
       }
     },
     tableContainer: {
+      flex: 1,
+      overflow: 'auto', // Enable scrolling for table content
       marginTop: '1rem',
-      boxShadow: 'none',
       border: '1px solid #e2e8f0',
-      borderRadius: '8px'
+      borderRadius: '8px',
+      '&::-webkit-scrollbar': {
+        width: '8px',
+        height: '8px',
+      },
+      '&::-webkit-scrollbar-track': {
+        background: '#f1f1f1',
+      },
+      '&::-webkit-scrollbar-thumb': {
+        background: '#888',
+        borderRadius: '4px',
+      },
+      '&::-webkit-scrollbar-thumb:hover': {
+        background: '#555',
+      },
     },
     tableHeader: {
       backgroundColor: '#f8fafc'
@@ -1026,8 +1049,23 @@ const CatAndProducts = () => {
           }}>
             <Typography>Please select a category to view products</Typography>
           </Box>
-        ) : selectedCategoryId === 2 ? (
-          <>
+            ) : (
+              <Box sx={{ 
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                minHeight: 0 // Allow content to shrink below minimum size
+              }}>
+                  {selectedCategoryId === 2 ? (
+                      <Box sx={{ 
+                        flex: 1,
+                        overflow: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2rem'
+                      }}>
+          <Box>
             <Typography 
               variant="h6" 
               sx={{ 
@@ -1108,9 +1146,10 @@ const CatAndProducts = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-
+            </Box>
             {/* Non-Coated Tablets Table - Similar structure as above */}
             {/* ... */}
+            <Box>
             <Typography 
               variant="h6" 
               sx={{ 
@@ -1193,7 +1232,8 @@ const CatAndProducts = () => {
               </Table>
           </TableContainer>
             
-          </>
+          </Box>
+          </Box>
         ) : (
           <TableContainer component={Paper} sx={styles.tableContainer}>
             {/* Similar table structure as above */}
@@ -1266,6 +1306,8 @@ const CatAndProducts = () => {
               </Table>
           </TableContainer>
         )}
+        </Box>
+                  )}
 
         {/* Dialog styling */}
         <Dialog 

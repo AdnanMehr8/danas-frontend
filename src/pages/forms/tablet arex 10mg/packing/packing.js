@@ -203,7 +203,7 @@ const Packing = () => {
             !requestForAnalysisPacking.qa.quantityOfSample ||
             !requestForAnalysisPacking.qa.containerNumbers ||
             !requestForAnalysisPacking.qaObservations.every(
-              (obs) => obs.parameter && obs.statusMixing && obs.remarks
+              (obs) => obs.parameter && obs.statusPacking && obs.remarks
             ) ||
             !requestForAnalysisPacking.qaOfficer ||
             !requestForAnalysisPacking.qaManager

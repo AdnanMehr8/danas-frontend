@@ -304,7 +304,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
             overflowX: 'hidden',
             position: 'sticky',
             top: '64px',
-            boxShadow: '4px 0 6px rgba(0, 0, 0, 0.1)'
+            boxShadow: '4px 0 6px rgba(0, 0, 0, 0.3)'
         }}>
             <button 
                 onClick={toggleSidebar}

@@ -497,6 +497,7 @@ import {
   Checkbox,
   FormControlLabel,
 } from '@mui/material';
+import { usePermissions } from '../hooks/usePermissions';
 
 const url = process.env.REACT_APP_INTERNAL_API_PATH;
 
@@ -512,10 +513,20 @@ const PermissionsTable = () => {
     module: '',
     actions: [],
   });
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canRead: hasPermission('permissions', 'read'),
+    canCreate: hasPermission('permissions', 'create'),
+    canUpdate: hasPermission('permissions', 'update'),
+    canDelete: hasPermission('permissions', 'delete'),
+  };
+  
 
   useEffect(() => {
-    fetchPermissions();
-  }, []);
+    if (permission.canRead) {
+      fetchPermissions();
+    }
+  }, [permission.canRead]);
 
   const fetchPermissions = async () => {
     try {
@@ -569,16 +580,38 @@ const PermissionsTable = () => {
     }
   };
 
+  if (!permission.canRead) {
+    console.log('Permission denied for departments read');
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+  
+    )
+  }
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2>Permissions</h2>
-        <Button variant="contained" onClick={() => {
-          resetForm();
-          setIsDialogOpen(true);
-        }}>
-          Add Permission
-        </Button>
+    // <div>
+    <div style={{ padding: '24px' }}>
+      {/* <div className="flex justify-between items-center mb-4"> */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Permissions</h1>
+        {permission.canCreate && (
+          <Button variant="contained" onClick={() => {
+            resetForm();
+            setIsDialogOpen(true);
+          }}>
+            Add Permission
+          </Button>
+        )}
       </div>
       <Dialog open={isDialogOpen} onClose={() => {
         setIsDialogOpen(false);
@@ -655,28 +688,32 @@ const PermissionsTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {permissions.map((permission) => (
-              <TableRow key={permission._id}>
-                <TableCell>{permission.name}</TableCell>
-                <TableCell>{permission.description}</TableCell>
-                <TableCell>{permission.module}</TableCell>
-                <TableCell>{permission.actions.join(', ')}</TableCell>
+            {permissions.map((permision) => (
+              <TableRow key={permision._id}>
+                <TableCell>{permision.name}</TableCell>
+                <TableCell>{permision.description}</TableCell>
+                <TableCell>{permision.module}</TableCell>
+                <TableCell>{permision.actions.join(', ')}</TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleEdit(permission)}
-                    sx={{ mr: 1 }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleDelete(permission._id)}
-                  >
-                    Delete
-                  </Button>
+                  {permission.canUpdate && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleEdit(permission)}
+                      sx={{ mr: 1 }}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {permission.canDelete && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(permission._id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -699,11 +736,20 @@ const RolesTable = () => {
     description: '',
     permissions: []
   });
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canRead: hasPermission('permissions', 'read'),
+    canCreate: hasPermission('permissions', 'create'),
+    canUpdate: hasPermission('permissions', 'update'),
+    canDelete: hasPermission('permissions', 'delete'),
+  };
 
   useEffect(() => {
-    fetchRoles();
-    fetchPermissions();
-  }, []);
+    if (permission.canRead) {
+      fetchRoles();
+      fetchPermissions();
+    }
+  }, [permission.canRead]);
 
   const fetchRoles = async () => {
     try {
@@ -765,16 +811,37 @@ const RolesTable = () => {
     }
   };
 
+  if (!permission.canRead) {
+    console.log('Permission denied for roles read');
+    return (
+      <div style={{  display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',}}>
+        Access denied!!
+      </div>
+    );
+  }
+  
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2>Roles</h2>
-        <Button variant="contained" onClick={() => {
-          resetForm();
-          setIsDialogOpen(true);
-        }}>
-          Add Role
-        </Button>
+    // <div>
+    <div style={{ padding: '24px' }}>
+
+      {/* <div className="flex justify-between items-center mb-4"> */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Roles</h1>
+        {permission.canCreate && (
+          <Button variant="contained" onClick={() => {
+            resetForm();
+            setIsDialogOpen(true);
+          }}>
+            Add Role
+          </Button>
+        )}
       </div>
       <Dialog open={isDialogOpen} onClose={() => {
         setIsDialogOpen(false);
@@ -852,21 +919,25 @@ const RolesTable = () => {
                   {role.permissions.map(p => p.name).join(', ')}
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => handleEdit(role)}
-                    sx={{ mr: 1 }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleDelete(role._id)}
-                  >
-                    Delete
-                  </Button>
+                  {permission.canUpdate && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleEdit(role)}
+                      sx={{ mr: 1 }}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {permission.canDelete && (
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(role._id)}
+                    >
+                      Delete
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

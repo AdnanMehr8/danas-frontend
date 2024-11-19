@@ -5,6 +5,7 @@ import "./Login.css";
 import { login } from "../../../api/api"; // Ensure this path is correct
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../store/authSlice";
+import Header from "../../header/Header";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -53,6 +54,8 @@ const Login = () => {
   };
 
   return (
+    <div>
+      <Header />
     <div className="center-form">
       <Form onSubmit={handleSubmit}>
         <h1>Login</h1>
@@ -83,7 +86,8 @@ const Login = () => {
           Login
         </Button>
       </Form>
-    </div>
+      </div>
+      </div>
   );
 };
 

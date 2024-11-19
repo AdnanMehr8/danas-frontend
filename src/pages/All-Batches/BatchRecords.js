@@ -881,11 +881,10 @@ import Uncoated from '../forms/tablet sulpeol 25mg/uncoated/Uncoated';
 import { useDispatch } from 'react-redux';
 import { setBatchInfo } from '../../store/batchInfoSlice';
 import { setBatchPInfo } from '../../store/batchInfoPackingSlice ';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import Report from '../../reports/Report';
-import html2pdf from 'html2pdf.js';
+import { usePermissions } from '../../hooks/usePermissions';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+
 const BatchRecordsTable = () => {
   const navigate = useNavigate();
   const [records, setRecords] = useState([]);
@@ -914,30 +913,38 @@ const BatchRecordsTable = () => {
   const [editingStatus, setEditingStatus] = useState(null);
     const dispatch = useDispatch();
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canRead: hasPermission('permissions', 'read'),
+    canCreate: hasPermission('permissions', 'create'),
+    canUpdate: hasPermission('permissions', 'update'),
+    canDelete: hasPermission('permissions', 'delete'),
+  };
   // Fetch the batch records from the backend API
   useEffect(() => {
-    const storedRecords = localStorage.getItem('batchRecords');
-    if (storedRecords) {
-      setRecords(JSON.parse(storedRecords));
-    }
+    // if (permission.canRead) {
+      const storedRecords = localStorage.getItem('batchRecords');
+      if (storedRecords) {
+        setRecords(JSON.parse(storedRecords));
+      }
     
-    // Also fetch from API and update both state and localStorage
-    fetch(`${API_BASE_URL}/api/batches-plan`)
-      .then((response) => response.json())
-      .then((data) => {
-        setRecords(data);
-        localStorage.setItem('batchRecords', JSON.stringify(data));
-      })
-      .catch((error) => console.error('Error fetching records:', error));
+      // Also fetch from API and update both state and localStorage
+      fetch(`${API_BASE_URL}/api/batches-plan`)
+        .then((response) => response.json())
+        .then((data) => {
+          setRecords(data);
+          localStorage.setItem('batchRecords', JSON.stringify(data));
+        })
+        .catch((error) => console.error('Error fetching records:', error));
     
       // Fetch product list from CategoryProductList
       fetch(`${API_BASE_URL}/api/products`)
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((error) => console.error('Error fetching products:', error));
+        .then((response) => response.json())
+        .then((data) => {
+          setProducts(data);
+        })
+        .catch((error) => console.error('Error fetching products:', error));
+    // }
   }, []);
     
   
@@ -947,9 +954,18 @@ const BatchRecordsTable = () => {
   }, [records]);
 
   const handleAddBatchRecord = async (newRecord) => {
+    // Find the selected product's details
+    const selectedProduct = products.flatMap((productDoc) => productDoc.productList)
+      .find((product) => product.description === newRecord.productName);
+  
+    // Determine subcategory and product name for dispatch
+    const subCategory = selectedProduct?.subCategory || 
+      (newRecord.productName.toLowerCase().includes('cream') ? 'Cream' : '');
+    const productNameToDisplay = newRecord.productName.split(' ')[0];
+  
     const batchInfo = {
       batch: {
-        productName: newRecord.productName,
+        productName: productNameToDisplay,
         batchNo: newRecord.batchNo,
         mfgLicense: newRecord.mfgLicense,
         productRegNo: newRecord.productRegNo,
@@ -958,10 +974,11 @@ const BatchRecordsTable = () => {
         noOfPacks: newRecord.noOfPacks,
         noOfTablets: newRecord.noOfTablets,
         packsSize: newRecord.packsSize || '',
-        expiryDate: newRecord.expiryDate
+        expiryDate: newRecord.expiryDate,
+        subCategory: subCategory
       }
     };
-
+  
     try {
       // First API call (from FormHeader)
       const batchInfoResponse = await fetch(`${API_BASE_URL}/api/batch-info`, {
@@ -971,45 +988,57 @@ const BatchRecordsTable = () => {
         },
         body: JSON.stringify({ ...batchInfo }),
       });
-
+  
       if (!batchInfoResponse.ok) {
         throw new Error(`HTTP error! Status: ${batchInfoResponse.status}`);
       }
-
+  
       const batchInfoData = await batchInfoResponse.json();
       
       if (batchInfoData && batchInfoData._id) {
         localStorage.setItem('batchInfoId', batchInfoData._id);
       }
-
+  
       // Second API call (original batch-plan)
       const batchPlanResponse = await fetch(`${API_BASE_URL}/api/batch-plan`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ batch: newRecord }),
+        body: JSON.stringify({ batch: { ...newRecord, subCategory } }),
       });
-
+  
       if (!batchPlanResponse.ok) {
         throw new Error(`HTTP error! Status: ${batchPlanResponse.status}`);
       }
-
+  
       const batchPlanData = await batchPlanResponse.json();
-
+  
       // Store the new batch as active batch
       localStorage.setItem('activeBatchNo', newRecord.batchNo);
       // Store the batch specific information
       localStorage.setItem(`batchInfo_${newRecord.batchNo}`, JSON.stringify(batchInfo));
-
+  
       // Dispatch to Redux store
-      dispatch(setBatchInfo(batchInfo));
-
+      dispatch(setBatchInfo({
+        batch: {
+          productName: productNameToDisplay,
+          subCategory: subCategory
+        }
+      }));
+      
+      dispatch(setBatchPInfo({
+        batch: {
+          productName: productNameToDisplay,
+          subCategory: subCategory
+        }
+      }));
+  
       // Update the records state and localStorage
       const updatedRecords = [...records, batchPlanData];
       setRecords(updatedRecords);
       localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
-
+  
       // Reset form and close modal
       setShowAddModal(false);
       setNewBatchRecord({
@@ -1025,12 +1054,97 @@ const BatchRecordsTable = () => {
         packsSize: '',
         status: ''
       });
-
+  
     } catch (error) {
       console.error('Error adding batch record:', error);
       alert('Failed to add batch record. Please try again.');
     }
   };
+  // const handleAddBatchRecord = async (newRecord) => {
+  //   const batchInfo = {
+  //     batch: {
+  //       productName: newRecord.productName,
+  //       batchNo: newRecord.batchNo,
+  //       mfgLicense: newRecord.mfgLicense,
+  //       productRegNo: newRecord.productRegNo,
+  //       validFrom: newRecord.validFrom,
+  //       batchSize: newRecord.batchSize,
+  //       noOfPacks: newRecord.noOfPacks,
+  //       noOfTablets: newRecord.noOfTablets,
+  //       packsSize: newRecord.packsSize || '',
+  //       expiryDate: newRecord.expiryDate
+  //     }
+  //   };
+
+  //   try {
+  //     // First API call (from FormHeader)
+  //     const batchInfoResponse = await fetch(`${API_BASE_URL}/api/batch-info`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ ...batchInfo }),
+  //     });
+
+  //     if (!batchInfoResponse.ok) {
+  //       throw new Error(`HTTP error! Status: ${batchInfoResponse.status}`);
+  //     }
+
+  //     const batchInfoData = await batchInfoResponse.json();
+      
+  //     if (batchInfoData && batchInfoData._id) {
+  //       localStorage.setItem('batchInfoId', batchInfoData._id);
+  //     }
+
+  //     // Second API call (original batch-plan)
+  //     const batchPlanResponse = await fetch(`${API_BASE_URL}/api/batch-plan`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ batch: newRecord }),
+  //     });
+
+  //     if (!batchPlanResponse.ok) {
+  //       throw new Error(`HTTP error! Status: ${batchPlanResponse.status}`);
+  //     }
+
+  //     const batchPlanData = await batchPlanResponse.json();
+
+  //     // Store the new batch as active batch
+  //     localStorage.setItem('activeBatchNo', newRecord.batchNo);
+  //     // Store the batch specific information
+  //     localStorage.setItem(`batchInfo_${newRecord.batchNo}`, JSON.stringify(batchInfo));
+
+  //     // Dispatch to Redux store
+  //     dispatch(setBatchInfo(batchInfo));
+
+  //     // Update the records state and localStorage
+  //     const updatedRecords = [...records, batchPlanData];
+  //     setRecords(updatedRecords);
+  //     localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
+
+  //     // Reset form and close modal
+  //     setShowAddModal(false);
+  //     setNewBatchRecord({
+  //       batchNo: '',
+  //       productName: '',
+  //       mfgLicense: '',
+  //       productRegNo: '',
+  //       validFrom: '',
+  //       expiryDate: '',
+  //       batchSize: '',
+  //       noOfPacks: '',
+  //       noOfTablets: '',
+  //       packsSize: '',
+  //       status: ''
+  //     });
+
+  //   } catch (error) {
+  //     console.error('Error adding batch record:', error);
+  //     alert('Failed to add batch record. Please try again.');
+  //   }
+  // };
 
   const filteredRecords = records.filter(record => 
     (record.batch && 
@@ -1070,18 +1184,25 @@ const BatchRecordsTable = () => {
   // const { handlePrint } = useOutletContext();
  
   const handleDownload = async () => {
-    //  navigate('/report')
     window.open('/report', '_blank');
   };
   
-
-
   const handleEdit = (record) => {
+    const productName = record.batch.productName;
+    const productNameToDisplay = productName.split(' ')[0];
     
-    // Store the selected batch info with a unique key based on batch number
+    // Find the product details from products list
+    const selectedProduct = products.flatMap((productDoc) => productDoc.productList)
+      .find((product) => product.description === productName);
+  
+    // Determine subcategory 
+    const subCategory = selectedProduct?.subCategory || 
+      (productName.toLowerCase().includes('cream') ? 'Cream' : '');
+  
+    // Store the batch info with a unique key based on batch number
     const batchInfo = {
       batch: {
-        productName: record.batch.productName,
+        productName: productNameToDisplay,
         batchNo: record.batch.batchNo,
         mfgLicense: record.batch.mfgLicense,
         productRegNo: record.batch.productRegNo,
@@ -1090,7 +1211,8 @@ const BatchRecordsTable = () => {
         noOfPacks: record.batch.noOfPacks,
         noOfTablets: record.batch.noOfTablets,
         packsSize: record.batch.packsSize,
-        expiryDate: record.batch.expiryDate
+        expiryDate: record.batch.expiryDate,
+        subCategory: subCategory
       }
     };
   
@@ -1100,15 +1222,57 @@ const BatchRecordsTable = () => {
     localStorage.setItem(`batchInfo_${record.batch.batchNo}`, JSON.stringify(batchInfo));
     
     // Dispatch to Redux store
-    dispatch(setBatchInfo(batchInfo));
-    navigate('/batch-record');
+    dispatch(setBatchInfo({
+      batch: {
+        productName: productNameToDisplay,
+        subCategory: subCategory
+      }
+    }));
     
-    // if (record.batch.productName.toLowerCase().includes('coated')) {
-    //   navigate('/batch-record');
-    // } else {
-    //   console.log(`Editing batch ${record.batch.batchNo}`, record);
-    // }
+    dispatch(setBatchPInfo({
+      batch: {
+        productName: productNameToDisplay,
+        subCategory: subCategory
+      }
+    }));
+  
+    // Navigate based on subcategory and product type
+    if (subCategory === 'Coated') {
+      navigate('/form-header');
+    } else if (subCategory === 'Non-Coated') {
+      navigate('/form-header-sulpeol');
+    } else if (productName.toLowerCase().includes('cream')) {
+      navigate('/form-header-cream');
+    }
   };
+
+  // const handleEdit = (record) => {
+    
+  //   // Store the selected batch info with a unique key based on batch number
+  //   const batchInfo = {
+  //     batch: {
+  //       productName: record.batch.productName,
+  //       batchNo: record.batch.batchNo,
+  //       mfgLicense: record.batch.mfgLicense,
+  //       productRegNo: record.batch.productRegNo,
+  //       validFrom: record.batch.validFrom,
+  //       batchSize: record.batch.batchSize,
+  //       noOfPacks: record.batch.noOfPacks,
+  //       noOfTablets: record.batch.noOfTablets,
+  //       packsSize: record.batch.packsSize,
+  //       expiryDate: record.batch.expiryDate
+  //     }
+  //   };
+  
+  //   // Store the current batch number as active batch
+  //   localStorage.setItem('activeBatchNo', record.batch.batchNo);
+  //   // Store the batch specific information
+  //   localStorage.setItem(`batchInfo_${record.batch.batchNo}`, JSON.stringify(batchInfo));
+    
+  //   // Dispatch to Redux store
+  //   dispatch(setBatchInfo(batchInfo));
+  //   navigate('/batch-record');
+  // };
 
   const handleDeleteClick = (record) => {
     setRecordToDelete(record);
@@ -1163,8 +1327,9 @@ const BatchRecordsTable = () => {
     setSelectedProduct(selectedProduct);
     setNewBatchRecord((prevState) => ({
       ...prevState,
-      productName: selectedProduct ? selectedProduct.description : '', // Make sure it's the description
+      productName: selectedProduct ? selectedProduct.description : '', 
     }));
+    
   };
   
 
@@ -1254,9 +1419,30 @@ const BatchRecordsTable = () => {
     );
   };
 
+  // if (!permission.canRead) {
+  //   console.log('Permission denied for departments read');
+  //   return (
+  //     <div style={{
+  //       display: 'flex',
+  //       justifyContent: 'center',
+  //       alignItems: 'center',
+  //       height: '100vh',
+  //       fontSize: '2rem', // Adjust size as needed
+  //       fontWeight: 'bold',
+  //       textAlign: 'center',
+  //     }}>
+  //       Access denied!!
+  //     </div>
+  
+  //   )
+  // }
+
+
   return (
-    <div className="w-full p-4" >
-      <div className="flex items-center mb-4">
+    <div style={{ padding: '24px' }}>
+
+<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+<h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Batches</h1>
         <div className="relative w-64">
           <input
             type="text"
@@ -1267,283 +1453,224 @@ const BatchRecordsTable = () => {
           />
           <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
         </div>
-      </div>
-
-      <button
+      <Button variant="contained"
         onClick={openAddModal}
-        className="mb-4 px-4 py-2 text-white rounded-md hover:bg-blue-700"
-  style={{ backgroundColor: '#3498DB' }}
-
       >
         Add Batch Record
-      </button>
+      </Button>
+      </div>
 
-        {/* Add New Batch Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              {/* Modal Header */}
-              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
-                <h3 className="text-xl font-semibold text-gray-900">Add New Batch Record</h3>
-                <button
-                  onClick={closeAddModal}
-                  className="text-gray-400 hover:text-gray-500 transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
 
-              {/* Modal Body */}
-              <div className="px-6 py-4">
-              <div className="grid grid-cols-2 gap-4">
-              <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="packsSize">
-                      ID
-                    </label>
-                    <input
-                      type="text"
-                      name="id"
-                      id="id"
-                      value={newBatchRecord.id}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  {/* Batch No */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="batchNo">
-                      Batch No
-                    </label>
-                    <input
-                      type="text"
-                      name="batchNo"
-                      id="batchNo"
-                      value={newBatchRecord.batchNo}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+      {/* Add New Batch Modal */}
+      <Dialog
+      open={showAddModal}
+      onClose={closeAddModal}
+      fullWidth
+      maxWidth="md"
+    >
+      <DialogTitle>Add New Batch Record</DialogTitle>
+      <DialogContent dividers>
+        <Grid container spacing={2}>
+          {/* ID */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="ID"
+              name="id"
+              value={newBatchRecord.id}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Product Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="productName">
-                      Product Name
-                    </label>
-                    <div className="relative">
-                      <select
-                        name="productName"
-                        id="productName"
-                        value={newBatchRecord.productName}
-                        onChange={(e) => handleProductSelect(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                        required
-                      >
-                        <option value="">Select a product</option>
-                        {products.flatMap((productDoc) => productDoc.productList).map((product) => (
-                          <option key={product.itemId} value={product.description}>
-                            {product.description}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
+          {/* Batch No */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Batch No"
+              name="batchNo"
+              value={newBatchRecord.batchNo}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Manufacturing License */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="mfgLicense">
-                      Manufacturing License
-                    </label>
-                    <input
-                      type="text"
-                      name="mfgLicense"
-                      id="mfgLicense"
-                      value={newBatchRecord.mfgLicense}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* Product Name */}
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth required>
+              <InputLabel>Product Name</InputLabel>
+              <Select
+                name="productName"
+                value={newBatchRecord.productName}
+                onChange={(e) => handleProductSelect(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Select a product</em>
+                </MenuItem>
+                {products.flatMap((productDoc) => productDoc.productList).map((product) => (
+                  <MenuItem key={product.itemId} value={product.description}>
+                    {product.description}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-                  {/* Expiry Date */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="expiryDate">
-                      Expiry Date
-                    </label>
-                    <input
-                      type="date"
-                      name="expiryDate"
-                      id="expiryDate"
-                      value={newBatchRecord.expiryDate}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* Manufacturing License */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Manufacturing License"
+              name="mfgLicense"
+              value={newBatchRecord.mfgLicense}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Batch Size */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="batchSize">
-                      Batch Size
-                    </label>
-                    <input
-                      type="text"
-                      name="batchSize"
-                      id="batchSize"
-                      value={newBatchRecord.batchSize}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* Expiry Date */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Expiry Date"
+              name="expiryDate"
+              type="date"
+              value={newBatchRecord.expiryDate}
+              onChange={handleInputChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+          </Grid>
 
-                  {/* No. of Packs */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="noOfPacks">
-                      No. of Packs
-                    </label>
-                    <input
-                      type="text"
-                      name="noOfPacks"
-                      id="noOfPacks"
-                      value={newBatchRecord.noOfPacks}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* Batch Size */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Batch Size"
+              name="batchSize"
+              value={newBatchRecord.batchSize}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* No. of Tablets */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="noOfTablets">
-                      No. of Tablets
-                    </label>
-                    <input
-                      type="text"
-                      name="noOfTablets"
-                      id="noOfTablets"
-                      value={newBatchRecord.noOfTablets}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* No. of Packs */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="No. of Packs"
+              name="noOfPacks"
+              value={newBatchRecord.noOfPacks}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Product Reg. No. */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="productRegNo">
-                      Product Reg. No.
-                    </label>
-                    <input
-                      type="text"
-                      name="productRegNo"
-                      id="productRegNo"
-                      value={newBatchRecord.productRegNo}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* No. of Tablets */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="No. of Tablets"
+              name="noOfTablets"
+              value={newBatchRecord.noOfTablets}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Valid From */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="validFrom">
-                      Valid From
-                    </label>
-                    <input
-                      type="date"
-                      name="validFrom"
-                      id="validFrom"
-                      value={newBatchRecord.validFrom}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
+          {/* Product Reg. No */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Product Reg. No"
+              name="productRegNo"
+              value={newBatchRecord.productRegNo}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
 
-                  {/* Pack Size */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="packsSize">
-                      Pack Size
-                    </label>
-                    <input
-                      type="text"
-                      name="packsSize"
-                      id="packsSize"
-                      value={newBatchRecord.packsSize}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="packsSize">
-                      MFG Date
-                    </label>
-                    <input
-                      type="date"
-                      name="mfgDate"
-                      id="mfgDate"
-                      value={newBatchRecord.mfgDate}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
-                </div>
-                
-                  {/* Status */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="status">
-                      Status
-                    </label>
-                    <div className="relative">
-                      <select
-                        name="status"
-                        id="status"
-                        value={newBatchRecord.status}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-                        required
-                      >
-                        <option value="">Select Status</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Pending">Pending</option>
-                      </select>
-                      <ChevronDown className="absolute right-3 top-2.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Valid From */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Valid From"
+              name="validFrom"
+              type="date"
+              value={newBatchRecord.validFrom}
+              onChange={handleInputChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+          </Grid>
 
-              {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
-                <button
-                  onClick={closeAddModal}
-                  type="button"
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleAddBatchRecord(newBatchRecord)}
-                  type="button"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                  Add Record
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-50">
+          {/* Pack Size */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Pack Size"
+              name="packsSize"
+              value={newBatchRecord.packsSize}
+              onChange={handleInputChange}
+              fullWidth
+              required
+            />
+          </Grid>
+
+          {/* MFG Date */}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="MFG Date"
+              name="mfgDate"
+              type="date"
+              value={newBatchRecord.mfgDate}
+              onChange={handleInputChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+          </Grid>
+
+          {/* Status */}
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth required>
+              <InputLabel>Status</InputLabel>
+              <Select
+                name="status"
+                value={newBatchRecord.status}
+                onChange={handleInputChange}
+              >
+                <MenuItem value="">
+                  <em>Select Status</em>
+                </MenuItem>
+                <MenuItem value="In Progress">In Progress</MenuItem>
+                <MenuItem value="Completed">Completed</MenuItem>
+                <MenuItem value="Pending">Pending</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={closeAddModal} variant="outlined">
+          Cancel
+        </Button>
+        <Button
+          onClick={() => handleAddBatchRecord(newBatchRecord)}
+          variant="contained"
+          color="primary"
+        >
+          Add Record
+        </Button>
+      </DialogActions>
+    </Dialog>
+    
+      {/* <div className="overflow-x-auto"> */}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
               {['ID', 'Batch No', 'Product Name', 'Mfg Date', 'Exp Date', 'Batch Size', 'Status', 'Actions'].map((header, index) => (
-                <th
+                <TableCell
                   key={index}
                   onClick={() => sortRecords(header.toLowerCase().replace(' ', ''))}
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
@@ -1552,40 +1679,41 @@ const BatchRecordsTable = () => {
                   {sortConfig.key === header.toLowerCase().replace(' ', '') && (
                     sortConfig.direction === 'asc' ? <ChevronUp className="inline w-4 h-4 ml-1" /> : <ChevronDown className="inline w-4 h-4 ml-1" />
                   )}
-                </th>
+                </TableCell>
               ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {currentRecords.map((record) => (
-              <tr key={record._id}>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.batchNo}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.productName}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.mfgDate}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.expiryDate}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{record.batch.batchSize}</td>
+              <TableRow key={record._id}>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.id}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.batchNo}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.productName}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.mfgDate}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.expiryDate}</TableCell>
+                <TableCell className="px-6 py-4 whitespace-nowrap">{record.batch.batchSize}</TableCell>
                 {/* <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 py-1 rounded-full text-sm ${record.batch.status === 'Completed' ? 'bg-green-100 text-green-800' : record.batch.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
                     {record.batch.status}
                   </span>
                 </td> */}
-                     <td className="px-6 py-4 whitespace-nowrap">
+                     <TableCell className="px-6 py-4 whitespace-nowrap">
               {renderStatusCell(record)}
-            </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex space-x-2">
-                    <button onClick={() => handleDownload()} className="text-blue-600 hover:text-blue-900 "><FileText className="w-5 h-5 mr-2" /> </button>
+            </TableCell>
+                <TableCell>
+                 
+                    <Button variant="outlined" color='info' onClick={() => handleDownload()} >Report </Button>
 
-                    <button onClick={() => handleEdit(record)} className="text-green-600 hover:text-green-900"><Pencil className="w-5 h-5" /></button>
-                    <button onClick={() => handleDeleteClick(record)} className="text-red-600 hover:text-red-900"><Trash2 className="w-5 h-5" /></button>
-                  </div>
-                </td>
-              </tr>
+                    <Button variant="outlined" color='primary' onClick={() => handleEdit(record)} >Edit</Button>
+                    <Button variant= "contained" color='error' onClick={() => handleDeleteClick(record)} >Delete</Button>
+             
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+        </TableContainer>
+      
 
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
@@ -1611,29 +1739,35 @@ const BatchRecordsTable = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg max-w-sm w-full">
-            <h3 className="text-lg font-medium mb-4">Confirm Deletion</h3>
-            <p className="mb-4">Are you sure you want to delete batch record {recordToDelete?.batchNo}?</p>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 border rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-  onClick={confirmDelete}
-  className="px-4 py-2 text-white rounded-md hover:bg-blue-700"
-  style={{ backgroundColor: '#3498DB' }}
->
-  Delete
-</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog
+      open={showDeleteConfirm}
+      onClose={() => setShowDeleteConfirm(false)}
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle>Confirm Deletion</DialogTitle>
+      <DialogContent>
+        <Typography>
+          Are you sure you want to delete batch record{' '}
+          <strong>{recordToDelete?.batchNo}</strong>?
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => setShowDeleteConfirm(false)}
+          variant="outlined"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={confirmDelete}
+          variant="contained"
+          color="primary"
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
     </div>
   );
 };
