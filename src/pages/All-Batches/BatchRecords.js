@@ -912,7 +912,7 @@ const BatchRecordsTable = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
     const dispatch = useDispatch();
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = process.env.REACT_APP_INTERNAL_API_PATH;
   const { hasPermission } = usePermissions();
   const permission = {
     canRead: hasPermission('permissions', 'read'),
