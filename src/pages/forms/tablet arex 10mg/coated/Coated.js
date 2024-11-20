@@ -219,9 +219,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import axios from 'axios';
-import { ChevronRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import axios from "axios";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, Card, CardContent, Typography, Chip, CircularProgress, Alert } from "@mui/material";
 
 const ProcessBox = () => {
   const batchInfo = useSelector((state) => state.batchInfo.batch);
@@ -229,27 +229,31 @@ const ProcessBox = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentProcessIndex, setCurrentProcessIndex] = useState(() => 
-    parseInt(localStorage.getItem('currentProcessIndex')) || 0
+    parseInt(localStorage.getItem("currentProcessIndex")) || 0
   );
   const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
-  
+
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_URL}/api/processes`, {
           params: {
-            productType: batchInfo?.productName?.toLowerCase().includes('cream') ? 'cream' :
-                        batchInfo?.subCategory?.toLowerCase().includes('non-coated') ? 'non-coated' : 'coated',
-          }
+            productType: batchInfo?.productName?.toLowerCase().includes("cream")
+              ? "cream"
+              : batchInfo?.subCategory?.toLowerCase().includes("non-coated")
+              ? "non-coated"
+              : "coated",
+          },
         });
-        
-        // Get stored processes from localStorage
-        const storedProcesses = localStorage.getItem('processes');
+
+        const storedProcesses = localStorage.getItem("processes");
         if (storedProcesses) {
           const parsedStoredProcesses = JSON.parse(storedProcesses);
-          const reorderedProcesses = parsedStoredProcesses.map(storedProcess => {
-            const matchingProcess = response.data.find(p => p._id === storedProcess._id);
+          const reorderedProcesses = parsedStoredProcesses.map((storedProcess) => {
+            const matchingProcess = response.data.find(
+              (p) => p._id === storedProcess._id
+            );
             return matchingProcess || storedProcess;
           });
           setProcesses(reorderedProcesses);
@@ -258,8 +262,8 @@ const ProcessBox = () => {
         }
         setError(null);
       } catch (err) {
-        setError('Failed to load processes');
-        console.error('Error fetching processes:', err);
+        setError("Failed to load processes");
+        console.error("Error fetching processes:", err);
       } finally {
         setLoading(false);
       }
@@ -270,32 +274,48 @@ const ProcessBox = () => {
     }
   }, [batchInfo]);
 
-  if (loading) return <div className="p-4">Loading processes...</div>;
-  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
+  if (loading)
+    return (
+      <Box p={4} display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
+  if (error)
+    return (
+      <Box p={4}>
+        <Alert severity="error">Error: {error}</Alert>
+      </Box>
+    );
 
   return (
-    <Card className="w-full p-4">
-      <h3 className="text-lg font-semibold mb-4">Process Flow</h3>
-      <div className="flex flex-wrap items-center gap-2">
-        {processes.map((process, index) => (
-          <div key={process._id} className="flex items-center">
-            <div 
-              className={`px-4 py-2 rounded-md ${
-                index === currentProcessIndex 
-                  ? 'bg-blue-200 font-medium' 
-                  : index < currentProcessIndex 
-                    ? 'bg-green-100'
-                    : 'bg-gray-100'
-              }`}
-            >
-              {process.displayName || process.name}
-            </div>
-            {index < processes.length - 1 && (
-              <ChevronRight className="mx-2 text-gray-400" size={20} />
-            )}
-          </div>
-        ))}
-      </div>
+    <Card sx={{ width: "100%", p: 2 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Process Flow
+        </Typography>
+        <Box display="flex" flexWrap="wrap" alignItems="center" gap={2}>
+          {processes.map((process, index) => (
+            <Box key={process._id} display="flex" alignItems="center">
+              <Chip
+                label={process.displayName || process.name}
+                sx={{
+                  backgroundColor:
+                    index === currentProcessIndex
+                      ? "primary.light"
+                      : index < currentProcessIndex
+                      ? "success.light"
+                      : "grey.200",
+                  color: index === currentProcessIndex ? "white" : "inherit",
+                  fontWeight: index === currentProcessIndex ? "bold" : "normal",
+                }}
+              />
+              {index < processes.length - 1 && (
+                <ChevronRightIcon sx={{ mx: 1, color: "grey.400" }} />
+              )}
+            </Box>
+          ))}
+        </Box>
+      </CardContent>
     </Card>
   );
 };
