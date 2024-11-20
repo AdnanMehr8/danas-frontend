@@ -1060,92 +1060,7 @@ const BatchRecordsTable = () => {
       alert('Failed to add batch record. Please try again.');
     }
   };
-  // const handleAddBatchRecord = async (newRecord) => {
-  //   const batchInfo = {
-  //     batch: {
-  //       productName: newRecord.productName,
-  //       batchNo: newRecord.batchNo,
-  //       mfgLicense: newRecord.mfgLicense,
-  //       productRegNo: newRecord.productRegNo,
-  //       validFrom: newRecord.validFrom,
-  //       batchSize: newRecord.batchSize,
-  //       noOfPacks: newRecord.noOfPacks,
-  //       noOfTablets: newRecord.noOfTablets,
-  //       packsSize: newRecord.packsSize || '',
-  //       expiryDate: newRecord.expiryDate
-  //     }
-  //   };
-
-  //   try {
-  //     // First API call (from FormHeader)
-  //     const batchInfoResponse = await fetch(`${API_BASE_URL}/api/batch-info`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ ...batchInfo }),
-  //     });
-
-  //     if (!batchInfoResponse.ok) {
-  //       throw new Error(`HTTP error! Status: ${batchInfoResponse.status}`);
-  //     }
-
-  //     const batchInfoData = await batchInfoResponse.json();
-      
-  //     if (batchInfoData && batchInfoData._id) {
-  //       localStorage.setItem('batchInfoId', batchInfoData._id);
-  //     }
-
-  //     // Second API call (original batch-plan)
-  //     const batchPlanResponse = await fetch(`${API_BASE_URL}/api/batch-plan`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ batch: newRecord }),
-  //     });
-
-  //     if (!batchPlanResponse.ok) {
-  //       throw new Error(`HTTP error! Status: ${batchPlanResponse.status}`);
-  //     }
-
-  //     const batchPlanData = await batchPlanResponse.json();
-
-  //     // Store the new batch as active batch
-  //     localStorage.setItem('activeBatchNo', newRecord.batchNo);
-  //     // Store the batch specific information
-  //     localStorage.setItem(`batchInfo_${newRecord.batchNo}`, JSON.stringify(batchInfo));
-
-  //     // Dispatch to Redux store
-  //     dispatch(setBatchInfo(batchInfo));
-
-  //     // Update the records state and localStorage
-  //     const updatedRecords = [...records, batchPlanData];
-  //     setRecords(updatedRecords);
-  //     localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
-
-  //     // Reset form and close modal
-  //     setShowAddModal(false);
-  //     setNewBatchRecord({
-  //       batchNo: '',
-  //       productName: '',
-  //       mfgLicense: '',
-  //       productRegNo: '',
-  //       validFrom: '',
-  //       expiryDate: '',
-  //       batchSize: '',
-  //       noOfPacks: '',
-  //       noOfTablets: '',
-  //       packsSize: '',
-  //       status: ''
-  //     });
-
-  //   } catch (error) {
-  //     console.error('Error adding batch record:', error);
-  //     alert('Failed to add batch record. Please try again.');
-  //   }
-  // };
-
+ 
   const filteredRecords = records.filter(record => 
     (record.batch && 
       (record.batch.batchNo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1183,8 +1098,13 @@ const BatchRecordsTable = () => {
   const totalPages = Math.ceil(getSortedRecords().length / itemsPerPage);
   // const { handlePrint } = useOutletContext();
  
-  const handleDownload = async () => {
-    window.open('/report', '_blank');
+  // const handleDownload = async () => {
+  //   window.open('/report', '_blank');
+  // };
+  const handleDownload = (record) => {
+    // Construct URL with product-specific parameters
+    const reportUrl = `/report?productName=${encodeURIComponent(record.batch.productName)}&batchNo=${encodeURIComponent(record.batch.batchNo)}`;
+    window.open(reportUrl, '_blank');
   };
   
   const handleEdit = (record) => {
@@ -1245,34 +1165,6 @@ const BatchRecordsTable = () => {
       navigate('/form-header-cream');
     }
   };
-
-  // const handleEdit = (record) => {
-    
-  //   // Store the selected batch info with a unique key based on batch number
-  //   const batchInfo = {
-  //     batch: {
-  //       productName: record.batch.productName,
-  //       batchNo: record.batch.batchNo,
-  //       mfgLicense: record.batch.mfgLicense,
-  //       productRegNo: record.batch.productRegNo,
-  //       validFrom: record.batch.validFrom,
-  //       batchSize: record.batch.batchSize,
-  //       noOfPacks: record.batch.noOfPacks,
-  //       noOfTablets: record.batch.noOfTablets,
-  //       packsSize: record.batch.packsSize,
-  //       expiryDate: record.batch.expiryDate
-  //     }
-  //   };
-  
-  //   // Store the current batch number as active batch
-  //   localStorage.setItem('activeBatchNo', record.batch.batchNo);
-  //   // Store the batch specific information
-  //   localStorage.setItem(`batchInfo_${record.batch.batchNo}`, JSON.stringify(batchInfo));
-    
-  //   // Dispatch to Redux store
-  //   dispatch(setBatchInfo(batchInfo));
-  //   navigate('/batch-record');
-  // };
 
   const handleDeleteClick = (record) => {
     setRecordToDelete(record);
@@ -1702,7 +1594,7 @@ const BatchRecordsTable = () => {
             </TableCell>
                 <TableCell>
                  
-                    <Button variant="outlined" color='info' onClick={() => handleDownload()} >Report </Button>
+                    <Button variant="outlined" color='info' onClick={() => handleDownload(record)} >Report </Button>
 
                     <Button variant="outlined" color='primary' onClick={() => handleEdit(record)} >Edit</Button>
                     <Button variant= "contained" color='error' onClick={() => handleDeleteClick(record)} >Delete</Button>
