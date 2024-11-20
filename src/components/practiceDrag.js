@@ -776,13 +776,13 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
 const DraggableList = () => {
   const navigate = useNavigate();
   const batchInfo = useSelector((state) => state.batchInfo.batch);
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
   
   const getBatchType = () => {
     if (batchInfo?.productName?.toLowerCase().includes('cream')) {
