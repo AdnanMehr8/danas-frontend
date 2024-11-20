@@ -86,18 +86,18 @@ const App = () => {
   useTokenRefresh();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Load user from local storage when the app mounts
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  useEffect(() => {
-    // Redirect to login if the user is not authenticated
-    if (!isAuth) {
-      navigate("/login");
-    }
-  }, [isAuth, navigate]);
+  // useEffect(() => {
+  //   // Redirect to login if the user is not authenticated
+  //   if (!isAuth) {
+  //     navigate("/login");
+  //   }
+  // }, [isAuth, navigate]);
 
   return loading ? (
     <Box sx={{ display: "flex" }}>
