@@ -206,7 +206,7 @@ const Blistering = () => {
 
       if (data && data._id) {
         localStorage.setItem("blisteringId", data._id);
-        console.log("MixingID stored in localStorage:", data._id);
+        console.log("BlisteringID stored in localStorage:", data._id);
       }
 
       
