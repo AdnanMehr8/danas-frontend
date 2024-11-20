@@ -1208,7 +1208,7 @@ const DraggableList = () => {
     }
   }, [batchInfo]);
 
-  const onDragEnd = async (result) => {
+  const onDragEnd = (result) => {
     if (!result.destination) return;
 
     const reorderedProcesses = Array.from(processes);
@@ -1218,16 +1218,28 @@ const DraggableList = () => {
     setProcesses(reorderedProcesses);
     localStorage.setItem('processes', JSON.stringify(reorderedProcesses));
     setCurrentProcessIndex(0);
-
-    try {
-      await axios.put(`${API_URL}/api/processes`, {
-        processes: reorderedProcesses
-      });
-    } catch (error) {
-      console.error('Error updating process order:', error);
-      setProcesses(processes);
-    }
   };
+  
+  // const onDragEnd = async (result) => {
+  //   if (!result.destination) return;
+
+  //   const reorderedProcesses = Array.from(processes);
+  //   const [movedProcess] = reorderedProcesses.splice(result.source.index, 1);
+  //   reorderedProcesses.splice(result.destination.index, 0, movedProcess);
+
+  //   setProcesses(reorderedProcesses);
+  //   localStorage.setItem('processes', JSON.stringify(reorderedProcesses));
+  //   setCurrentProcessIndex(0);
+
+  //   try {
+  //     await axios.put(`${API_URL}/api/processes`, {
+  //       processes: reorderedProcesses
+  //     });
+  //   } catch (error) {
+  //     console.error('Error updating process order:', error);
+  //     setProcesses(processes);
+  //   }
+  // };
 
   const getProcessRoute = (processName, batchType) => {
     const baseName = processName.toLowerCase().replace(/-cream|-sulpeol/g, '');
