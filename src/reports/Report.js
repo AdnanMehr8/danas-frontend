@@ -402,12 +402,75 @@ const Report = ({pdfRef, isPackingForm }) => {
     fetchAndClearStorage();
 }, [batchInfoId, dispensingId, mixingId, compressionID, coatingId, batchInfoPackingId, printingId, blisteringId, packingId, dispatch]);
 
+const globalStyles = {
+  // Global styles to make everything uneditable
+  "& input, & textarea, & select, & [contentEditable=true]": {
+    pointerEvents: "none",
+    backgroundColor: "transparent",
+    border: "none",
+    outline: "none",
+    WebkitTextFillColor: "black",
+    color: "black",
+    cursor: "default",
+    userSelect: "none",
+    readOnly: true,
+  },
+  // Disable all form controls
+  "& button:not(.print-button), & .MuiButton-root:not(.print-button)": {
+    display: "none",
+  },
+  // Remove hover and focus effects
+  "& *:hover, & *:focus": {
+    outline: "none",
+    backgroundColor: "transparent !important",
+    borderColor: "transparent !important",
+    boxShadow: "none !important",
+  },
+  // Disable text selection
+  "& *": {
+    userSelect: "none",
+    WebkitUserSelect: "none",
+    MozUserSelect: "none",
+    msUserSelect: "none",
+  },
+  // Make all MUI components uneditable
+  "& .MuiInputBase-root": {
+    pointerEvents: "none",
+    "& fieldset": {
+      border: "none",
+    },
+    "&:before, &:after": {
+      display: "none",
+    },
+  },
+  // Disable checkboxes and radio buttons
+  "& input[type='checkbox'], & input[type='radio']": {
+    pointerEvents: "none",
+    opacity: "1",
+  },
+  // Remove table interaction
+  "& table": {
+    pointerEvents: "none",
+  },
+  // Hide action columns and edit buttons
+  "& .actions-column, & .edit-button, & .delete-button": {
+    display: "none",
+  },
+  // Remove card interactions
+  "& .card": {
+    border: "none",
+    boxShadow: "none",
+    pointerEvents: "none",
+  },
+};
+
 
   // Get the total count of pages
 const totalPages = formPages.length;
   const renderPageWithFooter = (PageComponent, pageNumber) => (
     <Box
       sx={{
+        ...globalStyles,
         border: "2px solid black",
         padding: "15px",
         marginBottom: "20px",

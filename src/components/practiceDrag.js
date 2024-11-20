@@ -770,6 +770,162 @@
 
 // export default DraggableList;
 
+// import React, { useState, useEffect } from "react";
+// import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+// import { useNavigate } from "react-router-dom";
+// import { useSelector } from "react-redux";
+// import axios from 'axios';
+
+// const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+// const DraggableList = () => {
+//   const navigate = useNavigate();
+//   const batchInfo = useSelector((state) => state.batchInfo.batch);
+//   const [processes, setProcesses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+  
+//   const getBatchType = () => {
+//     if (batchInfo?.productName?.toLowerCase().includes('cream')) {
+//       return 'cream';
+//     } else if (batchInfo?.subCategory?.toLowerCase().includes('non-coated')) {
+//       // return 'sulpeol';
+//       return 'non-coated';
+//     }
+//     // return 'regular';
+//     return 'coated';
+//   };
+
+//   // Fetch processes and save to localStorage
+//   useEffect(() => {
+//     const fetchProcesses = async () => {
+//       try {
+//         setLoading(true);
+//         const batchType = getBatchType();
+//         const response = await axios.get(`${API_URL}/api/processes`, {
+//           params: {
+//             productType: batchType
+//           }
+//         });
+//         const fetchedProcesses = response.data;
+//         setProcesses(fetchedProcesses);
+//         // Save processes to localStorage
+//         localStorage.setItem('processes', JSON.stringify(fetchedProcesses));
+//         setError(null);
+//       } catch (err) {
+//         setError('Failed to load processes');
+//         console.error('Error fetching processes:', err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     if (batchInfo) {
+//       fetchProcesses();
+//     }
+//   }, [batchInfo]);
+
+//   const onDragEnd = async (result) => {
+//     if (!result.destination) return;
+
+//     const reorderedProcesses = Array.from(processes);
+//     const [movedProcess] = reorderedProcesses.splice(result.source.index, 1);
+//     reorderedProcesses.splice(result.destination.index, 0, movedProcess);
+
+//     setProcesses(reorderedProcesses);
+//     // Save reordered processes to localStorage
+//     localStorage.setItem('processes', JSON.stringify(reorderedProcesses));
+
+//     try {
+//       await axios.put(`${API_URL}/api/processes`, {
+//         processes: reorderedProcesses
+//       });
+//     } catch (error) {
+//       console.error('Error updating process order:', error);
+//       setProcesses(processes);
+//     }
+//   };
+
+//   const getProcessRoute = (processName, batchType) => {
+//     // Convert process name to lowercase and remove any existing suffixes
+//     const baseName = processName.toLowerCase().replace(/-cream|-sulpeol/g, '');
+    
+//     // Add appropriate suffix based on batch type
+//     switch(batchType) {
+//       case 'cream':
+//         return `${baseName}-cream`;
+//       // case 'sulpeol':
+//       //   return `${baseName}-sulpeol`;
+//       case 'non-coated':
+//         return `${baseName}-non-coated`;
+//       default:
+//         return baseName;
+//     }
+//   };
+
+//   const handleSaveAndNext = () => {
+//     if (processes.length > 0) {
+//       const batchType = getBatchType();
+//       const route = getProcessRoute(processes[0].name, batchType);
+//       // Save current process index to localStorage
+//       localStorage.setItem('currentProcessIndex', '0');
+//       navigate(`/${route}`);
+//     }
+//   };
+
+//   if (loading) return <div>Loading processes...</div>;
+//   if (error) return <div>Error: {error}</div>;
+
+//   return (
+//     <div className="container mx-auto p-4">
+//       <div className="mb-4 p-2 bg-blue-100 rounded">
+//         <p>Current Batch Type: {getBatchType()}</p>
+//       </div>
+      
+//       <DragDropContext onDragEnd={onDragEnd}>
+//         <Droppable droppableId="processes">
+//           {(provided) => (
+//             <ul
+//               {...provided.droppableProps}
+//               ref={provided.innerRef}
+//               className="space-y-2"
+//             >
+//               {processes.map((process, index) => (
+//                 <Draggable
+//                   key={process._id}
+//                   draggableId={process._id}
+//                   index={index}
+//                 >
+//                   {(provided) => (
+//                     <li
+//                       ref={provided.innerRef}
+//                       {...provided.draggableProps}
+//                       {...provided.dragHandleProps}
+//                       className="p-4 bg-gray-100 rounded shadow hover:shadow-md transition-shadow"
+//                     >
+//                       {process.displayName || process.name}
+//                     </li>
+//                   )}
+//                 </Draggable>
+//               ))}
+//               {provided.placeholder}
+//             </ul>
+//           )}
+//         </Droppable>
+//       </DragDropContext>
+
+//       <button
+//         onClick={handleSaveAndNext}
+//         className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+//         disabled={processes.length === 0}
+//       >
+//         Save and Continue
+//       </button>
+//     </div>
+//   );
+// };
+
+// export default DraggableList;
+
 import React, { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useNavigate } from "react-router-dom";
@@ -777,25 +933,24 @@ import { useSelector } from "react-redux";
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+
 const DraggableList = () => {
   const navigate = useNavigate();
   const batchInfo = useSelector((state) => state.batchInfo.batch);
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentProcessIndex, setCurrentProcessIndex] = useState(0); // Always start at 0
   
   const getBatchType = () => {
     if (batchInfo?.productName?.toLowerCase().includes('cream')) {
       return 'cream';
     } else if (batchInfo?.subCategory?.toLowerCase().includes('non-coated')) {
-      // return 'sulpeol';
       return 'non-coated';
     }
-    // return 'regular';
     return 'coated';
   };
 
-  // Fetch processes and save to localStorage
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
@@ -807,9 +962,20 @@ const DraggableList = () => {
           }
         });
         const fetchedProcesses = response.data;
-        setProcesses(fetchedProcesses);
-        // Save processes to localStorage
-        localStorage.setItem('processes', JSON.stringify(fetchedProcesses));
+        
+        // Get stored processes from localStorage
+        const storedProcesses = localStorage.getItem('processes');
+        if (storedProcesses) {
+          const parsedStoredProcesses = JSON.parse(storedProcesses);
+          const reorderedProcesses = parsedStoredProcesses.map(storedProcess => {
+            const matchingProcess = fetchedProcesses.find(p => p._id === storedProcess._id);
+            return matchingProcess || storedProcess;
+          });
+          setProcesses(reorderedProcesses);
+        } else {
+          setProcesses(fetchedProcesses);
+          localStorage.setItem('processes', JSON.stringify(fetchedProcesses));
+        }
         setError(null);
       } catch (err) {
         setError('Failed to load processes');
@@ -832,8 +998,8 @@ const DraggableList = () => {
     reorderedProcesses.splice(result.destination.index, 0, movedProcess);
 
     setProcesses(reorderedProcesses);
-    // Save reordered processes to localStorage
     localStorage.setItem('processes', JSON.stringify(reorderedProcesses));
+    setCurrentProcessIndex(0); // Reset to first process after reordering
 
     try {
       await axios.put(`${API_URL}/api/processes`, {
@@ -846,15 +1012,11 @@ const DraggableList = () => {
   };
 
   const getProcessRoute = (processName, batchType) => {
-    // Convert process name to lowercase and remove any existing suffixes
     const baseName = processName.toLowerCase().replace(/-cream|-sulpeol/g, '');
     
-    // Add appropriate suffix based on batch type
     switch(batchType) {
       case 'cream':
         return `${baseName}-cream`;
-      // case 'sulpeol':
-      //   return `${baseName}-sulpeol`;
       case 'non-coated':
         return `${baseName}-non-coated`;
       default:
@@ -862,12 +1024,51 @@ const DraggableList = () => {
     }
   };
 
+  const handleCompleteBatch = async () => {
+    try {
+      const response = await axios.patch(`${API_URL}/api/batch-plan/${batchInfo._id}`, {
+        'batch.status': 'Completed'
+      });
+
+      if (response.status === 200) {
+        localStorage.removeItem('currentProcessIndex');
+        localStorage.removeItem('processes');
+        navigate('/batch-table');
+      }
+    } catch (error) {
+      console.error('Error completing batch:', error);
+      alert('Failed to complete batch. Please try again.');
+    }
+  };
+
   const handleSaveAndNext = () => {
     if (processes.length > 0) {
+      const newIndex = currentProcessIndex + 1;
+      
+      if (newIndex < processes.length) {
+        const batchType = getBatchType();
+        const nextProcess = processes[newIndex];
+        const route = getProcessRoute(nextProcess.name, batchType);
+        
+        setCurrentProcessIndex(newIndex);
+        localStorage.setItem('currentProcessIndex', newIndex.toString());
+        localStorage.setItem('processes', JSON.stringify(processes));
+        
+        navigate(`/${route}`);
+      }
+    }
+  };
+
+  const handleStartProcess = () => {
+    if (processes.length > 0) {
       const batchType = getBatchType();
-      const route = getProcessRoute(processes[0].name, batchType);
-      // Save current process index to localStorage
+      const firstProcess = processes[0];
+      const route = getProcessRoute(firstProcess.name, batchType);
+      
+      setCurrentProcessIndex(0);
       localStorage.setItem('currentProcessIndex', '0');
+      localStorage.setItem('processes', JSON.stringify(processes));
+      
       navigate(`/${route}`);
     }
   };
@@ -875,10 +1076,13 @@ const DraggableList = () => {
   if (loading) return <div>Loading processes...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  const isLastProcess = currentProcessIndex === processes.length - 1;
+
   return (
     <div className="container mx-auto p-4">
       <div className="mb-4 p-2 bg-blue-100 rounded">
         <p>Current Batch Type: {getBatchType()}</p>
+        <p>Current Process: {processes[currentProcessIndex]?.displayName || processes[currentProcessIndex]?.name}</p>
       </div>
       
       <DragDropContext onDragEnd={onDragEnd}>
@@ -900,7 +1104,13 @@ const DraggableList = () => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="p-4 bg-gray-100 rounded shadow hover:shadow-md transition-shadow"
+                      className={`p-4 rounded shadow hover:shadow-md transition-shadow ${
+                        index === currentProcessIndex 
+                          ? 'bg-blue-200' 
+                          : index < currentProcessIndex 
+                            ? 'bg-green-100' 
+                            : 'bg-gray-100'
+                      }`}
                     >
                       {process.displayName || process.name}
                     </li>
@@ -913,13 +1123,32 @@ const DraggableList = () => {
         </Droppable>
       </DragDropContext>
 
-      <button
-        onClick={handleSaveAndNext}
-        className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        disabled={processes.length === 0}
-      >
-        Save and Continue
-      </button>
+      <div className="mt-4 space-x-4">
+        {currentProcessIndex === 0 ? (
+          <button
+            onClick={handleStartProcess}
+            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            disabled={processes.length === 0}
+          >
+            Start Process
+          </button>
+        ) : isLastProcess ? (
+          <button
+            onClick={handleCompleteBatch}
+            className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          >
+            Complete Batch
+          </button>
+        ) : (
+          <button
+            onClick={handleSaveAndNext}
+            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            disabled={processes.length === 0}
+          >
+            Save and Continue
+          </button>
+        )}
+      </div>
     </div>
   );
 };

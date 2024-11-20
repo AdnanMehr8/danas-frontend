@@ -885,6 +885,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { usePermissions } from '../../hooks/usePermissions';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 
+const API_BASE_URL = process.env.REACT_APP_INTERNAL_API_PATH;
 const BatchRecordsTable = () => {
   const navigate = useNavigate();
   const [records, setRecords] = useState([]);
@@ -912,7 +913,6 @@ const BatchRecordsTable = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [editingStatus, setEditingStatus] = useState(null);
     const dispatch = useDispatch();
-  const API_BASE_URL = process.env.REACT_APP_INTERNAL_API_PATH;
   const { hasPermission } = usePermissions();
   const permission = {
     canRead: hasPermission('permissions', 'read'),
@@ -1341,9 +1341,9 @@ const BatchRecordsTable = () => {
     setShowAddModal(false);
   };
 
-  if (showCoated) {
-    return <Coated record={selectedRecord} onReturn={handleReturn} />;
-  } 
+  // if (showCoated) {
+  //   return <Coated record={selectedRecord} onReturn={handleReturn} />;
+  // } 
 
   // Function to handle status change
   const handleStatusChange = async (recordId, newStatus) => {
