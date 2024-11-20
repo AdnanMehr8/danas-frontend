@@ -165,7 +165,7 @@ const ProcessBox = () => {
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_URL = 'http://localhost:5000';
+  const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
   
   useEffect(() => {
     const fetchProcesses = async () => {
