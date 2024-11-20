@@ -10,12 +10,14 @@ import BatchManufacturingFormPage20 from "./page20";
 import BatchManufacturingFormPage21 from "./page21";
 import BatchManufacturingFormPage22 from "./page22";
 import BatchManufacturingFormPage23 from "./page23";
+import ProcessBox from "../coated/Coated";
 
 const Coating = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const record = useSelector((state) => state.coating);
   const REACT_APP_INTERNAL_API_PATH = process.env.REACT_APP_INTERNAL_API_PATH;
+  const processes = JSON.parse(localStorage.getItem("processes"));
   const batchInfo = useSelector((state) => state.batchInfo.batch);
 
   // Load saved tabValue from localStorage or default to 0
@@ -298,6 +300,7 @@ const Coating = () => {
 
   return (
     <div>
+      <ProcessBox processes={processes} />
       <FormHeader />
       <h1 className="text-center mt-4">Coating</h1>
 
