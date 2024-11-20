@@ -91,6 +91,13 @@ const App = () => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
+  useEffect(() => {
+    // Redirect to login if the user is not authenticated
+    if (!isAuth) {
+      navigate("/login");
+    }
+  }, [isAuth, navigate]);
+
   return loading ? (
     <Box sx={{ display: "flex" }}>
       <CircularProgress />
