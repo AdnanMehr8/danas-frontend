@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Login from "./pages/auth/login/Login";
 import Signup from "./pages/auth/signup/Signup";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -85,7 +85,8 @@ const App = () => {
   const loading = useAutoLogin();
   useTokenRefresh();
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     // Load user from local storage when the app mounts
     dispatch(loadUserFromStorage());
