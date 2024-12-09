@@ -436,11 +436,11 @@ const totalPages = formPages.length;
             {PageComponent === BatchPackingFormPage0 ||
             PageComponent === BatchPackingFormPage1 ||
             PageComponent === BatchPackingFormPage2 ||
-            PageComponent === BatchPackingFormPage3 ||
+            // PageComponent === BatchPackingFormPage3 ||
             PageComponent === BatchPackingFormPage4 ||
             PageComponent === BatchPackingFormPage5 ||
             PageComponent === BatchPackingFormPage6 ||
-            PageComponent === BatchPackingFormPage7 ||
+            // PageComponent === BatchPackingFormPage7 ||
             PageComponent === BatchPackingFormPage8 ||
             PageComponent === BatchPackingFormPage9 ||
             PageComponent === BatchPackingFormPage10 ||
