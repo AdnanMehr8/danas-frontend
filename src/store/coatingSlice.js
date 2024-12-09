@@ -64,10 +64,8 @@ const initialState = {
   },
   coatingSolutionPreparation: [
     {
-      instructions:
-        "In solution preparation Vessel dissolve the following materials and mix under Silverson Mixer for 30 mints.",
+      target: "",
       activityCompliance: "",
-      sampleTakenQty: "",
       performedByOperator: "",
       checkedByPO: "",
       checkedByQAI: "",
@@ -78,45 +76,8 @@ const initialState = {
   ],
   coatingProcedure: [
     {
-      instructions:
-        "Bring the container of compressed tablets and transfer the bulk tablets into coating pan. Lift the bulk tablets container and insert it into coating pan. Emptying all containers into coating pan. Transfer all the core tablets into coating pan.",
+      target: "",
       activityCompliance: "",
-      sampleTakenQty: "",
-      performedByOperator: "",
-      checkedByPO: "",
-      checkedByQAI: "",
-      pboDate: "",
-      checkedByPODate: "",
-      checkedByQAIDate: "",
-    },
-    {
-      instructions:
-        "Pre warm the core tablets with jogging for 10 minutes at 75 C before film coating. Then start coating as per above mentioned parameters",
-      activityCompliance: "",
-      sampleTakenQty: "",
-      performedByOperator: "",
-      checkedByPO: "",
-      checkedByQAI: "",
-      pboDate: "",
-      checkedByPODate: "",
-      checkedByQAIDate: "",
-    },
-    {
-      instructions: "After coating, cool the tablets for 20 minutes. ",
-      activityCompliance: "",
-      sampleTakenQty: "",
-      performedByOperator: "",
-      checkedByPO: "",
-      checkedByQAI: "",
-      pboDate: "",
-      checkedByPODate: "",
-      checkedByQAIDate: "",
-    },
-    {
-      instructions:
-        "Collect tablets in cleaned, tarred, polythene lined labeled drums. Send test request to Quality Control for physical & chemical analysis. Raise the intimation to QA for sampling and getting the sample tested by QC physically and chemically. Sample taken Qty: ",
-      activityCompliance: "",
-      sampleTakenQty: "",
       performedByOperator: "",
       checkedByPO: "",
       checkedByQAI: "",
@@ -183,6 +144,37 @@ const initialState = {
     performedBy: "",
     performedByDate: "",
   },
+  qcHeader: {
+    docNo: "",
+    effectiveDate: "",
+    revisionNo: "",
+    replaces: ""
+},
+  batch: {
+    productName: "",
+    batchNo: "",
+    qCNo: "",
+    batchSize: "",
+    packsSize: "",
+    mfgDate: "",
+    expiryDate: "",
+    analysisDate: "",
+    sampleType: "",
+  },
+  testAndResults: {
+    parameters: [
+      {
+        parameters: "",
+        specification: "",
+        results: "",
+      },
+    ],
+    checkedByQCA: "",
+    checkedByQCADate: "",
+    checkedByQCM: "",
+    checkedByQCMDate: "",
+    remarks: ""
+  },
 };
 
 export const coatingSlice = createSlice({
@@ -211,11 +203,17 @@ export const coatingSlice = createSlice({
         coatingProcedure,
         weightOfCoatedTablets,
         batchManufacturingYield,
+        qcHeader,
+        batch,
+        testAndResults
       } = action.payload;
 
+      state.qcHeader = { ...state.qcHeader, ...qcHeader };
       state.precautions = { ...state.precautions, ...precautions };
       state.lineClearance = action.payload.lineClearance || state.lineClearance;
       // state.lineClearance = { ...state.lineClearance, ...lineClearance };
+      state.batch = { ...state.batch, ...batch };
+      state.testAndResults = { ...state.testAndResults, ...testAndResults };
       state.batchInfo = { ...state.batchInfo, ...batchInfo };
       state.batchRecord = { ...state.batchRecord, ...batchRecord };
       state.checkboxes = { ...state.checkboxes, ...checkboxes };

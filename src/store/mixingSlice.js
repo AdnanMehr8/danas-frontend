@@ -62,29 +62,7 @@ const initialState = {
   manufacturingRecord: [
     {
       target: "",
-      sievingStartedAt: "",
-      sievingCompletedOn: "",
-      performedByOperator: "",
-      checkedByPO: "",
-      checkedByQAI: "",
-      pboDate: "",
-      checkedByPODate: "",
-      checkedByQAIDate: "",
-    },
-    {
-      target: "",
-      mixingStartedAt: "",
-      mixingCompletedOn: "",
-      performedByOperator: "",
-      checkedByPO: "",
-      checkedByQAI: "",
-      pboDate: "",
-      checkedByPODate: "",
-      checkedByQAIDate: "",
-    },
-    {
-      target: "",
-      sampleTakenQty: "",
+      actual: "",
       performedByOperator: "",
       checkedByPO: "",
       checkedByQAI: "",
@@ -151,6 +129,37 @@ const initialState = {
     qaOfficer: "",
     qaManager: "",
   },
+  qcHeader: {
+    docNo: "",
+    effectiveDate: "",
+    revisionNo: "",
+    replaces: ""
+},
+  batch: {
+    productName: "",
+    batchNo: "",
+    qCNo: "",
+    batchSize: "",
+    packsSize: "",
+    mfgDate: "",
+    expiryDate: "",
+    analysisDate: "",
+    sampleType: "",
+  },
+  testAndResults: {
+    parameters: Array(8).fill(
+      {
+        parameters: "",
+        specification: "",
+        results: "",
+      },
+    ),
+    checkedByQCA: "",
+    checkedByQCADate: "",
+    checkedByQCM: "",
+    checkedByQCMDate: "",
+    qcRemarks: "",
+  },
 };
 
 export const mixingSlice = createSlice({
@@ -172,10 +181,16 @@ export const mixingSlice = createSlice({
         weightOfGranules,
         granulationYield,
         requestForAnalysisMixing,
+        qcHeader,
+        batch,
+        testAndResults
       } = action.payload;
 
       state.precautions = { ...state.precautions, ...precautions };
       //   state.precautions = action.payload.precautions || state.precautions;
+      state.batch = { ...state.batch, ...batch };
+      state.testAndResults = { ...state.testAndResults, ...testAndResults };
+      state.qcHeader = { ...state.qcHeader, ...qcHeader };
 
       // state.lineClearance = { ...state.lineClearance, ...lineClearance };
       state.lineClearance = action.payload.lineClearance || state.lineClearance;

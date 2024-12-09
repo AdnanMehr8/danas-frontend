@@ -17,11 +17,21 @@ import { useDispatch, useSelector } from "react-redux";
 import FormHeader from "../../../header/formHeader";
 import { setCoatingRecord } from "../../../../store/coatingSlice";
 import axios from "axios";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-const BatchManufacturingFormPage19 = () => {
+const BatchManufacturingFormPage19 = ({ isReport }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const coatingRecord = useSelector((state) => state.coating); // Access the compression state
+  const { hasPermission } = usePermissions();
+
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
+
   const [equipmentData, setEquipmentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,6 +55,8 @@ const BatchManufacturingFormPage19 = () => {
   }, []);
 
   const handleEquipmentChange = (e, index) => {
+    if (!permission.canEditProduction) return;
+
     const equipmentName = e.target.value;
     const selectedItem = equipmentData
       .flatMap((equip) => equip.equipmentList)
@@ -73,6 +85,19 @@ const BatchManufacturingFormPage19 = () => {
   const handleInputChange = (e, index) => {
     const { name, value } = e.target;
 
+    // Determine if the field is QA-specific or production-specific
+    const qaFields = ['verifiedBy', 'vDate'];
+    const productionFields = [
+      'previousProduct', 'batchNo', 'cleanedBy', 'clDate', 
+      'checkedBy', 'chDate'
+    ];
+
+    // Check permissions based on the field
+    if ((qaFields.includes(name) && !permission.canEditQA) ||
+        (productionFields.includes(name) && !permission.canEditProduction)) {
+      return;
+   }
+
     // Update precautions state
     const updatedPrecautions = {
       ...coatingRecord.precautions,
@@ -94,6 +119,8 @@ const BatchManufacturingFormPage19 = () => {
   };
 
   const addRow = () => {
+    if (!permission.canEditProduction) return;
+
     const newLineClearanceRecord = {
       equipment: "",
       equipmentId: "",
@@ -111,6 +138,33 @@ const BatchManufacturingFormPage19 = () => {
       })
     );
   };
+
+  // Check if user can read either production or QA sections
+  if (!(permission.canReadProduction || permission.canReadQA)) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
+
+  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <Card className="max-w-4xl mx-auto">
       <CardContent>
@@ -171,6 +225,8 @@ const BatchManufacturingFormPage19 = () => {
                 style={{ marginLeft: "0.5rem", margin: 0 }}
                 onChange={handleInputChange}
                 multiline
+                readOnly={!permission.canEditProduction}
+                disabled={!permission.canEditProduction}
               />
               Area
               <TextField
@@ -180,6 +236,8 @@ const BatchManufacturingFormPage19 = () => {
                 style={{ marginLeft: "0.5rem", margin: 7 }}
                 onChange={handleInputChange}
                 multiline
+                readOnly={!permission.canEditProduction}
+                disabled={!permission.canEditProduction}
               />
             </span>
           </div>
@@ -198,6 +256,8 @@ const BatchManufacturingFormPage19 = () => {
                   style={{ marginLeft: "1rem", margin: 0 }}
                   onChange={handleInputChange}
                   multiline
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </span>
             </strong>
@@ -303,6 +363,8 @@ const BatchManufacturingFormPage19 = () => {
                         value={item.equipment}
                         onChange={(e) => handleEquipmentChange(e, index)}
                         placeholder="Search equipment name..."
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                       <datalist id="equipment-names">
                         {equipmentData
@@ -340,6 +402,8 @@ const BatchManufacturingFormPage19 = () => {
                         fullWidth
                         multiline
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                     </TableCell>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
@@ -350,6 +414,8 @@ const BatchManufacturingFormPage19 = () => {
                         fullWidth
                         multiline
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                     </TableCell>
                     <TableCell
@@ -362,6 +428,8 @@ const BatchManufacturingFormPage19 = () => {
                         fullWidth
                         multiline
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                       <TextField
                         style={{ width: "150px" }}
@@ -370,6 +438,8 @@ const BatchManufacturingFormPage19 = () => {
                         value={item.clDate || ""}
                         fullWidth
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                     </TableCell>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
@@ -380,6 +450,8 @@ const BatchManufacturingFormPage19 = () => {
                         fullWidth
                         multiline
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                       <TextField
                         style={{ width: "150px" }}
@@ -388,6 +460,8 @@ const BatchManufacturingFormPage19 = () => {
                         value={item.chDate || ""}
                         fullWidth
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                     </TableCell>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
@@ -398,6 +472,8 @@ const BatchManufacturingFormPage19 = () => {
                         fullWidth
                         multiline
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditQA}
+                        disabled={!permission.canEditQA}
                       />
                       <TextField
                         type="date"
@@ -406,6 +482,8 @@ const BatchManufacturingFormPage19 = () => {
                         value={item.vDate || ""}
                         fullWidth
                         onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditQA}
+                        disabled={!permission.canEditQA}
                       />
                     </TableCell>
                   </TableRow>
@@ -414,7 +492,7 @@ const BatchManufacturingFormPage19 = () => {
             </Table>
           </TableContainer>
 
-          <Button variant="contained" color="primary" onClick={addRow}>
+          <Button variant="contained" color="primary" onClick={addRow} disabled={!permission.canEditProduction}>
             Add Row
           </Button>
         </div>

@@ -16,9 +16,11 @@ import sbatchInfo from "./sulpeol/batchInfoSlice";
 import scdispensing from "./sidikcream/dispensingSlice";
 import scmixing from "./sidikcream/mixingSlice";
 import sccompression from "./sidikcream/compressionSlice";
-
+import batchId from './batchIdSlice';
+import batchInfoQC from './batchInfoQCSlice';
+import mixingQC from './mixingQCSlice'
 const store = configureStore({
-  reducer: { user, dispensing, mixing, compression, coating, printing, blistering, packing, batchInfo, batchInfoPacking,  sbatchInfo, scompression, sdispensing, smixing, scdispensing, scmixing, sccompression },
+  reducer: { user, batchId, dispensing, mixing, compression, coating, printing, blistering, packing, batchInfo, batchInfoQC, mixingQC, batchInfoPacking,  sbatchInfo, scompression, sdispensing, smixing, scdispensing, scmixing, sccompression },
 });
 
 export default store;

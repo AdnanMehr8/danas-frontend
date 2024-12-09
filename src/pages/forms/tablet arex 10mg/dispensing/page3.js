@@ -2,12 +2,24 @@ import React from "react";
 import { Table, Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setDispensing } from "../../../../store/dispensingSlice";
+import { Plus } from "lucide-react";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-const BatchManufacturingFormPage3 = () => {
+const BatchManufacturingFormPage3 = ({ isReport }) => {
   const dispatch = useDispatch();
   const dispensing = useSelector((state) => state.dispensing);
+  const { hasPermission } = usePermissions();
+
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
 
   const handleWeighingRecordChange = (index, field, value) => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingRecord = dispensing.weighingRecordCoating.map(
       (item, idx) => (idx === index ? { ...item, [field]: value } : item)
     );
@@ -17,6 +29,20 @@ const BatchManufacturingFormPage3 = () => {
   };
 
   const handleCheckRecordChange = (name, value) => {
+     // Determine if the field is QA-specific or production-specific
+     const qaFields = ['checkedByQAOfficer', 'dateQA'];
+     const productionFields = [
+       'checkedByDispensingPharmacist', 'dateDP', 
+       'receivedByProductionPharmacist', 'datePP', 
+       'receivedBySupervisor', 'dateS'
+    ];
+    
+    // Check permissions based on the field
+    if ((qaFields.includes(name) && !permission.canEditQA) ||
+        (productionFields.includes(name) && !permission.canEditProduction)) {
+      return;
+    }
+
     const updatedCheckRecord = {
       ...dispensing.checkRecordCoating,
       [name]: value,
@@ -27,6 +53,8 @@ const BatchManufacturingFormPage3 = () => {
   };
 
   const addWeighingRecordRow = () => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingRecord = [
       ...dispensing.weighingRecordCoating,
       {
@@ -44,6 +72,8 @@ const BatchManufacturingFormPage3 = () => {
   };
 
   const deleteWeighingRecordRow = (index) => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingRecord = dispensing.weighingRecordCoating.filter(
       (_, idx) => idx !== index
     );
@@ -51,6 +81,22 @@ const BatchManufacturingFormPage3 = () => {
       setDispensing({ ...dispensing, weighingRecordCoating: newWeighingRecord })
     );
   };
+
+  if (!(permission.canReadProduction || permission.canReadQA)) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   return (
     <div className="batch-manufacturing-form-page-2 p-4 ">
@@ -81,6 +127,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleWeighingRecordChange(index, "item", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -90,6 +138,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleWeighingRecordChange(index, "unit", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -99,6 +149,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleWeighingRecordChange(index, "tareWt", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -108,6 +160,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleWeighingRecordChange(index, "netWt", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -117,6 +171,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleWeighingRecordChange(index, "grossWt", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -130,12 +186,15 @@ const BatchManufacturingFormPage3 = () => {
                       e.target.value
                     )
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td className="actions-column">
                 <Button
                   variant="outline-danger"
                   onClick={() => deleteWeighingRecordRow(index)}
+                  disabled={!permission.canEditProduction}
                 >
                   Delete
                 </Button>
@@ -144,7 +203,14 @@ const BatchManufacturingFormPage3 = () => {
           ))}
         </tbody>
       </Table>
-      <Button onClick={addWeighingRecordRow} className="mt-2">
+      <Button
+        onClick={addWeighingRecordRow}
+        className="mt-2"
+        variant="contained"
+        color="primary"
+        startIcon={<Plus className="w-4 h-4" />}
+        disabled={!permission.canEditProduction}
+      >
         Add Row
       </Button>
 
@@ -181,6 +247,8 @@ const BatchManufacturingFormPage3 = () => {
                       e.target.value
                     )
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -189,6 +257,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleCheckRecordChange("dateDP", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -201,6 +271,8 @@ const BatchManufacturingFormPage3 = () => {
                       e.target.value
                     )
                   }
+                  readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
                 />
                 <Form.Control
                   type="date"
@@ -209,6 +281,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleCheckRecordChange("dateQA", e.target.value)
                   }
+                  readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
                 />
               </td>
               <td>
@@ -224,6 +298,8 @@ const BatchManufacturingFormPage3 = () => {
                       e.target.value
                     )
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -232,6 +308,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleCheckRecordChange("datePP", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -246,6 +324,8 @@ const BatchManufacturingFormPage3 = () => {
                       e.target.value
                     )
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -254,6 +334,8 @@ const BatchManufacturingFormPage3 = () => {
                   onChange={(e) =>
                     handleCheckRecordChange("dateS", e.target.value)
                   }
+                  readOnly={!permission.canEditProduction}
+                  disabled={!permission.canEditProduction}
                 />
               </td>
             </tr>

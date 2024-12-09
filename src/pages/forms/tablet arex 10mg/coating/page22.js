@@ -1,14 +1,25 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCoatingRecord } from "../../../../store/coatingSlice";
+import { Button, IconButton, TextField } from '@mui/material';
+import DeleteIcon from "@mui/icons-material/Delete";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-const BatchManufacturingFormPage22 = () => {
+const BatchManufacturingFormPage22 = ({ isReport }) => {
   const dispatch = useDispatch();
   const { weightOfCoatedTablets, batchManufacturingYield } = useSelector(
     (state) => state.coating
   );
+  const { hasPermission } = usePermissions();
+
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+  };
 
   const handleWeightChange = (index, field, value) => {
+    if (!permission.canEditProduction) return;
+
     const updatedContainers = [...weightOfCoatedTablets.containers];
     updatedContainers[index] = { ...updatedContainers[index], [field]: value };
 
@@ -41,6 +52,8 @@ const BatchManufacturingFormPage22 = () => {
   };
 
   const handleGranulationChange = (index, field, value) => {
+    if (!permission.canEditProduction) return;
+
     const updatedLabels = [...batchManufacturingYield.labels];
     updatedLabels[index] = { ...updatedLabels[index], [field]: value };
     dispatch(
@@ -54,6 +67,8 @@ const BatchManufacturingFormPage22 = () => {
   };
 
   const handleWeighedByChange = (value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(
       setCoatingRecord({
         weightOfCoatedTablets: { ...weightOfCoatedTablets, weighedBy: value },
@@ -62,6 +77,8 @@ const BatchManufacturingFormPage22 = () => {
   };
 
   const handleReceivedByChange = (value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(
       setCoatingRecord({
         weightOfCoatedTablets: { ...weightOfCoatedTablets, receivedBy: value },
@@ -70,6 +87,8 @@ const BatchManufacturingFormPage22 = () => {
   };
 
   const handlegGranulationPerformedBy = (value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(
       setCoatingRecord({
         batchManufacturingYield: {
@@ -81,6 +100,8 @@ const BatchManufacturingFormPage22 = () => {
   };
 
   const handlegGranulationPerformedByDate = (value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(
       setCoatingRecord({
         batchManufacturingYield: {
@@ -90,6 +111,126 @@ const BatchManufacturingFormPage22 = () => {
       })
     );
   };
+
+   // Add new container row
+   const addContainerRow = () => {
+    if (!permission.canEditProduction) return;
+
+    const newContainer = {
+      grossWeight: "",
+      tareWeight: "",
+      netWeight: "",
+    };
+
+    const updatedContainers = [
+      ...weightOfCoatedTablets.containers, 
+      newContainer
+    ];
+
+    dispatch(
+      setCoatingRecord({
+        weightOfCoatedTablets: {
+          ...weightOfCoatedTablets,
+          containers: updatedContainers,
+        },
+      })
+    );
+  };
+
+  // Delete container row
+  const deleteContainerRow = (index) => {
+    if (!permission.canEditProduction) return;
+
+    const updatedContainers = weightOfCoatedTablets.containers.filter(
+      (_, idx) => idx !== index
+    );
+
+    const totalGrossWeight = updatedContainers.reduce(
+      (total, container) => total + parseFloat(container.grossWeight || 0),
+      0
+    );
+    const totalTareWeight = updatedContainers.reduce(
+      (total, container) => total + parseFloat(container.tareWeight || 0),
+      0
+    );
+    const totalNetWeight = updatedContainers.reduce(
+      (total, container) => total + parseFloat(container.netWeight || 0),
+      0
+    );
+
+    dispatch(
+      setCoatingRecord({
+        weightOfCoatedTablets: {
+          ...weightOfCoatedTablets,
+          containers: updatedContainers,
+          total: {
+            grossWeight: totalGrossWeight,
+            tareWeight: totalTareWeight,
+            netWeight: totalNetWeight,
+          },
+        },
+      })
+    );
+  };
+
+  // Add new granulation label row
+  const addGranulationLabelRow = () => {
+    if (!permission.canEditProduction) return;
+
+    const newLabel = {
+      description: "",
+      yield: "",
+    };
+
+    const updatedLabels = [
+      ...batchManufacturingYield.labels, 
+      newLabel
+    ];
+
+    dispatch(
+      setCoatingRecord({
+        batchManufacturingYield: { 
+          ...batchManufacturingYield, 
+          labels: updatedLabels 
+        },
+      })
+    );
+  };
+
+  // Delete granulation label row
+  const deleteGranulationLabelRow = (index) => {
+    if (!permission.canEditProduction) return;
+
+    const updatedLabels = batchManufacturingYield.labels.filter(
+      (_, idx) => idx !== index
+    );
+
+    dispatch(
+      setCoatingRecord({
+        batchManufacturingYield: { 
+          ...batchManufacturingYield, 
+          labels: updatedLabels 
+        },
+      })
+    );
+  };
+
+  // If user cannot read production, show access denied
+  if (!permission.canReadProduction) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 mb-4">
@@ -109,6 +250,9 @@ const BatchManufacturingFormPage22 = () => {
             <th className="border border-gray-300 p-2 text-center">
               Net Weight (Kg)
             </th>
+            <th className="border border-gray-300 p-2 text-center actions-column">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -125,6 +269,7 @@ const BatchManufacturingFormPage22 = () => {
                     handleWeightChange(index, "grossWeight", e.target.value)
                   }
                   className="w-full text-center"
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td className="border border-gray-300 p-2 text-center">
@@ -135,6 +280,7 @@ const BatchManufacturingFormPage22 = () => {
                     handleWeightChange(index, "tareWeight", e.target.value)
                   }
                   className="w-full text-center"
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td className="border border-gray-300 p-2 text-center">
@@ -145,7 +291,16 @@ const BatchManufacturingFormPage22 = () => {
                     handleWeightChange(index, "netWeight", e.target.value)
                   }
                   className="w-full text-center"
+                  disabled={!permission.canEditProduction}
                 />
+              </td>
+              <td className="border border-gray-300 p-2 text-center actions-column">
+                <IconButton 
+                  onClick={() => deleteContainerRow(index)}
+                  disabled={!permission.canEditProduction}
+                >
+                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
+                </IconButton>
               </td>
             </tr>
           ))}
@@ -165,6 +320,16 @@ const BatchManufacturingFormPage22 = () => {
           </tr>
         </tbody>
       </table>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={addContainerRow} 
+        className="mt-4"
+        disabled={!permission.canEditProduction}
+      >
+        Add Container Row
+      </Button>
+
 
       <div
         style={{
@@ -182,6 +347,7 @@ const BatchManufacturingFormPage22 = () => {
           <input
             value={weightOfCoatedTablets.weighedBy}
             onChange={(e) => handleWeighedByChange(e.target.value)}
+            disabled={!permission.canEditProduction}
           />
         </div>
         <div className=" ml-4">
@@ -191,6 +357,7 @@ const BatchManufacturingFormPage22 = () => {
           <input
             value={weightOfCoatedTablets.receivedBy}
             onChange={(e) => handleReceivedByChange(e.target.value)}
+            disabled={!permission.canEditProduction}
           />
         </div>
       </div>
@@ -208,6 +375,9 @@ const BatchManufacturingFormPage22 = () => {
             <th className="border border-gray-300 p-2 text-center">Yield</th>
             <th className="border border-gray-300 p-2 text-center" colSpan="2">
               Performed by Production Pharmacist (sign & date)
+            </th>
+            <th className="border border-gray-300 p-2 text-center actions-column">
+              Actions
             </th>
           </tr>
         </thead>
@@ -228,6 +398,10 @@ const BatchManufacturingFormPage22 = () => {
                       e.target.value
                     )
                   }
+                  InputProps={{
+                    readOnly: !permission.canEditProduction,
+                    disabled: !permission.canEditProduction
+                  }}
                   className="w-full"
                 />
               </td>
@@ -239,7 +413,19 @@ const BatchManufacturingFormPage22 = () => {
                     handleGranulationChange(index, "yield", e.target.value)
                   }
                   className="w-full text-center"
+                  InputProps={{
+                    readOnly: !permission.canEditProduction,
+                    disabled: !permission.canEditProduction
+                  }}
                 />
+              </td>
+              <td className="border border-gray-300 p-2 text-center actions-column">
+                <IconButton 
+                  onClick={() => deleteGranulationLabelRow(index)}
+                  disabled={!permission.canEditProduction}
+                >
+                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
+                </IconButton>
               </td>
               {/* Single centralized input fields for "Performed by Production Pharmacist" */}
               {index === 0 && (
@@ -255,6 +441,7 @@ const BatchManufacturingFormPage22 = () => {
                       handlegGranulationPerformedBy(e.target.value)
                     }
                     className="text-center w-full"
+                    disabled={!permission.canEditProduction}
                   />
                   <input
                     type="date"
@@ -262,14 +449,26 @@ const BatchManufacturingFormPage22 = () => {
                     onChange={(e) =>
                       handlegGranulationPerformedByDate(e.target.value)
                     }
+                    disabled={!permission.canEditProduction}
                     className="text-center w-full"
                   />
                 </td>
+                
               )}
+              
             </tr>
           ))}
         </tbody>
       </table>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={addGranulationLabelRow} 
+        className="mt-4"
+        disabled={!permission.canEditProduction}
+      >
+        Add Granulation Label Row
+      </Button>
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setPrinting } from "../../../../store/printingSlice";
 import { TextField } from "@mui/material";
 
-const BatchPackingFormPage3 = () => {
+const BatchPackingFormPage3 = ({ isReport }) => {
   const dispatch = useDispatch();
   const { tailLineClearancePrinting, tailLineClearancePrinting2} = useSelector((state) => state.printing);
 

@@ -12,7 +12,7 @@ const initialState = {
     mfgLicense: "",
     productRegNo: "",
     validFrom: "",
-    subCategory: ""
+    subCategory: "",
   },
 };
 

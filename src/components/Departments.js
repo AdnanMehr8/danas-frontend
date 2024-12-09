@@ -15,6 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 import { api } from '../api/api';
+import { Add } from '@mui/icons-material';
 
 const url = process.env.REACT_APP_INTERNAL_API_PATH;
 
@@ -191,6 +192,7 @@ const DepartmentManager = () => {
             variant="contained"
             color="primary"
             onClick={() => setIsDialogOpen(true)}
+            startIcon={<Add />}
           >
             Add Department
           </Button>

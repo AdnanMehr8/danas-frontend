@@ -62,27 +62,18 @@ const initialState = {
     authorizedForUse: "",
     dateAndTime: null,
   },
-  compressionRecord: {
-    temp: "",
-    rH: "",
-    weightOfGranules: "",
-    upperPunch: "",
-    lowerPunch: "",
-    compressionStartedAt: "",
-    compressionCompletedOn: "",
-    sampleTakenQty: "",
-    verification: [
-      {
-        performedByOperator: "",
-        checkedByPO: "",
-        checkedByQAI: "",
-        target: "",
-        pboDate: "",
-        checkedByPODate: "",
-        checkedByQAIDate: "",
-      },
-    ],
-  },
+  compressionRecord: [
+    {
+      target: "",
+      actual: "",
+      performedByOperator: "",
+      checkedByPO: "",
+      checkedByQAI: "",
+      pboDate: "",
+      checkedByPODate: "",
+      checkedByQAIDate: "",
+    },
+  ],
   compressionSpecifications: {
     parameters: [
       {
@@ -223,6 +214,37 @@ const initialState = {
     qaOfficer: "",
     qaManager: "",
   },
+  qcHeader: {
+    docNo: "",
+    effectiveDate: "",
+    revisionNo: "",
+    replaces: ""
+},
+  batch: {
+    productName: "",
+    batchNo: "",
+    qCNo: "",
+    batchSize: "",
+    packsSize: "",
+    mfgDate: "",
+    expiryDate: "",
+    analysisDate: "",
+    sampleType: "",
+  },
+  testAndResults: {
+    parameters: [
+      {
+        parameters: "",
+        specification: "",
+        results: "",
+      },
+    ],
+    checkedByQCA: "",
+    checkedByQCADate: "",
+    checkedByQCM: "",
+    checkedByQCMDate: "",
+    remarks: ""
+  },
 };
 
 export const compressionSlice = createSlice({
@@ -251,11 +273,17 @@ export const compressionSlice = createSlice({
         weightOfCompressedTablets,
         compressionYield,
         requestForAnalysisEnd,
+        qcHeader,
+        batch,
+        testAndResults
       } = action.payload;
 
+      state.qcHeader = { ...state.qcHeader, ...qcHeader };
       state.precautions = { ...state.precautions, ...precautions };
       // state.lineClearance = { ...state.lineClearance, ...lineClearance };
       state.lineClearance = action.payload.lineClearance || state.lineClearance;
+      state.batch = { ...state.batch, ...batch };
+      state.testAndResults = { ...state.testAndResults, ...testAndResults };
       state.batchInfo = { ...state.batchInfo, ...batchInfo };
       state.batchRecord = { ...state.batchRecord, ...batchRecord };
       state.checkboxes = { ...state.checkboxes, ...checkboxes };
@@ -263,10 +291,8 @@ export const compressionSlice = createSlice({
       state.compressionRemarks = compressionRemarks;
       state.authorization = { ...state.authorization, ...authorization };
       // state.compressionRecord = action.payload.compressionRecord || state.compressionRecord;
-      state.compressionRecord = {
-        ...state.compressionRecord,
-        ...compressionRecord,
-      };
+      state.compressionRecord =
+      action.payload.compressionRecord || state.compressionRecord;
 
       state.compressionSpecifications = {
         ...state.compressionSpecifications,

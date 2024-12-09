@@ -18,12 +18,46 @@ import {
 import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import "./page15.css";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-export default function BatchPackingFormPage5() {
+export default function BatchPackingFormPage5({ isReport }) {
   const dispatch = useDispatch();
   const printingState = useSelector((state) => state.printing);
+  const { hasPermission } = usePermissions();
+  
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
+
+  // Table-specific permissions (both production and QA can edit)
+  const canEditTable = permission.canEditProduction || permission.canEditQA;
+  
+  // General form permissions (only production can edit)
+  const canEditGeneral = permission.canEditProduction;
+
+  // Check if user can read either production or QA
+  if (!permission.canReadProduction && !permission.canReadQA) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   const handleInputChange = (index, field, value) => {
+    if (!canEditTable) return;
+
     const updatedLabels = [...printingState.checkSheet.labels];
 
   
@@ -41,6 +75,8 @@ export default function BatchPackingFormPage5() {
   };
 
   const handleGeneralInputChange = (field, value) => {
+    if (!canEditGeneral) return;
+
     dispatch(
       setPrinting({
         ...printingState,
@@ -53,6 +89,8 @@ export default function BatchPackingFormPage5() {
   };
 
   const handleAddRow = () => {
+    if (!canEditTable) return;
+
     const newRow = {
         dateAndTime: "",
         ucOrLabel: "",
@@ -75,6 +113,8 @@ export default function BatchPackingFormPage5() {
   };
 
   const handleRemoveRow = (index) => {
+    if (!canEditTable) return;
+
     const updatedLabels = printingState.checkSheet.labels.filter(
       (_, i) => i !== index
     );
@@ -113,6 +153,7 @@ export default function BatchPackingFormPage5() {
                     }
                     className="w-1/4 mt-4"
                     InputLabelProps={{ shrink: true }}
+                    disabled={!canEditGeneral}
                   />
                 </td>
                 <td>
@@ -129,6 +170,7 @@ export default function BatchPackingFormPage5() {
                     }
                     className="w-1/4 mt-4"
                     InputLabelProps={{ shrink: true }}
+                    disabled={!canEditGeneral}
                   />
                 </td>
               </tr>
@@ -206,6 +248,7 @@ export default function BatchPackingFormPage5() {
                         }
                         InputLabelProps={{ shrink: true }}
                         className="weight"
+                        disabled={!canEditTable}
                       />
                       {/* Time Field */}
                       <TextField
@@ -220,6 +263,7 @@ export default function BatchPackingFormPage5() {
                         }
                         InputLabelProps={{ shrink: true }}
                         className="weight"
+                        disabled={!canEditTable}
                       />
                     </div>
                   </TableCell>
@@ -237,6 +281,7 @@ export default function BatchPackingFormPage5() {
                           e.target.value
                         )
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -248,6 +293,7 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "commPackeOrExport", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -259,6 +305,7 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "batchNo", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -269,6 +316,7 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "mfgDate", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -279,6 +327,7 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "expDate", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -289,6 +338,7 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "mrp", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -299,10 +349,11 @@ export default function BatchPackingFormPage5() {
                       onChange={(e) =>
                         handleInputChange(index, "checkedBy", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell className="actions-column">
-                    <IconButton onClick={() => handleRemoveRow(index)}>
+                    <IconButton onClick={() => handleRemoveRow(index)} disabled={!canEditTable}>
                       <RemoveIcon />
                     </IconButton>
                   </TableCell>
@@ -318,6 +369,7 @@ export default function BatchPackingFormPage5() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleAddRow}
+            disabled={!canEditTable}
           >
             Add Row
           </Button>

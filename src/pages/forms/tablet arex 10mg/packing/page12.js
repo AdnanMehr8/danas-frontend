@@ -19,12 +19,21 @@ import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import "./page15.css";
 import { Form } from "react-bootstrap";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-export default function BatchPackingFormPage12() {
+export default function BatchPackingFormPage12({ isReport }) {
   const dispatch = useDispatch();
   const packingState = useSelector((state) => state.packing);
+  const { hasPermission } = usePermissions();
+  
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+  };
 
   const handleInputChange = (index, field, value) => {
+    if (!permission.canEditProduction) return;
+
     const updatedLabels = [...packingState.teamSheet.labels];
 
   
@@ -42,6 +51,8 @@ export default function BatchPackingFormPage12() {
   };
 
   const handleGeneralInputChange = (field, value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(
       setPacking({
         ...packingState,
@@ -54,6 +65,8 @@ export default function BatchPackingFormPage12() {
   };
 
   const handleAddRow = () => {
+    if (!permission.canEditProduction) return;
+
     const newRow = {
       name: "",
       process: "",
@@ -76,6 +89,8 @@ export default function BatchPackingFormPage12() {
   };
 
   const handleRemoveRow = (index) => {
+    if (!permission.canEditProduction) return;
+
     const updatedLabels = packingState.teamSheet.labels.filter(
       (_, i) => i !== index
     );
@@ -89,6 +104,23 @@ export default function BatchPackingFormPage12() {
       })
     );
   };
+
+  // If user cannot read, return null or a no access message
+  if (!permission.canReadProduction) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   return (
     <Card className="max-w-7xl mx-auto">
@@ -167,6 +199,10 @@ export default function BatchPackingFormPage12() {
                           e.target.value
                         )
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -178,6 +214,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "process", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -189,6 +229,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeIn", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -199,6 +243,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeOut", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -209,6 +257,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeIn2", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -219,6 +271,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeOut2", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -229,6 +285,10 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeIn3", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -239,10 +299,14 @@ export default function BatchPackingFormPage12() {
                       onChange={(e) =>
                         handleInputChange(index, "timeOut3", e.target.value)
                       }
+                      InputProps={{
+                        readOnly: !permission.canEditProduction,
+                        disabled: !permission.canEditProduction
+                      }}
                     />
                   </TableCell>
                   <TableCell className="actions-column">
-                    <IconButton onClick={() => handleRemoveRow(index)}>
+                    <IconButton onClick={() => handleRemoveRow(index)} disabled={!permission.canEditProduction}>
                       <RemoveIcon />
                     </IconButton>
                   </TableCell>
@@ -258,6 +322,7 @@ export default function BatchPackingFormPage12() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleAddRow}
+            disabled={!permission.canEditProduction}
           >
             Add Row
           </Button>
@@ -290,6 +355,7 @@ export default function BatchPackingFormPage12() {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -298,6 +364,7 @@ export default function BatchPackingFormPage12() {
                   onChange={(e) =>
                     handleGeneralInputChange("inchargeDate", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -310,6 +377,7 @@ export default function BatchPackingFormPage12() {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -318,6 +386,7 @@ export default function BatchPackingFormPage12() {
                   onChange={(e) =>
                     handleGeneralInputChange("packingOfficerDate", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
             </tr>

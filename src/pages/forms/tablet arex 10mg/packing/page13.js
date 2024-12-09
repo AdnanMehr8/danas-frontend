@@ -3,12 +3,48 @@ import { Table, Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setPacking } from "../../../../store/packingSlice";
 import { TextField } from "@mui/material";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-const BatchPackingFormPage13 = () => {
+const BatchPackingFormPage13 = ({ isReport }) => {
   const dispatch = useDispatch();
   const packing = useSelector((state) => state.packing);
+  const { hasPermission } = usePermissions();
+
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
+
+  // Table-specific permissions (both production and QA can edit)
+  const canEditTable = permission.canEditProduction || permission.canEditQA;
+  
+  // General form permissions (only production can edit)
+  const canEditGeneral = permission.canEditProduction;
+
+  // Check if user can read either production or QA
+  if (!permission.canReadProduction && !permission.canReadQA) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
+
 
   const handleInputChange = (index, field, value) => {
+    if (!canEditTable) return;
+
+    
     const updatedLabels = [...packing.checkSheet.labels];
 
   
@@ -26,6 +62,8 @@ const BatchPackingFormPage13 = () => {
   };
 
   const handleGeneralInputChange = (field, value) => {
+    if (!canEditGeneral) return;
+
     dispatch(
       setPacking({
         ...packing,
@@ -38,6 +76,8 @@ const BatchPackingFormPage13 = () => {
   };
 
   const handleAddRow = () => {
+    if (!canEditTable) return;
+
     const newRow = {
         dateAndTime: "",
         ucOrLabel: "",
@@ -60,6 +100,8 @@ const BatchPackingFormPage13 = () => {
   };
 
   const handleRemoveRow = (index) => {
+    if (!canEditTable) return;
+
     const updatedLabels = packing.checkSheet.labels.filter(
       (_, i) => i !== index
     );
@@ -104,6 +146,7 @@ const BatchPackingFormPage13 = () => {
                   onChange={(e) =>
                     handleGeneralInputChange("dateStarted", e.target.value)
                   }
+                  disabled={!canEditGeneral}
                 />
               </td>
               <td>
@@ -114,6 +157,7 @@ const BatchPackingFormPage13 = () => {
                   onChange={(e) =>
                     handleGeneralInputChange("dateCompleted", e.target.value)
                   }
+                  disabled={!canEditGeneral}
                 />
               </td>
             </tr>
@@ -142,7 +186,7 @@ const BatchPackingFormPage13 = () => {
       <th rowSpan={2}>UC / MC</th>
       <th rowSpan={2}>MC No.</th>
       <th rowSpan={2}>sign by produc./QA</th>
-      <th>Actions</th>
+      <th className="actions-column">Actions</th>
     </tr>
     <tr>
       <th></th>
@@ -158,7 +202,7 @@ const BatchPackingFormPage13 = () => {
       <th>Inner</th>
       <th>Label</th>
       <th style={{ borderRight: "1px solid #dee2e6" }}></th>
-      <th></th>
+      {/* <th></th> */}
     
     </tr>
   </thead>
@@ -176,6 +220,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -189,6 +234,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -202,6 +248,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -215,6 +262,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -228,6 +276,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -241,6 +290,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -254,6 +304,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -267,6 +318,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -280,6 +332,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -293,6 +346,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -306,6 +360,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -319,6 +374,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -332,6 +388,7 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td>
@@ -345,12 +402,14 @@ const BatchPackingFormPage13 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!canEditTable}
                 />
               </td>
               <td className="actions-column">
                 <Button
                   variant="outline-danger"
                   onClick={() => handleRemoveRow(index)}
+                  disabled={!canEditTable}
                 >
                   Delete
                 </Button>
@@ -359,7 +418,11 @@ const BatchPackingFormPage13 = () => {
           ))}
         </tbody>
       </Table>
-      <Button onClick={handleAddRow} className="mt-2">
+      <Button
+        onClick={handleAddRow}
+        className="mt-2"
+        disabled={!canEditTable}
+      >
         Add Row
       </Button>
     </div>

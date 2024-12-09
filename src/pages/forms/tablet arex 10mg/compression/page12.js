@@ -1,13 +1,41 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCompressionRecord } from '../../../../store/compressionSlice';
-import { TextField } from '@mui/material';
+import { Button, IconButton, TextField } from '@mui/material';
+import { usePermissions } from '../../../../hooks/usePermissions';
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const BatchManufacturingFormPage12 = () => {
+const BatchManufacturingFormPage12 = ({ isReport }) => {
   const dispatch = useDispatch();
   const { requestForAnalysis } = useSelector((state) => state.compression);
+  const { hasPermission } = usePermissions();
+
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
+  // If user cannot read, show access denied
+  if (!(permission.canReadProduction || permission.canReadQA)) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   const handleBatchInfoChange = (field, value) => {
+    if (!permission.canEditProduction) return;
+
     dispatch(setCompressionRecord({
       requestForAnalysis: {
         ...requestForAnalysis,
@@ -16,7 +44,16 @@ const BatchManufacturingFormPage12 = () => {
     }));
   };
 
-    const handleQAChange = (field, value) => {
+  const handleQAChange = (field, value) => {
+      // QA can edit QA-specific fields
+     const qaFields = [
+      
+      'dateCollected', 'collectedBy', 'quantityOfSample', 
+      'containerNumbers', 'qaOfficer', 'qaManager'
+    ];
+
+    if (qaFields.includes(field) && !permission.canEditQA) return;
+
     dispatch(setCompressionRecord({
       requestForAnalysis: {
         ...requestForAnalysis,
@@ -26,6 +63,8 @@ const BatchManufacturingFormPage12 = () => {
   };
 
   const handleObservationChange = (index, field, value) => {
+    if (!permission.canEditQA) return;
+
     const updatedObservations = [...requestForAnalysis.qaObservations];
     updatedObservations[index] = { ...updatedObservations[index], [field]: value };
     dispatch(setCompressionRecord({
@@ -35,6 +74,45 @@ const BatchManufacturingFormPage12 = () => {
       }
     }));
   };
+
+  // Add new observation row
+  const addObservationRow = () => {
+    // Only QA can add rows
+    if (!permission.canEditQA) return;
+
+    const newRow = {
+      parameter: "",
+      statusCompression: "",
+      remarks: "",
+    };
+    dispatch(
+      setCompressionRecord({
+        requestForAnalysis: {
+          ...requestForAnalysis,
+          qaObservations: [...requestForAnalysis.qaObservations, newRow],
+        },
+      })
+    );
+  };
+
+  // Delete observation row
+  const deleteObservationRow = (index) => {
+    // Only QA can delete rows
+    if (!permission.canEditQA) return;
+
+    const updatedObservations = requestForAnalysis.qaObservations.filter(
+      (_, idx) => idx !== index
+    );
+    dispatch(
+      setCompressionRecord({
+        requestForAnalysis: {
+          ...requestForAnalysis,
+          qaObservations: updatedObservations,
+        },
+      })
+    );
+  };
+
 
   return (
     <div className=" p-4 mb-4">
@@ -53,6 +131,8 @@ const BatchManufacturingFormPage12 = () => {
           style={{ width: '100%' }}
           value={requestForAnalysis.batchInfo.product}
           onChange={(e) => handleBatchInfoChange('product', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">QC#</td>
@@ -61,6 +141,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.qcNumber}
           onChange={(e) => handleBatchInfoChange('qcNumber', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
     </tr>
@@ -74,6 +156,8 @@ const BatchManufacturingFormPage12 = () => {
           style={{ width: '100%' }}
           value={requestForAnalysis.batchInfo.section}
           onChange={(e) => handleBatchInfoChange('section', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Stage</td>
@@ -82,6 +166,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.stage}
           onChange={(e) => handleBatchInfoChange('stage', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
     </tr>
@@ -94,6 +180,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.batchNumber}
           onChange={(e) => handleBatchInfoChange('batchNumber', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Mfg. Date</td>
@@ -102,6 +190,8 @@ const BatchManufacturingFormPage12 = () => {
           type="date"
           value={requestForAnalysis.batchInfo.mfgDate}
           onChange={(e) => handleBatchInfoChange('mfgDate', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Batch Size</td>
@@ -110,6 +200,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.bSize}
           onChange={(e) => handleBatchInfoChange('bSize', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
     </tr>
@@ -122,6 +214,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.packSize}
           onChange={(e) => handleBatchInfoChange('packSize', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Exp. Date</td>
@@ -130,6 +224,8 @@ const BatchManufacturingFormPage12 = () => {
           type="date"
           value={requestForAnalysis.batchInfo.expDate}
           onChange={(e) => handleBatchInfoChange('expDate', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Sample quantity</td>
@@ -138,6 +234,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.sampleQuantity}
           onChange={(e) => handleBatchInfoChange('sampleQuantity', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
     </tr>
@@ -150,6 +248,8 @@ const BatchManufacturingFormPage12 = () => {
           type="text"
           value={requestForAnalysis.batchInfo.weightPerUnit}
           onChange={(e) => handleBatchInfoChange('weightPerUnit', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Date</td>
@@ -158,6 +258,8 @@ const BatchManufacturingFormPage12 = () => {
           type="date"
           value={requestForAnalysis.batchInfo.date}
           onChange={(e) => handleBatchInfoChange('date', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
       <td className="border p-2">Time</td>
@@ -166,6 +268,8 @@ const BatchManufacturingFormPage12 = () => {
           type="time"
           value={requestForAnalysis.batchInfo.time}
           onChange={(e) => handleBatchInfoChange('time', e.target.value)}
+          readOnly={!permission.canEditProduction}
+          disabled={!permission.canEditProduction}
         />
       </td>
     </tr>
@@ -185,6 +289,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.sampleType || ''}
          onChange={(e) => handleQAChange('sampleType', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditProduction}
+         disabled={!permission.canEditProduction}
         />
       </td>
       <td><strong>Release Required For: </strong></td>
@@ -194,6 +300,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.releaseRequiredFor || ''}
          onChange={(e) => handleQAChange('releaseRequiredFor', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditProduction}
+         disabled={!permission.canEditProduction}
         />
       </td>
   </tr>
@@ -205,6 +313,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.signature || ''}
          onChange={(e) => handleQAChange('signature', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditProduction}
+         disabled={!permission.canEditProduction}
         />
       </td>
   </tr>
@@ -225,6 +335,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.dateCollected || ''}
          onChange={(e) => handleQAChange('dateCollected', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
         />
       </td>
       <td colSpan="2">
@@ -234,6 +346,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.collectedBy || ''}
          onChange={(e) => handleQAChange('collectedBy', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
         />
       </td>
   </tr>
@@ -244,6 +358,8 @@ const BatchManufacturingFormPage12 = () => {
          type="text"
          value={requestForAnalysis.qa.quantityOfSample || ''}
          onChange={(e) => handleQAChange('quantityOfSample', e.target.value)}
+         readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
          className="ml-2 border border-gray-300 p-1"
         />
       </td>
@@ -254,6 +370,8 @@ const BatchManufacturingFormPage12 = () => {
          value={requestForAnalysis.qa.containerNumbers || ''}
          onChange={(e) => handleQAChange('containerNumbers', e.target.value)}
          className="ml-2 border border-gray-300 p-1"
+         readOnly={!permission.canEditQA}
+                  disabled={!permission.canEditQA}
         />
       </td>
   </tr>
@@ -270,21 +388,26 @@ const BatchManufacturingFormPage12 = () => {
               <th className="border border-gray-300 p-2">OK</th>
               <th className="border border-gray-300 p-2">Not OK</th>
               <th className="border border-gray-300 p-2 text-center">Remarks</th>
+              <th className="border border-gray-300 p-2 actions-column">Actions</th>
             </tr>
           </thead>
           <tbody>
             {requestForAnalysis.qaObservations.map((observation, index) => (
               <tr key={index}>
                 <td className="border border-gray-300 p-2"
-                    style={{width: '500px'}}
+                   
                   
                 >
                   <TextField
-                    style={{width: '500px'}}
+                   
                     multiline
                     value={observation.parameter}
                     onChange={(e) => handleObservationChange(index, 'parameter', e.target.value)}
                     className="w-full p-1"
+                    InputProps={{
+                      readOnly: !permission.canEditQA,
+                      disabled: !permission.canEditQA
+                    }}
                   />
                 </td>
                 <td className="border border-gray-300 p-2 text-center">
@@ -296,6 +419,7 @@ const BatchManufacturingFormPage12 = () => {
                     value="OK"
                     checked={observation.statusCompression === 'OK'}
                     onChange={() => handleObservationChange(index, 'statusCompression', 'OK')}
+                    disabled={!permission.canEditQA}
                   />
                 </td>
                 <td className="border border-gray-300 p-2 text-center">
@@ -307,21 +431,43 @@ const BatchManufacturingFormPage12 = () => {
                     value="Not OK"
                     checked={observation.statusCompression === 'Not OK'}
                     onChange={() => handleObservationChange(index, 'statusCompression', 'Not OK')}
+                    disabled={!permission.canEditQA}
                   />
                 </td>
                 <td className="border border-gray-300 p-2">
                   <TextField
-                    style={{width: '500px'}}
+                   
                     multiline
                     value={observation.remarks}
                     onChange={(e) => handleObservationChange(index, 'remarks', e.target.value)}
                     className="w-full  p-1"
+                    InputProps={{
+                      readOnly: !permission.canEditQA,
+                      disabled: !permission.canEditQA
+                    }}
                   />
                 </td>
+                <td className="border border-gray-300 p-2 actions-column">
+                    <IconButton
+                      onClick={() => deleteObservationRow(index)}
+                      disabled={!permission.canEditQA}
+                    >
+                      <DeleteIcon color={permission.canEditQA ? "error" : "disabled"} />
+                    </IconButton>
+                  </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <Button
+          variant="contained" 
+          color="primary" 
+          onClick={addObservationRow} 
+          className="mt-4"
+          disabled={!permission.canEditQA}
+        >
+          Add Observation Row
+        </Button>
       </div>
 
       <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }} className="mt-4">
@@ -336,6 +482,8 @@ const BatchManufacturingFormPage12 = () => {
                 }))
               }
               className="ml-2 border border-gray-300 p-1"
+              readOnly={!permission.canEditQA}
+              disabled={!permission.canEditQA}
             />
           </p>
         </div>
@@ -350,6 +498,8 @@ const BatchManufacturingFormPage12 = () => {
                 }))
               }
               className="ml-2 border border-gray-300 p-1"
+              readOnly={!permission.canEditQA}
+              disabled={!permission.canEditQA}
             />
           </p>
         </div>

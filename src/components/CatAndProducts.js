@@ -496,6 +496,7 @@ import { Edit as EditIcon, Delete as DeleteIcon, Eye as EyeIcon, Plus as PlusIco
 
 import { setBatchInfo } from "../store/batchInfoSlice";
 import { setBatchPInfo } from "../store/batchInfoPackingSlice ";
+import { usePermissions } from "../hooks/usePermissions";
 
 
 const categories = [
@@ -652,6 +653,13 @@ const CatAndProducts = () => {
   const [dialogType, setDialogType] = useState("");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canRead: hasPermission('products', 'read'),
+    canCreate: hasPermission('products', 'create'),
+    canUpdate: hasPermission('products', 'update'),
+    canDelete: hasPermission('products', 'delete'),
+  };
 
   const product = process.env.REACT_APP_INTERNAL_API_PATH || '';
 
@@ -704,8 +712,10 @@ const CatAndProducts = () => {
   }, [product]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    if (permission.canRead) {
+      fetchProducts();
+    }
+  }, [fetchProducts, permission.canRead]);
 
   const handleDialogClose = () => {
     setDialogOpen(false);
@@ -991,6 +1001,21 @@ const CatAndProducts = () => {
     </Dialog>
   );
 
+  if (!permission.canRead) {
+    console.log('Permission denied for roles read');
+    return (
+      <div style={{  display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',}}>
+        Access denied!!
+      </div>
+    );
+  }
+
   return (
     <Box sx={styles.pageContainer}>
       {/* Categories Section */}
@@ -1023,14 +1048,16 @@ const CatAndProducts = () => {
               ? categories.find(c => c.id === selectedCategoryId)?.name 
               : 'Products'}
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<PlusIcon size={18} />}
-            onClick={handleAdd}
-            sx={styles.addButton}
-          >
-            Add Product
-          </Button>
+          {permission.canCreate && (
+            <Button
+              variant="contained"
+              startIcon={<PlusIcon size={18} />}
+              onClick={handleAdd}
+              sx={styles.addButton}
+            >
+              Add Product
+            </Button>
+          )}
         </Box>
 
         {loading ? (
@@ -1113,31 +1140,37 @@ const CatAndProducts = () => {
                       <TableCell sx={styles.tableCell}>
                         <Box sx={{ display: 'flex', gap: '0.5rem' }}>
                           <Tooltip title="View">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleView(product.description, product.packSize)}
-                              sx={{ ...styles.actionButton, color: '#3498DB' }}
-                            >
-                              <EyeIcon size={16} />
-                            </IconButton>
+                            {permission.canRead && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleView(product.description, product.packSize)}
+                                sx={{ ...styles.actionButton, color: '#3498DB' }}
+                              >
+                                <EyeIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Edit">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(product)}
-                              sx={{ ...styles.actionButton, color: '#f59e0b' }}
-                            >
-                              <EditIcon size={16} />
-                            </IconButton>
+                            {permission.canUpdate && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(product)}
+                                sx={{ ...styles.actionButton, color: '#f59e0b' }}
+                              >
+                                <EditIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDelete(product)}
-                              sx={{ ...styles.actionButton, color: '#ef4444' }}
-                            >
-                              <DeleteIcon size={16} />
-                            </IconButton>
+                            {permission.canDelete && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDelete(product)}
+                                sx={{ ...styles.actionButton, color: '#ef4444' }}
+                              >
+                                <DeleteIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                         </Box>
                       </TableCell>
@@ -1198,31 +1231,37 @@ const CatAndProducts = () => {
                       <TableCell sx={styles.tableCell}>
                         <Box sx={{ display: 'flex', gap: '0.5rem' }}>
                           <Tooltip title="View">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleView(product.description, product.packSize)}
-                              sx={{ ...styles.actionButton, color: '#3498DB' }}
-                            >
-                              <EyeIcon size={16} />
-                            </IconButton>
+                            {permission.canRead && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleView(product.description, product.packSize)}
+                                sx={{ ...styles.actionButton, color: '#3498DB' }}
+                              >
+                                <EyeIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Edit">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(product)}
-                              sx={{ ...styles.actionButton, color: '#f59e0b' }}
-                            >
-                              <EditIcon size={16} />
-                            </IconButton>
+                            {permission.canUpdate && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(product)}
+                                sx={{ ...styles.actionButton, color: '#f59e0b' }}
+                              >
+                                <EditIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDelete(product)}
-                              sx={{ ...styles.actionButton, color: '#ef4444' }}
-                            >
-                              <DeleteIcon size={16} />
-                            </IconButton>
+                            {permission.canDelete && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDelete(product)}
+                                sx={{ ...styles.actionButton, color: '#ef4444' }}
+                              >
+                                <DeleteIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                         </Box>
                       </TableCell>
@@ -1272,31 +1311,37 @@ const CatAndProducts = () => {
                       <TableCell sx={styles.tableCell}>
                         <Box sx={{ display: 'flex', gap: '0.5rem' }}>
                           <Tooltip title="View">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleView(product.description, product.packSize)}
-                              sx={{ ...styles.actionButton, color: '#3498DB' }}
-                            >
-                              <EyeIcon size={16} />
-                            </IconButton>
+                            {permission.canRead && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleView(product.description, product.packSize)}
+                                sx={{ ...styles.actionButton, color: '#3498DB' }}
+                              >
+                                <EyeIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Edit">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleEdit(product)}
-                              sx={{ ...styles.actionButton, color: '#f59e0b' }}
-                            >
-                              <EditIcon size={16} />
-                            </IconButton>
+                            {permission.canUpdate && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleEdit(product)}
+                                sx={{ ...styles.actionButton, color: '#f59e0b' }}
+                              >
+                                <EditIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                           <Tooltip title="Delete">
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDelete(product)}
-                              sx={{ ...styles.actionButton, color: '#ef4444' }}
-                            >
-                              <DeleteIcon size={16} />
-                            </IconButton>
+                            {permission.canDelete && (
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDelete(product)}
+                                sx={{ ...styles.actionButton, color: '#ef4444' }}
+                              >
+                                <DeleteIcon size={16} />
+                              </IconButton>
+                            )}
                           </Tooltip>
                         </Box>
                       </TableCell>

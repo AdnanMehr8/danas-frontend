@@ -1,4 +1,6 @@
 import axios from "axios";
+import { setUser } from "../store/authSlice";
+import { useDispatch } from "react-redux";
 
 export const api = axios.create({
   baseURL: process.env.REACT_APP_INTERNAL_API_PATH,
@@ -72,8 +74,7 @@ api.interceptors.response.use(
   (config) => config,
   async (error) => {
     const originalReq = error.config;
-    const errorMessage =
-      error.response && error.response.data && error.response.data.message;
+    const errorMessage = error.response?.data?.message;
 
     if (
       errorMessage === "Unauthorized" &&
@@ -84,21 +85,51 @@ api.interceptors.response.use(
       originalReq._isRetry = true;
 
       try {
-        await axios.get(
-          `${process.env.REACT_APP_INTERNAL_API_PATH}/auth/refresh-token`,
-          {
-            withCredentials: true,
-          }
-        );
-        console.log("Token Refreshed SuccessFully");
+        // Use POST method and correct syntax
+        await api.post("/auth/refresh-token");
+        console.log("Token Refreshed Successfully");
         return api.request(originalReq);
-      } catch (error) {
-        return error;
+      } catch (refreshError) {
+        // Redirect to login if refresh fails
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
     }
     throw error;
   }
 );
+
+// api.interceptors.response.use(
+//   (config) => config,
+//   async (error) => {
+//     const originalReq = error.config;
+//     const errorMessage =
+//       error.response && error.response.data && error.response.data.message;
+
+//     if (
+//       errorMessage === "Unauthorized" &&
+//       (error.response.status === 401 || error.response.status === 500) &&
+//       originalReq &&
+//       !originalReq._isRetry
+//     ) {
+//       originalReq._isRetry = true;
+
+//       try {
+//         await axios.get(
+//           `${process.env.REACT_APP_INTERNAL_API_PATH}/auth/refresh-token`,
+//           {
+//             withCredentials: true,
+//           }
+//         );
+//         console.log("Token Refreshed SuccessFully");
+//         return api.request(originalReq);
+//       } catch (error) {
+//         return error;
+//       }
+//     }
+//     throw error;
+//   }
+// );
 
 // api.interceptors.response.use(
 //   (response) => response,

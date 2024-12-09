@@ -1632,34 +1632,283 @@
 // export default Processes;
 
 
+// import React, { useState, useEffect } from 'react';
+// import {
+//   Card,
+//   CardHeader,
+//   CardContent,
+//   CardActions,
+//   Typography,
+//   Button,
+//   TextField,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogActions,
+//   Select,
+//   MenuItem,
+//   InputLabel,
+//   FormControl,
+//   Alert,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   IconButton,
+// } from '@mui/material';
+// import { Add, Edit, Delete } from '@mui/icons-material';
+
+// const Processes = () => {
+//   const [processes, setProcesses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [isDialogOpen, setIsDialogOpen] = useState(false);
+//   const [currentProcess, setCurrentProcess] = useState(null);
+//   const [selectedProductType, setSelectedProductType] = useState('coated');
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     displayName: '',
+//     productType: 'coated',
+//   });
+
+//   const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+
+//   const productTypes = [
+//     { value: 'coated', label: 'Coated' },
+//     { value: 'non-coated', label: 'Non-Coated' },
+//     { value: 'cream', label: 'Cream' },
+//   ];
+
+//   // Fetch processes based on selected product type
+//   const fetchProcesses = async () => {
+//     try {
+//       setLoading(true);
+//       const response = await fetch(`${API_URL}/api/processes?productType=${selectedProductType}`);
+//       const data = await response.json();
+//       setProcesses(data);
+//       setError(null);
+//     } catch (err) {
+//       setError('Failed to load processes');
+//       console.error('Error fetching processes:', err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchProcesses();
+//   }, [selectedProductType]); // Refetch when product type changes
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const url = currentProcess
+//         ? `${API_URL}/api/processes/${currentProcess._id}`
+//         : `${API_URL}/api/processes`;
+      
+//       const method = currentProcess ? 'PUT' : 'POST';
+      
+//       const response = await fetch(url, {
+//         method,
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(formData),
+//       });
+
+//       if (!response.ok) throw new Error('Failed to save process');
+      
+//       await fetchProcesses();
+//       setIsDialogOpen(false);
+//       resetForm();
+//     } catch (err) {
+//       setError(err.message);
+//     }
+//   };
+
+//   const handleEdit = (process) => {
+//     setCurrentProcess(process);
+//     setFormData({
+//       name: process.name,
+//       displayName: process.displayName || '',
+//       productType: process.productType || 'coated',
+//     });
+//     setIsDialogOpen(true);
+//   };
+
+//   const handleDelete = async (id) => {
+//     if (window.confirm('Are you sure you want to delete this process?')) {
+//       try {
+//         const response = await fetch(`${API_URL}/api/processes/${id}`, {
+//           method: 'DELETE',
+//         });
+
+//         if (!response.ok) throw new Error('Failed to delete process');
+        
+//         await fetchProcesses();
+//       } catch (err) {
+//         setError(err.message);
+//       }
+//     }
+//   };
+
+//   const resetForm = () => {
+//     setCurrentProcess(null);
+//     setFormData({
+//       name: '',
+//       displayName: '',
+//       productType: selectedProductType, // Set to currently selected type
+//     });
+//   };
+
+//   if (loading) return <div>Loading processes...</div>;
+
+//   return (
+//     <div>
+//       <CardHeader
+//         title={
+//           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+//             <Typography variant="h6">Process Management</Typography>
+//             <FormControl variant="outlined" size="small">
+//               <InputLabel>Product Type</InputLabel>
+//               <Select
+//                 value={selectedProductType}
+//                 onChange={(e) => setSelectedProductType(e.target.value)}
+//                 label="Product Type"
+//               >
+//                 {productTypes.map((type) => (
+//                   <MenuItem key={type.value} value={type.value}>
+//                     {type.label}
+//                   </MenuItem>
+//                 ))}
+//               </Select>
+//             </FormControl>
+//           </div>
+//         }
+//       />
+//       <CardContent>
+//         {error && <Alert severity="error">{error}</Alert>}
+//         <TableContainer component={Paper}>
+//           <Table>
+//             <TableHead>
+//               <TableRow>
+//                 <TableCell>Name</TableCell>
+//                 <TableCell>Display Name</TableCell>
+//                 <TableCell>Actions</TableCell>
+//               </TableRow>
+//             </TableHead>
+//             <TableBody>
+//               {processes.map((process) => (
+//                 <TableRow key={process._id}>
+//                   <TableCell>{process.name}</TableCell>
+//                   <TableCell>{process.displayName || process.name}</TableCell>
+//                   <TableCell>
+//                     <IconButton onClick={() => handleEdit(process)}>
+//                       <Edit />
+//                     </IconButton>
+//                     <IconButton onClick={() => handleDelete(process._id)}>
+//                       <Delete />
+//                     </IconButton>
+//                   </TableCell>
+//                 </TableRow>
+//               ))}
+//             </TableBody>
+//           </Table>
+//         </TableContainer>
+//       </CardContent>
+//       <CardActions>
+//         <Button
+//           variant="contained"
+//           startIcon={<Add />}
+//           onClick={() => {
+//             resetForm();
+//             setIsDialogOpen(true);
+//           }}
+//         >
+//           Add Process
+//         </Button>
+//       </CardActions>
+
+//       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+//         <DialogTitle>{currentProcess ? 'Edit Process' : 'Add New Process'}</DialogTitle>
+//         <DialogContent>
+//           <form onSubmit={handleSubmit}>
+//             <TextField
+//               label="Process Name"
+//               value={formData.name}
+//               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+//               fullWidth
+//               required
+//               margin="normal"
+//             />
+//             <TextField
+//               label="Display Name"
+//               value={formData.displayName}
+//               onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+//               fullWidth
+//               margin="normal"
+//             />
+//             <FormControl fullWidth margin="normal">
+//               <InputLabel>Product Type</InputLabel>
+//               <Select
+//                 value={formData.productType}
+//                 onChange={(e) =>
+//                   setFormData({ ...formData, productType: e.target.value })
+//                 }
+//                 label="Product Type"
+//               >
+//                 {productTypes.map((type) => (
+//                   <MenuItem key={type.value} value={type.value}>
+//                     {type.label}
+//                   </MenuItem>
+//                 ))}
+//               </Select>
+//             </FormControl>
+//           </form>
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+//           <Button variant="contained" onClick={handleSubmit}>
+//             {currentProcess ? 'Update' : 'Create'}
+//           </Button>
+//         </DialogActions>
+//       </Dialog>
+//     </div>
+//   );
+// };
+
+// export default Processes;
+
 import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardHeader,
   CardContent,
   CardActions,
-  Typography,
-  Button,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Grid,
   Select,
   MenuItem,
   InputLabel,
   FormControl,
-  Alert,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  IconButton,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Alert,
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
+import { usePermissions } from '../hooks/usePermissions';
 
 const Processes = () => {
   const [processes, setProcesses] = useState([]);
@@ -1667,26 +1916,38 @@ const Processes = () => {
   const [error, setError] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentProcess, setCurrentProcess] = useState(null);
-  const [selectedProductType, setSelectedProductType] = useState('coated');
+  const [selectedProductType, setSelectedProductType] = useState('all');
   const [formData, setFormData] = useState({
     name: '',
     displayName: '',
     productType: 'coated',
   });
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canRead: hasPermission('processes', 'read'),
+    canCreate: hasPermission('processes', 'create'),
+    canUpdate: hasPermission('processes', 'update'),
+    canDelete: hasPermission('processes', 'delete'),
+  };
 
   const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
 
   const productTypes = [
+    { value: 'all', label: 'All' },
     { value: 'coated', label: 'Coated' },
     { value: 'non-coated', label: 'Non-Coated' },
     { value: 'cream', label: 'Cream' },
   ];
 
-  // Fetch processes based on selected product type
   const fetchProcesses = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/processes?productType=${selectedProductType}`);
+      const url =
+        selectedProductType === 'all'
+          ? `${API_URL}/api/processes`
+          : `${API_URL}/api/processes?productType=${selectedProductType}`;
+
+      const response = await fetch(url);
       const data = await response.json();
       setProcesses(data);
       setError(null);
@@ -1699,18 +1960,20 @@ const Processes = () => {
   };
 
   useEffect(() => {
-    fetchProcesses();
-  }, [selectedProductType]); // Refetch when product type changes
+    if (permission.canRead) {
+      fetchProcesses();
+    }
+  }, [selectedProductType, permission.canRead]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const url = currentProcess 
+      const url = currentProcess
         ? `${API_URL}/api/processes/${currentProcess._id}`
         : `${API_URL}/api/processes`;
-      
+
       const method = currentProcess ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -1720,7 +1983,7 @@ const Processes = () => {
       });
 
       if (!response.ok) throw new Error('Failed to save process');
-      
+
       await fetchProcesses();
       setIsDialogOpen(false);
       resetForm();
@@ -1747,7 +2010,7 @@ const Processes = () => {
         });
 
         if (!response.ok) throw new Error('Failed to delete process');
-        
+
         await fetchProcesses();
       } catch (err) {
         setError(err.message);
@@ -1760,80 +2023,111 @@ const Processes = () => {
     setFormData({
       name: '',
       displayName: '',
-      productType: selectedProductType, // Set to currently selected type
+      productType: selectedProductType,
     });
   };
 
   if (loading) return <div>Loading processes...</div>;
 
+  if (!permission.canRead) {
+    console.log('Permission denied for roles read');
+    return (
+      <div style={{  display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',}}>
+        Access denied!!
+      </div>
+    );
+  }
+  
   return (
     <div>
-      <CardHeader
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6">Process Management</Typography>
-            <FormControl variant="outlined" size="small">
-              <InputLabel>Product Type</InputLabel>
-              <Select
-                value={selectedProductType}
-                onChange={(e) => setSelectedProductType(e.target.value)}
-                label="Product Type"
-              >
-                {productTypes.map((type) => (
-                  <MenuItem key={type.value} value={type.value}>
-                    {type.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-        }
-      />
-      <CardContent>
-        {error && <Alert severity="error">{error}</Alert>}
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Display Name</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {processes.map((process) => (
-                <TableRow key={process._id}>
-                  <TableCell>{process.name}</TableCell>
-                  <TableCell>{process.displayName || process.name}</TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleEdit(process)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(process._id)}>
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
+      <Card>
+        <CardHeader
+          title={
+            <Grid container alignItems="center" justifyContent="space-between">
+              <div>Process Management</div>
+              <FormControl size="small">
+                <InputLabel>Product Type</InputLabel>
+                <Select
+                  value={selectedProductType}
+                  onChange={(e) => setSelectedProductType(e.target.value)}
+                  label="Product Type"
+                >
+                  {productTypes.map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          }
+        />
+        <CardContent>
+          {error && <Alert severity="error">{error}</Alert>}
+
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Display Name</TableCell>
+                  {/* <TableCell>Product Type</TableCell> */}
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </CardContent>
-      <CardActions>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => {
-            resetForm();
-            setIsDialogOpen(true);
-          }}
-        >
-          Add Process
-        </Button>
-      </CardActions>
+              </TableHead>
+              <TableBody>
+                {processes.map((process) => (
+                  <TableRow key={process._id}>
+                    <TableCell>{process.name}</TableCell>
+                    <TableCell>{process.displayName || process.name}</TableCell>
+                    {/* <TableCell>{process.productType}</TableCell> */}
+                    <TableCell>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {permission.canUpdate && (
+                          <Button variant='outlined' onClick={() => handleEdit(process)}>
+                            Edit
+                          </Button>
+                        )}
+                        {permission.canDelete && (
+                          <Button variant='contained' color='error' onClick={() => handleDelete(process._id)}>
+                            Delete
+                          </Button>
+                        )}
+                        </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+        <CardActions>
+          {permission.canCreate && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                resetForm();
+                setIsDialogOpen(true);
+              }}
+            >
+              <Add />
+              Add Process
+            </Button>
+          )}
+        </CardActions>
+      </Card>
 
       <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-        <DialogTitle>{currentProcess ? 'Edit Process' : 'Add New Process'}</DialogTitle>
+        <DialogTitle>
+          {currentProcess ? 'Edit Process' : 'Add New Process'}
+        </DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
             <TextField
@@ -1841,8 +2135,8 @@ const Processes = () => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               fullWidth
-              required
               margin="normal"
+              required
             />
             <TextField
               label="Display Name"
@@ -1855,23 +2149,22 @@ const Processes = () => {
               <InputLabel>Product Type</InputLabel>
               <Select
                 value={formData.productType}
-                onChange={(e) =>
-                  setFormData({ ...formData, productType: e.target.value })
-                }
-                label="Product Type"
+                onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
               >
-                {productTypes.map((type) => (
-                  <MenuItem key={type.value} value={type.value}>
-                    {type.label}
-                  </MenuItem>
-                ))}
+                {productTypes
+                  .filter((type) => type.value !== 'all')
+                  .map((type) => (
+                    <MenuItem key={type.value} value={type.value}>
+                      {type.label}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
           </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button onClick={handleSubmit}>
             {currentProcess ? 'Update' : 'Create'}
           </Button>
         </DialogActions>

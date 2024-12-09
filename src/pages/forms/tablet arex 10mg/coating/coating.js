@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Tabs, Tab, Box } from "@mui/material";
@@ -11,6 +11,9 @@ import BatchManufacturingFormPage21 from "./page21";
 import BatchManufacturingFormPage22 from "./page22";
 import BatchManufacturingFormPage23 from "./page23";
 import ProcessBox from "../coated/Coated";
+import { usePermissions } from "../../../../hooks/usePermissions";
+import CoatingQC from "./qC";
+import FormHeaderQCCoating from "../../../header/formHeaderQCCoating";
 
 const Coating = () => {
   const navigate = useNavigate();
@@ -30,21 +33,92 @@ const Coating = () => {
     false,
     false,
     false,
+    false,
   ]); // Manage tab enabled/disabled
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canReadPrecautions: hasPermission('coating-precautions', 'read'),
+    canReadLineClearance: hasPermission('coating-line-clearance', 'read'),
+    canReadCoatingProcedure: hasPermission('coating-procedure', 'read'),
+    canReadWeightOfCoatedTablets: hasPermission('coating-weight-yield', 'read'),
+    canReadRequestForAnalysis: hasPermission('coating-analysis', 'read'),
+    canReadQC: hasPermission('coating-qc', 'read'),
+    canCreate: hasPermission('coating', 'create'),
+    canCreateQC: hasPermission('coating-qc', 'create'),
+    canUpdatePrecautions: hasPermission('coating-precautions', 'update'),
+    canUpdateLineClearance: hasPermission('coating-line-clearance', 'update'),
+    canUpdateCoatingProcedure: hasPermission('coating-procedure', 'update'),
+    canUpdateWeightOfCoatedTablets: hasPermission('coating-weight-yield', 'update'),
+    canUpdateRequestForAnalysis: hasPermission('coating-analysis', 'update'),
+    canUpdateQC: hasPermission('coating-qc', 'update'),
+    canDeletePrecautions: hasPermission('coating-precautions', 'delete'),
+    canDeleteLineClearance: hasPermission('coating-line-clearance', 'delete'),
+    canDeleteCoatingProcedure: hasPermission('coating-procedure', 'delete'),
+    canDeleteWeightOfCoatedTablets: hasPermission('coating-weight-yield', 'delete'),
+    canDeleteRequestForAnalysis: hasPermission('coating-analysis', 'delete'),
+    canDeleteQC: hasPermission('coating-qc', 'delete'),
+  };
+  // New state to store the fetched record
+const [fetchedCoating, setFetchedCoatinf] = useState(null);
 
-  useEffect(() => {
-    const storedRecord = JSON.parse(localStorage.getItem("coatingRecord"));
-    if (storedRecord) {
-      dispatch(setCoatingRecord(storedRecord));
-    }
-  }, [dispatch]);
+// Fetch existing dispensing record on component mount
+useEffect(() => {
+  const fetchExistingDispensing = async () => {
+    // Ensure we have a batch number
+    if (!batchInfo?.batchNo) return;
 
-  const handleChangeTab = (event, newValue) => {
-    if (tabStatus[newValue]) {
-      setTabValue(newValue);
-      localStorage.setItem("activeTabCoating", JSON.stringify(newValue)); // Save tabValue to localStorage
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/coating/batch/${batchInfo.batchNo}`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        // If no existing record is found, this isn't necessarily an error
+        if (response.status === 404) {
+          console.log('No existing dispensing record found for this batch');
+          return;
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Update Redux store with fetched data
+      if (data) {
+        dispatch(setCoatingRecord(data));
+        setFetchedCoatinf(data);
+      }
+    } catch (error) {
+      console.error("Error fetching dispensing record:", error);
     }
   };
+
+  fetchExistingDispensing();
+}, [batchInfo?.batchNo, dispatch, REACT_APP_INTERNAL_API_PATH]);
+
+  // useEffect(() => {
+  //   const storedRecord = JSON.parse(localStorage.getItem("coatingRecord"));
+  //   if (storedRecord) {
+  //     dispatch(setCoatingRecord(storedRecord));
+  //   }
+  // }, [dispatch]);
+
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+    localStorage.setItem("activeTabCoating", JSON.stringify(newValue)); // Save tabValue to localStorage
+  };
+  // const handleChangeTab = (event, newValue) => {
+  //   if (tabStatus[newValue]) {
+  //     setTabValue(newValue);
+  //     localStorage.setItem("activeTabCoating", JSON.stringify(newValue)); // Save tabValue to localStorage
+  //   }
+  // };
 
   const handlePrint = () => {
     window.print(); // Trigger browser print
@@ -64,6 +138,8 @@ const Coating = () => {
       weightOfCoatedTablets,
       batchManufacturingYield,
       requestForAnalysis,
+      batch,
+      testAndResults
     } = record;
 
     switch (tabValue) {
@@ -213,13 +289,37 @@ const Coating = () => {
           return false;
         }
         break;
+      
+        case 5:
+          if (
+            !batch.productName ||
+            !batch.batchNo ||
+            !batch.qCNo ||
+            !batch.batchSize ||
+            !batch.packsSize ||
+            !batch.mfgDate ||
+            !batch.expiryDate ||
+            !batch.analysisDate||
+            !batch.sampleType ||
+            !testAndResults.parameters.every(
+              (obs) => obs.parameters && obs.specification && obs.results
+            ) ||
+            !testAndResults.checkedByQCA ||
+            !testAndResults.checkedByQCADate ||
+            !testAndResults.checkedByQCM ||
+            !testAndResults.checkedByQCMDate 
+          ) {
+            alert("Please required fields on this page before proceeding.");
+            return false;
+          }
+          break;
     }
 
     return true; // All validations passed
   };
 
   const handleNextTab = () => {
-    if (validateFields()) {
+    // if (validateFields()) {
       dispatch(setCoatingRecord(record));
       const newTabValue = tabValue + 1;
       setTabValue(newTabValue);
@@ -229,7 +329,7 @@ const Coating = () => {
         return updatedStatus;
       });
       localStorage.setItem("activeTabCoating", JSON.stringify(newTabValue)); // Save the updated tabValue
-    }
+    // }
   };
 
   const handleBackTab = () => {
@@ -240,23 +340,26 @@ const Coating = () => {
     ); // Save the updated tabValue
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Perform final validation before submitting
-    if (!validateFields()) {
-      return;
-    }
-
-    console.log("Record data to be sent:", record);
+  const handleSave = async () => {
+    // if (!validateFields()) {
+    //   return; // Exit if validation fails
+    // }
 
     try {
-      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/coating`, {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/coating/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...record }),
+        body: JSON.stringify({
+          ...record,
+          batchInfo: {
+            ...batchInfo,
+            batchNo: batchInfo.batchNo,
+            productName: batchInfo.productName
+          },
+          tabValue: tabValue  // Include the current tab value for server-side tracking
+        }),
       });
 
       if (!response.ok) {
@@ -264,12 +367,52 @@ const Coating = () => {
       }
 
       const data = await response.json();
-      console.log("Batch created:", data);
+      console.log("Coating saved:", data);
 
-      if (data && data._id) {
-        localStorage.setItem("coatingId", data._id);
-        console.log("Coating ID stored in localStorage:", data._id);
-      }
+      // Optional: Show a success message to the user
+      alert(`Data for Tab ${tabValue + 1} saved successfully!`);
+
+    } catch (error) {
+      console.error("Error saving coating data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // // Perform final validation before submitting
+    // if (!validateFields()) {
+    //   return;
+    // }
+
+    // console.log("Record data to be sent:", record);
+
+    // try {
+    //   const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/coating`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       ...record, batchInfo: {
+    //         ...batchInfo,
+    //         batchNo: batchInfo.batchNo,
+    //         productName: batchInfo.productName
+    //     }}),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error(`HTTP error! Status: ${response.status}`);
+    //   }
+
+    //   const data = await response.json();
+    //   console.log("Batch created:", data);
+
+    //   if (data && data._id) {
+    //     localStorage.setItem("coatingId", data._id);
+    //     console.log("Coating ID stored in localStorage:", data._id);
+    //   }
 
       const processes = JSON.parse(localStorage.getItem("processes"));
       const currentIndex = processes.findIndex(
@@ -293,9 +436,9 @@ const Coating = () => {
       } else {
         console.log("No next process available.");
       }
-    } catch (error) {
-      console.error("Error creating batch:", error);
-    }
+    // } catch (error) {
+    //   console.error("Error creating batch:", error);
+    // }
   }
 
   return (
@@ -309,15 +452,18 @@ const Coating = () => {
           value={tabValue}
           onChange={handleChangeTab}
           aria-label="coating tabs"
+           variant="scrollable" 
+          scrollButtons="auto"
         >
-          <Tab label="Precautions" disabled={!tabStatus[0]} />
-          <Tab label="Line clearance" disabled={!tabStatus[1]} />
+          <Tab label="Precautions"  />
+          <Tab label="Line clearance" />
           <Tab
             label="Solution Preparation & Procedure"
-            disabled={!tabStatus[2]}
+            // disabled={!tabStatus[2]}
           />
-          <Tab label="weight & Yield" disabled={!tabStatus[3]} />
-          <Tab label="Request for analysis" disabled={!tabStatus[4]} />
+          <Tab label="weight & Yield" />
+          <Tab label="Request for analysis" />
+          <Tab label="QC"  />
         </Tabs>
       </Box>
 
@@ -330,6 +476,7 @@ const Coating = () => {
             </Button>
           </div>
         )}
+       
         {tabValue === 1 && (
           <div>
             <BatchManufacturingFormPage20 />
@@ -338,6 +485,7 @@ const Coating = () => {
             </Button>
           </div>
         )}
+      
         {tabValue === 2 && (
           <div>
             <BatchManufacturingFormPage21 />
@@ -346,6 +494,7 @@ const Coating = () => {
             </Button>
           </div>
         )}
+    
         {tabValue === 3 && (
           <div>
             <BatchManufacturingFormPage22 />
@@ -354,6 +503,7 @@ const Coating = () => {
             </Button>
           </div>
         )}
+        
         {tabValue === 4 && (
           <div>
             <BatchManufacturingFormPage23 />
@@ -362,6 +512,16 @@ const Coating = () => {
             </Button>
           </div>
         )}
+        
+         {tabValue === 5 &&  (
+          <div className="mt-6">
+            <CoatingQC />
+            <Button variant="contained" onClick={handlePrint} className="mt-3">
+              Print Page
+            </Button>
+          </div>
+        )}
+       
       </div>
 
       <div
@@ -378,8 +538,16 @@ const Coating = () => {
             Back
           </Button>
         )}
+<Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSave}
+          className="ml-2"
+        >
+          Save
+        </Button>
 
-        {tabValue < 4 && (
+        {tabValue < 5 && (
           <Button
             variant="contained"
             color="primary"
@@ -390,9 +558,9 @@ const Coating = () => {
           </Button>
         )}
 
-        {tabValue === 4 && (
+        {tabValue === 5 && (
           <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Save and Next
+        Next Process
           </Button>
         )}
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Tabs, Tab, Box } from "@mui/material";
@@ -15,6 +15,9 @@ import BatchManufacturingFormPage15 from "./page15";
 import BatchManufacturingFormPage17 from "./page17";
 import BatchManufacturingFormPage18 from "./page18";
 import ProcessBox from "../coated/Coated";
+import { usePermissions } from "../../../../hooks/usePermissions";
+import CompressionQC from "./qC";
+import FormHeaderQCCompression from "../../../header/formHeaderQCCompression";
 
 const Compression = () => {
   const navigate = useNavigate();
@@ -38,21 +41,104 @@ const Compression = () => {
     false,
     false,
     false,
+    false
   ]);
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canReadPrecautions: hasPermission('compression-precautions', 'read'),
+    canReadLineClearance: hasPermission('compression-line-clearance', 'read'),
+    canReadCompressionRecord: hasPermission('compression-compression-record', 'read'),
+    canReadRequestForAnalysis: hasPermission('compression-analysis', 'read'),
+    canReadCompressionSpecifications: hasPermission('compression-specification', 'read'),
+    canReadFollowUp: hasPermission('compression-follow-up', 'read'),
+    canReadCheckSheet: hasPermission('compression-check-sheet', 'read'),
+    canReadWeightOfCompressedTablets: hasPermission('compression-weight-yeild', 'read'),
+    canReadRequestForAnalysisEnd: hasPermission('compression-analysis-end', 'read'),
+    canReadQC: hasPermission('compression-qc', 'read'),
+    canCreate: hasPermission('compression', 'create'),
+    canCreateQC: hasPermission('compression-qc', 'create'),
+    canUpdatePrecautions: hasPermission('compression-precautions', 'update'),
+    canUpdateLineClearance: hasPermission('compression-line-clearance', 'update'),
+    canUpdateCompressionRecord: hasPermission('compression-compression-record', 'update'),
+    canUpdateRequestForAnalysis: hasPermission('compression-analysis', 'update'),
+    canUpdateCompressionSpecifications: hasPermission('compression-compression-specification', 'update'),
+    canUpdateFollowUp: hasPermission('compression-follow-up', 'update'),
+    canUpdateCheckSheet: hasPermission('compression-check-sheet', 'update'),
+    canUpdateWeightOfCompressedTablets: hasPermission('compression-weight-yeild', 'update'),
+    canUpdateRequestForAnalysisEnd: hasPermission('compression-analysis-end', 'update'),
+    canUpdateQC: hasPermission('compression-qc', 'update'),
+    canDeletePrecautions: hasPermission('compression-precautions', 'delete'),
+    canDeleteLineClearance: hasPermission('compression-line-clearance', 'delete'),
+    canDeleteCompressionRecord: hasPermission('compression-compression-record', 'delete'),
+    canDeleteRequestForAnalysis: hasPermission('compression-analysis', 'delete'),
+    canDeleteCompressionSpecifications: hasPermission('compression-compression-specification', 'delete'),
+    canDeleteFollowUp: hasPermission('compression-follow-up', 'delete'),
+    canDeleteCheckSheet: hasPermission('compression-check-sheet', 'delete'),
+    canDeleteWeightOfCompressedTablets: hasPermission('compression-weight-yeild', 'delete'),
+    canDeleteRequestForAnalysisEnd: hasPermission('compression-analysis-end', 'delete'),
+    canDeleteQC: hasPermission('compression-qc', 'delete'),
+  };
+  // New state to store the fetched record
+const [fetchedCompression, setFetchedCompression] = useState(null);
 
-  useEffect(() => {
-    const storedRecord = JSON.parse(localStorage.getItem("compressionRecord"));
-    if (storedRecord) {
-      dispatch(setCompressionRecord(storedRecord));
-    }
-  }, [dispatch]);
+// Fetch existing dispensing record on component mount
+useEffect(() => {
+  const fetchExistingDispensing = async () => {
+    // Ensure we have a batch number
+    if (!batchInfo?.batchNo) return;
 
-  const handleChangeTab = (event, newValue) => {
-    if (tabStatus[newValue]) {
-      setTabValue(newValue);
-      localStorage.setItem("activeTabCompression", JSON.stringify(newValue)); // Save tabValue to localStorage
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/compression/batch/${batchInfo.batchNo}`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        // If no existing record is found, this isn't necessarily an error
+        if (response.status === 404) {
+          console.log('No existing dispensing record found for this batch');
+          return;
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Update Redux store with fetched data
+      if (data) {
+        dispatch(setCompressionRecord(data));
+        setFetchedCompression(data);
+      }
+    } catch (error) {
+      console.error("Error fetching dispensing record:", error);
     }
   };
+
+  fetchExistingDispensing();
+}, [batchInfo?.batchNo, dispatch, REACT_APP_INTERNAL_API_PATH]);
+
+  // useEffect(() => {
+  //   const storedRecord = JSON.parse(localStorage.getItem("compressionRecord"));
+  //   if (storedRecord) {
+  //     dispatch(setCompressionRecord(storedRecord));
+  //   }
+  // }, [dispatch]);
+
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+    localStorage.setItem("activeTabCompression", JSON.stringify(newValue)); // Save tabValue to localStorage
+  };
+  // const handleChangeTab = (event, newValue) => {
+  //   if (tabStatus[newValue]) {
+  //     setTabValue(newValue);
+  //     localStorage.setItem("activeTabCompression", JSON.stringify(newValue)); // Save tabValue to localStorage
+  //   }
+  // };
 
   const handlePrint = () => {
     window.print(); // Print the current page
@@ -75,6 +161,8 @@ const Compression = () => {
       compressionYield,
       requestForAnalysisEnd,
       checkboxes,
+      batch,
+      testAndResults
     } = record;
 
     switch (tabValue) {
@@ -314,13 +402,37 @@ const Compression = () => {
           return false;
         }
         break;
+      
+        case 9:
+          if (
+            !batch.productName ||
+            !batch.batchNo ||
+            !batch.qCNo ||
+            !batch.batchSize ||
+            !batch.packsSize ||
+            !batch.mfgDate ||
+            !batch.expiryDate ||
+            !batch.analysisDate||
+            !batch.sampleType ||
+            !testAndResults.parameters.every(
+              (obs) => obs.parameters && obs.specification && obs.results
+            ) ||
+            !testAndResults.checkedByQCA ||
+            !testAndResults.checkedByQCADate ||
+            !testAndResults.checkedByQCM ||
+            !testAndResults.checkedByQCMDate 
+          ) {
+            alert("Please required fields on this page before proceeding.");
+            return false;
+          }
+          break;
     }
 
     return true; // All validations passed
   };
 
   const handleNextTab = () => {
-    if (validateFields()) {
+    // if (validateFields()) {
       dispatch(setCompressionRecord(record));
       const newTabValue = tabValue + 1;
       setTabValue(newTabValue);
@@ -330,7 +442,7 @@ const Compression = () => {
         return updatedStatus;
       });
       localStorage.setItem("activeTabCompression", JSON.stringify(newTabValue)); // Save the updated tabValue
-    }
+    // }
   };
 
   const handleBackTab = () => {
@@ -341,20 +453,26 @@ const Compression = () => {
     ); // Save the updated tabValue
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateFields()) {
-      return;
-    }
+  const handleSave = async () => {
+    // if (!validateFields()) {
+    //   return; // Exit if validation fails
+    // }
 
     try {
-      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression`, {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...record }),
+        body: JSON.stringify({
+          ...record,
+          batchInfo: {
+            ...batchInfo,
+            batchNo: batchInfo.batchNo,
+            productName: batchInfo.productName
+          },
+          tabValue: tabValue  // Include the current tab value for server-side tracking
+        }),
       });
 
       if (!response.ok) {
@@ -362,12 +480,50 @@ const Compression = () => {
       }
 
       const data = await response.json();
-      console.log("Batch created:", data);
+      console.log("Compression saved:", data);
 
-      if (data && data._id) {
-        localStorage.setItem("compressionID", data._id);
-        console.log("Compression ID stored in localStorage:", data._id);
-      }
+      // Optional: Show a success message to the user
+      alert(`Data for Tab ${tabValue + 1} saved successfully!`);
+
+    } catch (error) {
+      console.error("Error saving dispensing data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // if (!validateFields()) {
+    //   return;
+    // }
+
+    // try {
+    //   const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/compression`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       ...record, batchInfo: {
+    //         ...batchInfo,
+    //         batchNo: batchInfo.batchNo,
+    //         productName: batchInfo.productName
+    //     }}),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error(`HTTP error! Status: ${response.status}`);
+    //   }
+
+    //   const data = await response.json();
+    //   console.log("Batch created:", data);
+
+    //   if (data && data._id) {
+    //     localStorage.setItem("compressionID", data._id);
+    //     console.log("Compression ID stored in localStorage:", data._id);
+    //   }
 
       
       const processes = JSON.parse(localStorage.getItem("processes"));
@@ -392,9 +548,9 @@ const Compression = () => {
       } else {
         console.log("No next process available.");
       }
-    } catch (error) {
-      console.error("Error creating batch:", error);
-    }
+    // } catch (error) {
+    //   console.error("Error creating batch:", error);
+    // }
   }
 
   return (
@@ -409,16 +565,19 @@ const Compression = () => {
           value={tabValue}
           onChange={handleChangeTab}
           aria-label="compression tabs"
+          variant="scrollable" 
+          scrollButtons="auto"
         >
-          <Tab label="Precautions" disabled={!tabStatus[0]} />
-          <Tab label="Line Clearance" disabled={!tabStatus[1]} />
-          <Tab label="Compression Process" disabled={!tabStatus[2]} />
-          <Tab label="Request for analysis" disabled={!tabStatus[3]} />
-          <Tab label="Compression specifications" disabled={!tabStatus[4]} />
-          <Tab label="Follow up" disabled={!tabStatus[5]} />
-          <Tab label="Check-sheet" disabled={!tabStatus[6]} />
-          <Tab label="Weight & Yield" disabled={!tabStatus[7]} />
-          <Tab label="Request for analysis" disabled={!tabStatus[8]} />
+          <Tab label="Precautions"  />
+          <Tab label="Line Clearance"  />
+          <Tab label="Compression Process"  />
+          <Tab label="Request for analysis"  />
+          <Tab label="Compression specifications"  />
+          <Tab label="Follow up"  />
+          <Tab label="Check-sheet"  />
+          <Tab label="Weight & Yield"  />
+          <Tab label="Request for analysis" />
+          <Tab label="QC"  />
         </Tabs>
       </Box>
 
@@ -431,6 +590,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+       
         {tabValue === 1 && (
           <div>
             <BatchManufacturingFormPage10 />
@@ -439,6 +599,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+      
         {tabValue === 2 && (
           <div>
             <BatchManufacturingFormPage11 />
@@ -447,6 +608,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+       
         {tabValue === 3 && (
           <div>
             <BatchManufacturingFormPage12 />
@@ -455,6 +617,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+       
         {tabValue === 4 && (
           <div>
             <BatchManufacturingFormPage13 />
@@ -463,6 +626,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+        
         {tabValue === 5 && (
           <div>
             <BatchManufacturingFormPage14 />
@@ -471,6 +635,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+        
         {tabValue === 6 && (
           <div>
             <BatchManufacturingFormPage15 />
@@ -479,6 +644,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+        
         {tabValue === 7 && (
           <div>
             <BatchManufacturingFormPage17 />
@@ -487,6 +653,7 @@ const Compression = () => {
             </Button>
           </div>
         )}
+        
         {tabValue === 8 && (
           <div>
             <BatchManufacturingFormPage18 />
@@ -495,6 +662,17 @@ const Compression = () => {
             </Button>
           </div>
         )}
+  
+         {tabValue === 9 && (
+          <div className="mt-6">
+            
+            <CompressionQC />
+            <Button variant="contained" onClick={handlePrint} className="mt-3">
+              Print Page
+            </Button>
+          </div>
+        )}
+         
       </div>
 
       <div
@@ -512,7 +690,16 @@ const Compression = () => {
           </Button>
         )}
 
-        {tabValue < 8 && (
+<Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSave}
+          className="ml-2"
+        >
+          Save
+        </Button>
+
+        {tabValue < 9 && (
           <Button
             variant="contained"
             color="primary"
@@ -523,9 +710,9 @@ const Compression = () => {
           </Button>
         )}
 
-        {tabValue === 8 && (
+        {tabValue === 9 && (
           <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Save and Next
+           Next Process
           </Button>
         )}
       </div>

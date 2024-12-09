@@ -37,16 +37,43 @@ export const userSlice = createSlice({
       localStorage.removeItem("user");
     },
     loadUserFromStorage: (state) => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      console.log("Loaded user from local storage:", user); // Debug log
-      if (user) {
-        state._id = user._id || "";
-        state.name = user.name || ""; // Ensure this is set correctly
-        state.email = user.email || "";
-        state.role = user.role || ""; // Ensure this is set correctly
-        state.auth = user.auth || false; // Ensure this is set correctly
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          console.log("Loaded user from local storage:", user);
+          
+          // More robust parsing and default values
+          state._id = user._id || "";
+          state.name = user.name || ""; 
+          state.email = user.email || "";
+          state.role = user.role || ""; 
+          state.auth = user.auth || false;
+        }
+      } catch (error) {
+        console.error("Error loading user from local storage", error);
+        // Clear local storage if parsing fails
+        localStorage.removeItem("user");
+        
+        // Reset state
+        state._id = "";
+        state.name = "";
+        state.email = "";
+        state.role = "";
+        state.auth = false;
       }
     },
+    // loadUserFromStorage: (state) => {
+    //   const user = JSON.parse(localStorage.getItem("user"));
+    //   console.log("Loaded user from local storage:", user); // Debug log
+    //   if (user) {
+    //     state._id = user._id || "";
+    //     state.name = user.name || ""; // Ensure this is set correctly
+    //     state.email = user.email || "";
+    //     state.role = user.role || ""; // Ensure this is set correctly
+    //     state.auth = user.auth || false; // Ensure this is set correctly
+    //   }
+    // },
   },
 });
 

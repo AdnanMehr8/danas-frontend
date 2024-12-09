@@ -3,12 +3,21 @@ import { Table, Form, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setPrinting } from "../../../../store/printingSlice";
 import { TextField } from "@mui/material";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-const BatchPackingFormPage1 = () => {
+const BatchPackingFormPage1 = ({ isReport }) => {
   const dispatch = useDispatch();
   const printing = useSelector((state) => state.printing);
+  const { hasPermission } = usePermissions();
+  
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+  };
 
   const handleWeighingprintingChange = (index, field, value) => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingprinting = printing.batchQRecord.map(
       (item, idx) => (idx === index ? { ...item, [field]: value } : item)
     );
@@ -18,6 +27,8 @@ const BatchPackingFormPage1 = () => {
   };
 
   const handleCheckprintingChange = (name, value) => {
+    if (!permission.canEditProduction) return;
+
     const updatedCheckprinting = {
       ...printing.batchQRecordSignAndRemarks,
       [name]: value,
@@ -28,6 +39,8 @@ const BatchPackingFormPage1 = () => {
   };
 
   const addWeighingprintingRow = () => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingprinting = [
       ...printing.batchQRecord,
       {
@@ -50,6 +63,8 @@ const BatchPackingFormPage1 = () => {
   };
 
   const deleteWeighingprintingRow = (index) => {
+    if (!permission.canEditProduction) return;
+
     const newWeighingprinting = printing.batchQRecord.filter(
       (_, idx) => idx !== index
     );
@@ -57,6 +72,22 @@ const BatchPackingFormPage1 = () => {
       setPrinting({ ...printing, batchQRecord: newWeighingprinting })
     );
   };
+
+  if (!permission.canReadProduction) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
 
   return (
     <div className="batch-manufacturing-form-page-2 p-4 ">
@@ -84,7 +115,7 @@ const BatchPackingFormPage1 = () => {
       <th>Total Rejection</th>
       <th rowSpan={2}>Packing Store Supervisor (Sign./Date)</th>
       <th rowSpan={2}>Packing Supervisor (Sign./Date)</th>
-      <th>Actions</th>
+      <th className="actions-column">Actions</th>
     </tr>
     <tr>
       <th></th>
@@ -97,7 +128,7 @@ const BatchPackingFormPage1 = () => {
       <th>Vendor</th>
       <th>In Process</th>
       <th style={{ borderRight: "1px solid #dee2e6" }}></th>
-      <th></th>
+      {/* <th></th> */}
     
     </tr>
   </thead>
@@ -115,6 +146,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -128,6 +160,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -141,6 +174,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -154,6 +188,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -167,6 +202,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -180,6 +216,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -193,6 +230,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -206,6 +244,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -219,6 +258,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -232,6 +272,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                      <Form.Control
                   type="date"
@@ -240,6 +281,7 @@ const BatchPackingFormPage1 = () => {
                   onChange={(e) =>
                     handleWeighingprintingChange(index, "packingStoreSupervisorDate", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -253,6 +295,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                                     <Form.Control
                   type="date"
@@ -261,12 +304,14 @@ const BatchPackingFormPage1 = () => {
                   onChange={(e) =>
                     handleWeighingprintingChange(index, "packingSupervisorDate", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td className="actions-column">
                 <Button
                   variant="outline-danger"
                   onClick={() => deleteWeighingprintingRow(index)}
+                  disabled={!permission.canEditProduction}
                 >
                   Delete
                 </Button>
@@ -275,7 +320,7 @@ const BatchPackingFormPage1 = () => {
           ))}
         </tbody>
       </Table>
-      <Button onClick={addWeighingprintingRow} className="mt-2">
+      <Button onClick={addWeighingprintingRow} className="mt-2" disabled={!permission.canEditProduction}>
         Add Row
       </Button>
       <div className="mt-4">
@@ -293,6 +338,7 @@ const BatchPackingFormPage1 = () => {
             onChange={(e) =>
               handleCheckprintingChange("remarks", e.target.value)
             }
+            disabled={!permission.canEditProduction}
           />
         </div>
       <div className="mt-5">
@@ -329,6 +375,7 @@ const BatchPackingFormPage1 = () => {
         e.target.value
       )
     }
+    disabled={!permission.canEditProduction}
   />
 </td>
 <td>
@@ -342,6 +389,7 @@ const BatchPackingFormPage1 = () => {
         e.target.value
       )
     }
+    disabled={!permission.canEditProduction}
   />
 </td>
 <td>
@@ -358,6 +406,7 @@ const BatchPackingFormPage1 = () => {
         e.target.value
       )
     }
+    disabled={!permission.canEditProduction}
   />
 </td>
 <td>
@@ -371,6 +420,7 @@ const BatchPackingFormPage1 = () => {
         e.target.value
       )
     }
+    disabled={!permission.canEditProduction}
   />
 </td>
         </tr>
@@ -408,6 +458,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -416,6 +467,7 @@ const BatchPackingFormPage1 = () => {
                   onChange={(e) =>
                     handleCheckprintingChange("datePM", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -428,6 +480,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -436,6 +489,7 @@ const BatchPackingFormPage1 = () => {
                   onChange={(e) =>
                     handleCheckprintingChange("dateMIB", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
               <td>
@@ -451,6 +505,7 @@ const BatchPackingFormPage1 = () => {
                       e.target.value
                     )
                   }
+                  disabled={!permission.canEditProduction}
                 />
                 <Form.Control
                   type="date"
@@ -459,6 +514,7 @@ const BatchPackingFormPage1 = () => {
                   onChange={(e) =>
                     handleCheckprintingChange("dateCARB", e.target.value)
                   }
+                  disabled={!permission.canEditProduction}
                 />
               </td>
             </tr>

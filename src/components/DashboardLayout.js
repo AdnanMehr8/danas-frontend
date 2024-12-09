@@ -435,7 +435,7 @@
 
 // export default DashboardLayout;
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './sideBar';
 import Header from '../pages/header/Header';
@@ -447,6 +447,13 @@ const DashboardLayout = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Navigate to '/batch-plan' if the user opens the root path
+    useEffect(() => {
+        if (location.pathname === '/') {
+            navigate('/batch-plan', { replace: true });
+        }
+    }, [location.pathname, navigate]);
 
     const getPageTitle = () => {
         const path = location.pathname.split('/')[1];
@@ -464,7 +471,9 @@ const DashboardLayout = () => {
             height: '100vh',
             backgroundColor: '#f5f6fa',
             overflow: 'hidden',
-        }}>
+        }}
+            className='dashboard'
+        >
             {/* Header */}
             <div style={{ flexShrink: 0 }}>
                 <Header />

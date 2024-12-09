@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setBlistering } from "../../../../store/blisteringSlice";
 import { TextField } from "@mui/material";
 
-const BatchPackingFormPage7 = () => {
+const BatchPackingFormPage7 = ({ isReport }) => {
   const dispatch = useDispatch();
   const { tailLineClearanceBlistering, tailLineClearanceBlistering2} = useSelector((state) => state.blistering);
 

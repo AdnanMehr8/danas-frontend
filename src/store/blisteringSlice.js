@@ -1,7 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-
+  pHeader: {
+    productName: "",
+    batchNo: "",
+    batchSize: "",
+    noOfPacks: "",
+    noOfTablets: "",
+    packsSize: "",
+    expiryDate: "",
+    mfgLicense: "",
+    productRegNo: "",
+    validFrom: "",
+    mrpRs: "",
+    subCategory: ""
+  },
   batchRecord: {
     department: "",
     currentProduct: "",
@@ -106,7 +119,9 @@ export const blisteringSlice = createSlice({
     reducers: {
         setBlistering: (state, action) => {
             console.log('Dispatching setBlistering with payload:', action.payload);
-            const {
+        const {
+          pHeader,
+              
                 batchRecord,
                 checkboxes,
                 tempAndHumidity,
@@ -119,7 +134,9 @@ export const blisteringSlice = createSlice({
                 checkSheet
             } = action.payload;
 
-            // Update state with the payload
+        // Update state with the payload
+        state.pHeader = { ...state.pHeader, ...pHeader };
+        
             state.batchRecord = { ...state.batchRecord, ...batchRecord };
             state.checkboxes = { ...state.checkboxes, ...checkboxes };
             state.tempAndHumidity = { ...state.tempAndHumidity, ...tempAndHumidity };

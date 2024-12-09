@@ -1,18 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  // batchInfo: {
-  //     productName: '',
-  //     batchNo: '',
-  //     batchSize: '',
-  //     noOfPacks: '',
-  //     noOfTablets: '',
-  //     packsSize: '',
-  //     expiryDate: '',
-  //     mfgLicense: '',
-  //     productRegNo: '',
-  //     validFrom: '',
-  // },
+
+  batchInfo: {
+      productName: '',
+      batchNo: '',
+      batchSize: '',
+      noOfPacks: '',
+      noOfTablets: '',
+      packsSize: '',
+      expiryDate: '',
+      mfgLicense: '',
+      productRegNo: '',
+      validFrom: '',
+  },
   batchRecord: {
     department: "",
     currentProduct: "",
@@ -80,8 +81,9 @@ export const dispensingSlice = createSlice({
     reducers: {
         setDispensing: (state, action) => {
             console.log('Dispatching setDispensing with payload:', action.payload);
-            const {
-                // batchInfo,
+        const {
+          
+                batchInfo,
                 batchRecord,
                 checkboxes,
                 weighingRecordRaw,
@@ -94,7 +96,9 @@ export const dispensingSlice = createSlice({
             } = action.payload;
 
             // Update state with the payload
-            // state.batchInfo = { ...state.batchInfo, ...batchInfo };
+        // state._id = _id;
+        console.log('DispEnsing')
+        state.batchInfo = {...state.batchInfo, ...batchInfo};
             state.batchRecord = { ...state.batchRecord, ...batchRecord };
             state.checkboxes = { ...state.checkboxes, ...checkboxes };
             state.tempAndHumidity = { ...state.tempAndHumidity, ...tempAndHumidity };

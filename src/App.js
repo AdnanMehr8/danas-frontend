@@ -72,6 +72,9 @@ import Processes from "./components/Processes";
 import CatAndProducts from "./components/CatAndProducts";
 import Departments from "./components/Departments";
 import { PermissionsTable, RolesTable } from "./components/PermissionsAndRoles";
+import MixingQC from "./pages/forms/tablet arex 10mg/mixing/qC";
+import FormHeaderQC from "./pages/header/formHeaderQCMixing";
+import BatchPackingFormPage0 from "./pages/forms/tablet arex 10mg/printing/page0";
 
 
 
@@ -92,12 +95,21 @@ const App = () => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
+  useEffect(() => {
+    // Redirect to login if not authenticated and not loading
+    if (!loading && !isAuth) {
+      navigate("/login");
+    }
+  }, [isAuth, loading, navigate]);
+
   // useEffect(() => {
   //   // Redirect to login if the user is not authenticated
   //   if (!isAuth) {
   //     navigate("/login");
   //   }
   // }, [isAuth, navigate]);
+
+  
 
   return loading ? (
     <Box sx={{ display: "flex" }}>
@@ -112,22 +124,28 @@ const App = () => {
         <Route path="/report" element={<Report />} />
         <Route path="/report-sulpeol" element={<ReportSulpeol />} />
         <Route path="/report-cream" element={<ReportCream />} />
+        <Route path="/qc" element={<MixingQC />} />
+        <Route path="/pa1" element={<BatchPackingFormPage0 />} />
+        
+        
+        
         
         {/* <Route 
   path="/" 
   element={
     <Protected
-      isAuth={isAuth}
+    isAuth={isAuth}
       userRole={userRole}
       requiredRole="admin"
-    >
+      >
       <DashboardLayout />
     </Protected>
-  }
-> */}
+    }
+    > */}
         <Route path="/" element={<DashboardLayout />}>
         {/* <Route path="/" element={<CategoryProductList />} /> */}
         <Route path="/form-header" element={<FormHeader />} />
+    <Route path="/form-header-qc" element={<FormHeaderQC />} />
         <Route path="/form-header-sulpeol" element={<FormHeaderSulpeol />} />
         <Route path="/form-header-cream" element={<FormHeaderCream />} />
         <Route path="/form-header-packing" element={<FormHeaderPacking />} />
@@ -136,6 +154,7 @@ const App = () => {
         
         {/* Arex Routes */}
         <Route path="/dispensing" element={<Dispensing />} />
+        
         <Route path="/mixing" element={<Mixing />} />
         <Route path="/compression" element={<Compression />} />
         <Route path="/coating" element={<Coating />} />

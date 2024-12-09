@@ -1,7 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-
+  pHeader: {
+    productName: "",
+    batchNo: "",
+    batchSize: "",
+    noOfPacks: "",
+    noOfTablets: "",
+    packsSize: "",
+    expiryDate: "",
+    mfgLicense: "",
+    productRegNo: "",
+    validFrom: "",
+    mrpRs: "",
+    subCategory: ""
+  },
+  docCheckList: {
+    status: Array(11).fill({
+      parameter: "",
+      statusDocs: "",
+    }),
+    checkedByDoc: "",
+    checkedbyPPO: "",
+    checkedByQA: "",
+  },
   batchRecord: {
     department: "",
     currentProduct: "",
@@ -104,7 +126,9 @@ export const printingSlice = createSlice({
     reducers: {
         setPrinting: (state, action) => {
             console.log('Dispatching setPrinting with payload:', action.payload);
-            const {
+        const {
+                pHeader,
+                docCheckList,
                 batchRecord,
                 checkboxes,
                 tempAndHumidity,
@@ -117,7 +141,9 @@ export const printingSlice = createSlice({
                 checkSheet
             } = action.payload;
 
-            // Update state with the payload
+        // Update state with the payload
+        state.pHeader = { ...state.pHeader, ...pHeader };
+            state.docCheckList = { ...state.docCheckList, ...docCheckList };
             state.batchRecord = { ...state.batchRecord, ...batchRecord };
             state.checkboxes = { ...state.checkboxes, ...checkboxes };
             state.tempAndHumidity = { ...state.tempAndHumidity, ...tempAndHumidity };

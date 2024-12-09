@@ -3,7 +3,7 @@ import axios from 'axios';
 const url = process.env.REACT_APP_INTERNAL_API_PATH;
 
 // Helper hook for checking permissions
-export const usePermissions = () => {
+export const usePermissions = (isReportMode = false) => {
     const [userRole, setUserRole] = useState(null);
     const [rolePermissions, setRolePermissions] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -35,7 +35,12 @@ export const usePermissions = () => {
   
       fetchPermissions();
     }, []);
-  
+   // If in report mode, always return false for permissions
+   if (isReportMode) {
+    return {
+      hasPermission: () => true
+    };
+  }
     const hasPermission = (module, action) => {
       // Grant all permissions if 'admin' wildcard is present
       const isAdmin = rolePermissions.some(

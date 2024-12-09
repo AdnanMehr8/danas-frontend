@@ -1,0 +1,71 @@
+@media print {
+    /* Hide everything by default */
+   .dashboard {
+    visibility: hidden;
+   }
+  
+    /* Target the specific print container for this component */
+    .print-container {
+      visibility: visible;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+  
+    /* Ensure only the desired content is visible */
+    .print-container * {
+      visibility: visible;
+    }
+  
+    /* Hide print-specific hidden elements */
+    .print-hide {
+      display: none !important;
+    }
+  
+    /* Enable all disabled inputs and elements */
+    .print-container input[disabled],
+    .print-container select[disabled],
+    .print-container textarea[disabled],
+    .print-container button[disabled] {
+      opacity: 1 !important;
+      pointer-events: all !important;
+      cursor: default !important;
+      color: black !important;
+      background-color: white !important;
+      border: 1px solid #000 !important;
+    }
+  
+    /* Style the printed content */
+    .print-container {
+      margin: 0;
+      padding: 10px;
+      border: 1px solid #000;
+      page-break-inside: avoid;
+    }
+  
+    /* Optional: Add some basic print formatting */
+    .print-container h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+  
+    /* Ensure form elements print cleanly */
+    .print-container input,
+    .print-container select,
+    .print-container textarea {
+      border: 1px solid #000;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    /* Remove any background colors to save ink */
+    .print-container {
+      background: white !important;
+      color: black !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+  }

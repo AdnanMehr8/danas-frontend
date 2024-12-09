@@ -884,6 +884,9 @@ import { setBatchPInfo } from '../../store/batchInfoPackingSlice ';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { usePermissions } from '../../hooks/usePermissions';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, Grid, InputLabel, MenuItem, Paper, Select,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import StatusButtons from '../../components/Status';
+import { Chip } from '@mui/material';
+import { Add } from '@mui/icons-material';
 
 const API_BASE_URL = process.env.REACT_APP_INTERNAL_API_PATH;
 const BatchRecordsTable = () => {
@@ -907,22 +910,25 @@ const BatchRecordsTable = () => {
     expDate: '',
     batchSize: '',
     status: '',
+    machines: [],
   });
     // Fetch product list from CategoryProductList component
-    const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [machines, setMachines] = useState([]);
+const [selectedMachines, setSelectedMachines] = useState([]);
   const [editingStatus, setEditingStatus] = useState(null);
     const dispatch = useDispatch();
   const { hasPermission } = usePermissions();
   const permission = {
-    canRead: hasPermission('permissions', 'read'),
-    canCreate: hasPermission('permissions', 'create'),
-    canUpdate: hasPermission('permissions', 'update'),
-    canDelete: hasPermission('permissions', 'delete'),
+    canRead: hasPermission('batches', 'read'),
+    canCreate: hasPermission('batches', 'create'),
+    canUpdate: hasPermission('batches', 'update'),
+    canDelete: hasPermission('batches', 'delete'),
   };
   // Fetch the batch records from the backend API
+
   useEffect(() => {
-    // if (permission.canRead) {
       const storedRecords = localStorage.getItem('batchRecords');
       if (storedRecords) {
         setRecords(JSON.parse(storedRecords));
@@ -943,8 +949,15 @@ const BatchRecordsTable = () => {
         .then((data) => {
           setProducts(data);
         })
-        .catch((error) => console.error('Error fetching products:', error));
-    // }
+      .catch((error) => console.error('Error fetching products:', error));
+
+fetch(`${API_BASE_URL}/api/equipment`)
+.then((response) => response.json())
+.then((data) => {
+  setMachines(data);
+})
+.catch((error) => console.error('Error fetching machines:', error));
+ 
   }, []);
     
   
@@ -975,6 +988,7 @@ const BatchRecordsTable = () => {
         noOfTablets: newRecord.noOfTablets,
         packsSize: newRecord.packsSize || '',
         expiryDate: newRecord.expiryDate,
+        machines: newRecord.machines || [],
         subCategory: subCategory
       }
     };
@@ -1018,6 +1032,8 @@ const BatchRecordsTable = () => {
       localStorage.setItem('activeBatchNo', newRecord.batchNo);
       // Store the batch specific information
       localStorage.setItem(`batchInfo_${newRecord.batchNo}`, JSON.stringify(batchInfo));
+      // localStorage.setItem(`batchInfoPacking_${newRecord.batchNo}`, JSON.stringify(batchInfo));
+
   
       // Dispatch to Redux store
       dispatch(setBatchInfo({
@@ -1027,12 +1043,12 @@ const BatchRecordsTable = () => {
         }
       }));
       
-      dispatch(setBatchPInfo({
-        batch: {
-          productName: productNameToDisplay,
-          subCategory: subCategory
-        }
-      }));
+      // dispatch(setBatchPInfo({
+      //   batch: {
+      //     productName: productNameToDisplay,
+      //     subCategory: subCategory
+      //   }
+      // }));
   
       // Update the records state and localStorage
       const updatedRecords = [...records, batchPlanData];
@@ -1096,16 +1112,12 @@ const BatchRecordsTable = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentRecords = getSortedRecords().slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(getSortedRecords().length / itemsPerPage);
-  // const { handlePrint } = useOutletContext();
- 
-  // const handleDownload = async () => {
-  //   window.open('/report', '_blank');
-  // };
+
   const handleDownload = (record) => {
-    // Construct URL with product-specific parameters
-    const reportUrl = `/report?productName=${encodeURIComponent(record.batch.productName)}&batchNo=${encodeURIComponent(record.batch.batchNo)}`;
+    const reportUrl = `/report?batchNo=${encodeURIComponent(record.batch.batchNo)}&productName=${encodeURIComponent(record.batch.productName)}`;
     window.open(reportUrl, '_blank');
   };
+  
   
   const handleEdit = (record) => {
     const productName = record.batch.productName;
@@ -1143,6 +1155,7 @@ const BatchRecordsTable = () => {
     
     // Dispatch to Redux store
     dispatch(setBatchInfo({
+      ...batchInfo,
       batch: {
         productName: productNameToDisplay,
         subCategory: subCategory
@@ -1150,6 +1163,7 @@ const BatchRecordsTable = () => {
     }));
     
     dispatch(setBatchPInfo({
+      ...batchInfo,
       batch: {
         productName: productNameToDisplay,
         subCategory: subCategory
@@ -1237,45 +1251,102 @@ const BatchRecordsTable = () => {
   //   return <Coated record={selectedRecord} onReturn={handleReturn} />;
   // } 
 
-  // Function to handle status change
-  const handleStatusChange = async (recordId, newStatus) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/batch-plan/${recordId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          'batch.status': newStatus
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update status');
-      }
-
-      // Update local state
-      const updatedRecords = records.map(record => {
-        if (record._id === recordId) {
-          return {
-            ...record,
-            batch: {
-              ...record.batch,
-              status: newStatus
-            }
-          };
-        }
-        return record;
-      });
-
+  
+// Add this function to update from external status changes
+useEffect(() => {
+  const handleStorageChange = (e) => {
+    if (e.key === 'batchRecords') {
+      const updatedRecords = JSON.parse(e.newValue);
       setRecords(updatedRecords);
-      localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
-      setEditingStatus(null); 
-    } catch (error) {
-      console.error('Error updating status:', error);
-      alert('Failed to update status. Please try again.');
     }
   };
+
+  window.addEventListener('storage', handleStorageChange);
+  return () => window.removeEventListener('storage', handleStorageChange);
+}, []);
+
+  // Function to handle status change
+  // Modify the handleStatusChange function
+const handleStatusChange = async (batchNo, newStatus) => {
+  try {
+    // Find the record with matching batchNo
+    const recordToUpdate = records.find(record => record.batch.batchNo === batchNo);
+    
+    if (!recordToUpdate) return;
+
+    const response = await fetch(`${API_BASE_URL}/api/batch-plan/${recordToUpdate._id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        'batch.status': newStatus
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update status');
+    }
+
+    // Update local state
+    const updatedRecords = records.map(record => {
+      if (record.batch.batchNo === batchNo) {
+        return {
+          ...record,
+          batch: {
+            ...record.batch,
+            status: newStatus
+          }
+        };
+      }
+      return record;
+    });
+
+    setRecords(updatedRecords);
+    localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
+  } catch (error) {
+    console.error('Error updating status:', error);
+    alert('Failed to update status. Please try again.');
+  }
+};
+  // const handleStatusChange = async (recordId, newStatus) => {
+  //   try {
+  //     const response = await fetch(`${API_BASE_URL}/api/batch-plan/${recordId}`, {
+  //       method: 'PATCH',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         'batch.status': newStatus
+  //       }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to update status');
+  //     }
+
+  //     // Update local state
+  //     const updatedRecords = records.map(record => {
+  //       if (record._id === recordId) {
+  //         return {
+  //           ...record,
+  //           batch: {
+  //             ...record.batch,
+  //             status: newStatus
+  //           }
+  //         };
+  //       }
+  //       return record;
+  //     });
+
+  //     setRecords(updatedRecords);
+  //     localStorage.setItem('batchRecords', JSON.stringify(updatedRecords));
+  //     setEditingStatus(null); 
+  //   } catch (error) {
+  //     console.error('Error updating status:', error);
+  //     alert('Failed to update status. Please try again.');
+  //   }
+  // };
 
   const renderStatusCell = (record) => {
     const isEditing = editingStatus === record._id;
@@ -1311,23 +1382,23 @@ const BatchRecordsTable = () => {
     );
   };
 
-  // if (!permission.canRead) {
-  //   console.log('Permission denied for departments read');
-  //   return (
-  //     <div style={{
-  //       display: 'flex',
-  //       justifyContent: 'center',
-  //       alignItems: 'center',
-  //       height: '100vh',
-  //       fontSize: '2rem', // Adjust size as needed
-  //       fontWeight: 'bold',
-  //       textAlign: 'center',
-  //     }}>
-  //       Access denied!!
-  //     </div>
+  if (!permission.canRead) {
+    console.log('Permission denied for departments read');
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem', // Adjust size as needed
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
   
-  //   )
-  // }
+    )
+  }
 
 
   return (
@@ -1345,11 +1416,14 @@ const BatchRecordsTable = () => {
           />
           <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
         </div>
-      <Button variant="contained"
+        {permission.canCreate && (
+          <Button variant="contained"
+          startIcon={<Add />}
         onClick={openAddModal}
       >
         Add Batch Record
       </Button>
+        )}
       </div>
 
 
@@ -1406,7 +1480,45 @@ const BatchRecordsTable = () => {
                 ))}
               </Select>
             </FormControl>
-          </Grid>
+            </Grid>
+            
+            {/* Machines Selection */}
+<Grid item xs={12}>
+  <FormControl fullWidth>
+    <InputLabel>Select Machines</InputLabel>
+    <Select
+      multiple
+      value={selectedMachines}
+      onChange={(e) => {
+        const value = e.target.value;
+        setSelectedMachines(
+          // On autofill we get a stringified value.
+          typeof value === 'string' ? value.split(',') : value
+        );
+        // Update newBatchRecord
+        setNewBatchRecord(prev => ({
+          ...prev,
+          machines: typeof value === 'string' ? value.split(',') : value
+        }));
+      }}
+      renderValue={(selected) => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {selected.map((value) => (
+            <Chip key={value} label={value} style={{ margin: '2px' }} />
+          ))}
+        </div>
+      )}
+    >
+      {machines.flatMap((machineCategory) => 
+        machineCategory.equipmentList.map((machine) => (
+          <MenuItem key={machine.Equipment_Code} value={machine.Equipment_Code}>
+            {machine.Equipment_Name} ({machine.Equipment_Code})
+          </MenuItem>
+        ))
+      )}
+    </Select>
+  </FormControl>
+</Grid>
 
           {/* Manufacturing License */}
           <Grid item xs={12} sm={6}>
@@ -1536,7 +1648,7 @@ const BatchRecordsTable = () => {
                 </MenuItem>
                 <MenuItem value="In Progress">In Progress</MenuItem>
                 <MenuItem value="Completed">Completed</MenuItem>
-                <MenuItem value="Pending">Pending</MenuItem>
+                {/* <MenuItem value="Pending">Pending</MenuItem> */}
               </Select>
             </FormControl>
           </Grid>
@@ -1589,16 +1701,38 @@ const BatchRecordsTable = () => {
                     {record.batch.status}
                   </span>
                 </td> */}
-                     <TableCell className="px-6 py-4 whitespace-nowrap">
+                     {/* <TableCell className="px-6 py-4 whitespace-nowrap">
               {renderStatusCell(record)}
-            </TableCell>
+            </TableCell> */}
+                <TableCell className="px-6 py-4 whitespace-nowrap">
+  <span className={`px-2 py-1 rounded-full text-sm ${
+    record.batch.status === 'Completed' 
+      ? 'bg-green-100 text-green-800' 
+      : record.batch.status === 'In Progress' 
+      ? 'bg-blue-100 text-blue-800' 
+      : 'bg-yellow-100 text-yellow-800'
+  }`}>
+    {record.batch.status}
+  </span>
+</TableCell>
+{/* <TableCell>
+  <StatusButtons 
+    currentStatus={record.batch.status}
+    recordId={record._id}
+    onStatusChange={handleStatusChange}
+  />
+</TableCell> */}
                 <TableCell>
+        {permission.canRead && (
                  
                     <Button variant="outlined" color='info' onClick={() => handleDownload(record)} >Report </Button>
-
-                    <Button variant="outlined" color='primary' onClick={() => handleEdit(record)} >Edit</Button>
-                    <Button variant= "contained" color='error' onClick={() => handleDeleteClick(record)} >Delete</Button>
-             
+                  )}
+                  {permission.canUpdate && (    
+                    <Button variant="outlined" color='primary' onClick={() => handleEdit(record)} disabled={record.batch.status === 'Completed'}>Edit</Button>
+                  )}
+                  {permission.canDelete && (
+                    <Button variant="contained" color='error' onClick={() => handleDeleteClick(record)}>Delete</Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

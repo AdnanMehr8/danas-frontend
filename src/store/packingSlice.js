@@ -1,7 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-
+  pHeader: {
+    productName: "",
+    batchNo: "",
+    batchSize: "",
+    noOfPacks: "",
+    noOfTablets: "",
+    packsSize: "",
+    expiryDate: "",
+    mfgLicense: "",
+    productRegNo: "",
+    validFrom: "",
+    mrpRs: "",
+    subCategory: ""
+  },
   batchRecord: {
     department: "",
     currentProduct: "",
@@ -148,6 +161,37 @@ checkSheet: {
         }),
         qaOfficer: "",
         qaManager: "",
+  },
+  qcHeader: {
+    docNo: "",
+    effectiveDate: "",
+    revisionNo: "",
+    replaces: ""
+},
+    batch: {
+      productName: "",
+      batchNo: "",
+      qCNo: "",
+      batchSize: "",
+      packsSize: "",
+      mfgDate: "",
+      expiryDate: "",
+      analysisDate: "",
+      sampleType: "",
+    },
+    testAndResults: {
+      parameters: Array(8).fill(
+        {
+          parameters: "",
+          specification: "",
+          results: "",
+        },
+      ),
+      checkedByQCA: "",
+      checkedByQCADate: "",
+      checkedByQCM: "",
+      checkedByQCMDate: "",
+      remarks: "",
     },
     reconcilliationSheet: {
         labels:  Array(6)
@@ -186,7 +230,11 @@ export const packingSlice = createSlice({
     reducers: {
         setPacking: (state, action) => {
             console.log('Dispatching setPacking with payload:', action.payload);
-            const {
+        const {
+                pHeader,
+                qcHeader,
+                batch,
+                testAndResults,
                 batchRecord,
                 checkboxes,
                 tempAndHumidity,
@@ -203,6 +251,9 @@ export const packingSlice = createSlice({
             } = action.payload;
 
             // Update state with the payload
+        state.pHeader = { ...state.pHeader, ...pHeader };
+            
+            state.qcHeader = { ...state.qcHeader, ...qcHeader };  
             state.batchRecord = { ...state.batchRecord, ...batchRecord };
             state.checkboxes = { ...state.checkboxes, ...checkboxes };
             state.tempAndHumidity = { ...state.tempAndHumidity, ...tempAndHumidity };
@@ -214,6 +265,8 @@ export const packingSlice = createSlice({
             state.teamSheet = { ...state.teamSheet, ...teamSheet };
             state.checkSheet = { ...state.checkSheet, ...checkSheet };
             state.requestForAnalysisPacking = { ...state.requestForAnalysisPacking, ...requestForAnalysisPacking };
+            state.batch = { ...state.batch, ...batch };
+            state.testAndResults = { ...state.testAndResults, ...testAndResults };
             state.reconcilliationSheet = { ...state.reconcilliationSheet, ...reconcilliationSheet };
             state.stockTransferReport = { ...state.stockTransferReport, ...stockTransferReport };
 

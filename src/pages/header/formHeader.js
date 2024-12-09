@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { setBatchInfo } from "../../store/batchInfoSlice";
 import logo from "../../assets/g.jpg";
+import { setDispensing } from "../../store/dispensingSlice";
 
 const FormHeader = () => {
   const dispatch = useDispatch();
@@ -38,6 +39,9 @@ const FormHeader = () => {
         setBatchInfo({
           ...batchInfo,
           batch: { ...batchInfo.batch, [name]: value },
+        }),
+        setDispensing({
+          batchInfo: { ...batchInfo.batch, [name]: value },
         })
       );
     }

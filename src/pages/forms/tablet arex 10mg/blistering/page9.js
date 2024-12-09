@@ -18,12 +18,47 @@ import {
 import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import "./page15.css";
+import { usePermissions } from "../../../../hooks/usePermissions";
 
-export default function BatchPackingFormPage9() {
+export default function BatchPackingFormPage9({ isReport }) {
   const dispatch = useDispatch();
   const blisteringState = useSelector((state) => state.blistering);
+  const { hasPermission } = usePermissions();
+  
+  const permission = {
+    canReadProduction: isReport ? true : hasPermission('production', 'read'),
+    canReadQA: isReport ? true : hasPermission('qa', 'read'),
+    canEditProduction: isReport ? true : hasPermission('production', 'update'),
+    canEditQA: isReport ? true : hasPermission('qa', 'update')
+  };
+
+  // Table-specific permissions (both production and QA can edit)
+  const canEditTable = permission.canEditProduction || permission.canEditQA;
+  
+  // General form permissions (only production can edit)
+  const canEditGeneral = permission.canEditProduction;
+
+  // Check if user can read either production or QA
+  if (!permission.canReadProduction && !permission.canReadQA) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      }}>
+        Access denied!!
+      </div>
+    );
+  }
+
 
   const handleInputChange = (index, field, value) => {
+    if (!canEditTable) return;
+
     const updatedLabels = [...blisteringState.checkSheet.labels];
 
   
@@ -41,6 +76,8 @@ export default function BatchPackingFormPage9() {
   };
 
   const handleGeneralInputChange = (field, value) => {
+    if (!canEditGeneral) return;
+
     dispatch(
       setBlistering({
         ...blisteringState,
@@ -53,6 +90,8 @@ export default function BatchPackingFormPage9() {
   };
 
   const handleAddRow = () => {
+    if (!canEditTable) return;
+
     const newRow = {
       dateAndTime: "",
       sealingTemp: "",
@@ -76,6 +115,8 @@ export default function BatchPackingFormPage9() {
   };
 
   const handleRemoveRow = (index) => {
+    if (!canEditTable) return;
+
     const updatedLabels = blisteringState.checkSheet.labels.filter(
       (_, i) => i !== index
     );
@@ -108,6 +149,8 @@ export default function BatchPackingFormPage9() {
                     onChange={(e) =>
                       handleGeneralInputChange("blisterMachineId", e.target.value)
                     }
+                    disabled={!canEditGeneral}
+            
                     // className=" mt-4"
                     // InputLabelProps={{ shrink: true }}
                   />
@@ -189,6 +232,7 @@ export default function BatchPackingFormPage9() {
                         }
                         InputLabelProps={{ shrink: true }}
                         className="weight"
+                        disabled={!canEditTable}
                       />
                       {/* Time Field */}
                       <TextField
@@ -203,6 +247,7 @@ export default function BatchPackingFormPage9() {
                         }
                         InputLabelProps={{ shrink: true }}
                         className="weight"
+                        disabled={!canEditTable}
                       />
                     </div>
                   </TableCell>
@@ -220,6 +265,7 @@ export default function BatchPackingFormPage9() {
                           e.target.value
                         )
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -231,6 +277,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "appearance", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -242,6 +289,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "embossing", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -252,6 +300,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "tabsOrCapsPerBlister", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -262,6 +311,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "text", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -272,6 +322,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "sealing", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -282,6 +333,7 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "leakTest", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
@@ -292,10 +344,11 @@ export default function BatchPackingFormPage9() {
                       onChange={(e) =>
                         handleInputChange(index, "performedByProductionQA", e.target.value)
                       }
+                      disabled={!canEditTable}
                     />
                   </TableCell>
                   <TableCell className="actions-column">
-                    <IconButton onClick={() => handleRemoveRow(index)}>
+                    <IconButton onClick={() => handleRemoveRow(index)} disabled={!canEditTable}>
                       <RemoveIcon />
                     </IconButton>
                   </TableCell>
@@ -311,6 +364,7 @@ export default function BatchPackingFormPage9() {
             color="primary"
             startIcon={<AddIcon />}
             onClick={handleAddRow}
+            disabled={!canEditTable}
           >
             Add Row
           </Button>
@@ -323,6 +377,7 @@ export default function BatchPackingFormPage9() {
             onChange={(e) =>
               handleGeneralInputChange("productionPharmacist", e.target.value)
             }
+            disabled={!canEditGeneral}
           />
            <input
             type="date"
@@ -330,6 +385,7 @@ export default function BatchPackingFormPage9() {
             onChange={(e) =>
               handleGeneralInputChange( "productionPharmacistDate", e.target.value)
             }
+            disabled={!canEditGeneral}
           />
         </div>
       </CardContent>

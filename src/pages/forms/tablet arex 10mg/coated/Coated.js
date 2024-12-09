@@ -217,14 +217,141 @@
 
 // export default ProcessBox;
 
+// import React, { useState, useEffect } from "react";
+// import { useSelector } from "react-redux";
+// import axios from "axios";
+// import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+// import { Box, Card, CardContent, Typography, Chip, CircularProgress, Alert } from "@mui/material";
+// import StatusButtons from "../../../../components/Status";
+
+// const ProcessBox = () => {
+//   const batchInfo = useSelector((state) => state.batchInfo.batch);
+//   const [processes, setProcesses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [currentProcessIndex, setCurrentProcessIndex] = useState(() =>
+//     parseInt(localStorage.getItem("currentProcessIndex")) || 0
+//   );
+//   const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+//   const batchNumber = batchInfo.batchNo;
+//   console.log('BatchNumer: ', batchNumber)
+//   const [isLastProcess, setIsLastProcess] = useState(false);
+
+//   useEffect(() => {
+//     const fetchProcesses = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await axios.get(`${API_URL}/api/processes`, {
+//           params: {
+//             productType: batchInfo?.productName?.toLowerCase().includes("cream")
+//               ? "cream"
+//               : batchInfo?.subCategory?.toLowerCase().includes("non-coated")
+//               ? "non-coated"
+//               : "coated",
+//           },
+//         });
+
+//         const storedProcesses = localStorage.getItem("processes");
+//         if (storedProcesses) {
+//           const parsedStoredProcesses = JSON.parse(storedProcesses);
+//           const reorderedProcesses = parsedStoredProcesses.map((storedProcess) => {
+//             const matchingProcess = response.data.find(
+//               (p) => p._id === storedProcess._id
+//             );
+//             return matchingProcess || storedProcess;
+//           });
+//           setProcesses(reorderedProcesses);
+//           const currentIndex = reorderedProcesses.findIndex(
+//             (process) => process._id === localStorage.getItem("currentProcessId")
+//           );
+//           setIsLastProcess(currentIndex === reorderedProcesses.length - 1);
+//         } else {
+//           setProcesses(response.data);
+//           setIsLastProcess(response.data.length === 1);
+//         }
+//         setError(null);
+//       } catch (err) {
+//         setError("Failed to load processes");
+//         console.error("Error fetching processes:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     if (batchInfo) {
+//       fetchProcesses();
+//     }
+//   }, [batchInfo]);
+
+//   if (loading)
+//     return (
+//       <Box p={4} display="flex" justifyContent="center" alignItems="center">
+//         <CircularProgress />
+//       </Box>
+//     );
+//   if (error)
+//     return (
+//       <Box p={4}>
+//         <Alert severity="error">Error: {error}</Alert>
+//       </Box>
+//     );
+
+//   return (
+//     <Card sx={{ width: "100%", p: 2 }}>
+//          <StatusButtons
+//   batchNo= {batchNumber}
+//   onStatusChange={(batchNo, newStatus) => {
+//     console.log(`Status changed to ${newStatus} for batch ${batchNo}`);
+//     // Optional callback handling
+//   }}
+//   currentStatus="current_status"
+//   // isLastProcess={isLastProcess} // Pass the dynamic isLastProcess value
+// />
+//       <CardContent>
+//         <Typography variant="h6" gutterBottom>
+//           Process Flow
+//         </Typography>
+//         <Box display="flex" flexWrap="wrap" alignItems="center" gap={2}>
+//           {processes.map((process, index) => (
+//             <Box key={process._id} display="flex" alignItems="center">
+//               <Chip
+//                 label={process.displayName || process.name}
+//                 sx={{
+//                   backgroundColor:
+//                     index === currentProcessIndex
+//                       ? "primary.light"
+//                       : index < currentProcessIndex
+//                       ? "success.light"
+//                       : "grey.200",
+//                   color: index === currentProcessIndex ? "white" : "inherit",
+//                   fontWeight: index === currentProcessIndex ? "bold" : "normal",
+//                 }}
+//               />
+//               {index < processes.length - 1 && (
+//                 <ChevronRightIcon sx={{ mx: 1, color: "grey.400" }} />
+//               )}
+//             </Box>
+//           ))}
+//         </Box>
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+// export default ProcessBox;
+
+
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Box, Card, CardContent, Typography, Chip, CircularProgress, Alert } from "@mui/material";
+import StatusButtons from "../../../../components/Status";
+
 
 const ProcessBox = () => {
   const batchInfo = useSelector((state) => state.batchInfo.batch);
+  
   const [processes, setProcesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -232,6 +359,45 @@ const ProcessBox = () => {
     parseInt(localStorage.getItem("currentProcessIndex")) || 0
   );
   const API_URL = process.env.REACT_APP_INTERNAL_API_PATH;
+  const batchNumber = batchInfo.batchNo;
+  const [isLastProcess, setIsLastProcess] = useState(false);
+
+  // List of clickable processes
+  const clickableProcesses = [
+    'dispensing',
+    'mixing',
+    'compression',
+    'coating',
+    'form-header-packing',
+    'printing',
+    'blistering',
+    'packing'
+  ];
+
+  const handleProcessClick = (process, index) => {
+    if (clickableProcesses.includes(process.name.toLowerCase())) {
+      // Update the current process index
+      setCurrentProcessIndex(index);
+      localStorage.setItem("currentProcessIndex", index);
+      localStorage.setItem("currentProcessId", process._id);
+
+      // Navigate to the respective process page
+      // You can replace these routes with your actual routes
+      const routes = {
+        'dispensing': 'dispensing',
+        'mixing': '/mixing',
+        'compression': '/compression',
+        'coating': '/coating',
+        'form-header-packing': '/form-header-packing',
+        'printing': '/printing',
+        'blistering': '/blistering',
+        'packing': '/packing'
+      };
+
+      // Navigate to the corresponding route
+      window.location.href = routes[process.name.toLowerCase()];
+    }
+  };
 
   useEffect(() => {
     const fetchProcesses = async () => {
@@ -257,8 +423,20 @@ const ProcessBox = () => {
             return matchingProcess || storedProcess;
           });
           setProcesses(reorderedProcesses);
+          
+          // Update current index based on stored process ID
+          const currentStoredId = localStorage.getItem("currentProcessId");
+          if (currentStoredId) {
+            const newIndex = reorderedProcesses.findIndex(
+              (process) => process._id === currentStoredId
+            );
+            setCurrentProcessIndex(newIndex >= 0 ? newIndex : 0);
+          }
+          
+          setIsLastProcess(currentProcessIndex === reorderedProcesses.length - 1);
         } else {
           setProcesses(response.data);
+          setIsLastProcess(response.data.length === 1);
         }
         setError(null);
       } catch (err) {
@@ -272,7 +450,7 @@ const ProcessBox = () => {
     if (batchInfo) {
       fetchProcesses();
     }
-  }, [batchInfo]);
+  }, [batchInfo, currentProcessIndex]);
 
   if (loading)
     return (
@@ -286,9 +464,17 @@ const ProcessBox = () => {
         <Alert severity="error">Error: {error}</Alert>
       </Box>
     );
+    
 
   return (
     <Card sx={{ width: "100%", p: 2 }}>
+      <StatusButtons 
+        batchNo={batchNumber}
+        onStatusChange={(batchNo, newStatus) => {
+          console.log(`Status changed to ${newStatus} for batch ${batchNo}`);
+        }}
+        currentStatus="current_status"
+      />
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Process Flow
@@ -298,15 +484,20 @@ const ProcessBox = () => {
             <Box key={process._id} display="flex" alignItems="center">
               <Chip
                 label={process.displayName || process.name}
+                onClick={() => handleProcessClick(process, index)}
                 sx={{
                   backgroundColor:
                     index === currentProcessIndex
-                      ? "primary.light"
+                      ? "#1976d2"  // Using Material-UI primary blue
                       : index < currentProcessIndex
-                      ? "success.light"
+                      ? "#4caf50"  // Using Material-UI success green
                       : "grey.200",
-                  color: index === currentProcessIndex ? "white" : "inherit",
+                  color: (index === currentProcessIndex || index < currentProcessIndex) ? "white" : "inherit",
                   fontWeight: index === currentProcessIndex ? "bold" : "normal",
+                  cursor: clickableProcesses.includes(process.name.toLowerCase()) ? "pointer" : "default",
+                  '&:hover': clickableProcesses.includes(process.name.toLowerCase()) 
+                    ? { backgroundColor: '#1565c0' }  // Darker blue on hover
+                    : {},
                 }}
               />
               {index < processes.length - 1 && (

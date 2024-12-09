@@ -3,7 +3,230 @@
         display: none !important; /* Hide the button on print */
     }
     /* Ensure page height matches letter size */
-    body {
-        min-height: 11in; /* Set for standard letter size */
-    }
+    /* body {
+        min-height: 11in; /* Set for standard letter size }*/
+    /* Reset all default margins and paddings */
+  * {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Page Setup */
+  @page {
+    size: A4;
+    margin: 1mm !important;
+  }
+
+  body, html {
+    width: 312mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 13pt !important;
+  }
+
+  /* Containers */
+  .MuiBox-root {
+    page-break-inside: avoid !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Tables Specific Styling */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 13pt !important;
+    margin-bottom: 10px !important;
+  }
+
+  table th, table td {
+    border: 1px solid #dee2e6 !important;
+    padding: 4px 6px !important;
+    word-wrap: break-word !important;
+    max-width: 100% !important;
+    vertical-align: top !important;
+  }
+
+  table th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Prevent table cell content overflow */
+  td, th {
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+  }
+
+  /* Scrollbar and Overflow Prevention */
+  * {
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Input and Form Control Visibility */
+  input, textarea, select {
+    /* border: 1px solid #ccc !important; */
+    width: 100% !important;
+    font-size: 13pt !important;
+    padding: 2px !important;
+  }
+
+  /* Typography */
+  body, html, div, span, p, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Arial', sans-serif !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Hide Unnecessary Elements */
+  /* .print-hide, .MuiButton-root, button, .actions-column {
+    display: none !important;
+  } */
+
+  /* Page Break Rules */
+  .page-break {
+    page-break-before: always !important;
+  }
+
+  /* Responsive Table Handling */
+  .table-responsive {
+    overflow: visible !important;
+    width: 100% !important;
+  }
+
+  /* Specific Component Adjustments */
+  .MuiTypography-root {
+    font-size: 10pt !important;
+  }
+
+  /* Footer Styling */
+  .page-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 8pt !important;
+  }
+
+  /* Ensure full width content */
+  .full-width {
+    width: 100% !important;
+  }
 }
+
+/* Additional Styles for Print Readability */
+@media screen and (max-width: 1024px) {
+  /* Responsive adjustments for smaller screens */
+  table {
+    font-size: 8pt !important;
+  }
+}
+
+/* Report Styling for Both Screen and Print */
+
+/* Global Reset and Base Styles */
+.report-container * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    line-height: 1.4;
+  }
+  
+  /* Screen and Print Shared Styles */
+  .report-container {
+    max-width: 500mm;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+  }
+  
+  /* Tables Styling */
+  .report-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 10pt;
+  }
+  
+  .report-container table th,
+  .report-container table td {
+    border: 1px solid #dee2e6;
+    padding: 6px 8px;
+    word-wrap: break-word;
+    vertical-align: top;
+  }
+  
+  .report-container table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  Input and Form Control Styling
+  .report-container input,
+  .report-container textarea,
+  .report-container select {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 4px;
+    font-size: 10pt;
+    background-color: transparent;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  
+  /* Disable Interactions */
+  .report-container input,
+  .report-container textarea,
+  .report-container select,
+  .report-container button {
+    cursor: default;
+  }
+  
+  /* Typography */
+  .report-container h1,
+  .report-container h2,
+  .report-container h3,
+  .report-container h4,
+  .report-container h5,
+  .report-container h6 {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .report-container p {
+    margin-bottom: 10px;
+  }
+  
+  /* Page Footer Styling */
+  .page-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 10pt;
+    border-top: 1px solid #000;
+    padding-top: 10px;
+  }
+  
+ 
+  /* Responsive Adjustments */
+  @media screen and (max-width: 1024px) {
+    .report-container {
+      padding: 10px;
+    }
+  
+    .report-container table {
+      font-size: 9pt;
+    }
+  
+    .report-container input,
+    .report-container textarea,
+    .report-container select {
+      font-size: 9pt;
+    }
+  }

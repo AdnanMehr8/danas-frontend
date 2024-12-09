@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Tabs, Tab, Box } from "@mui/material";
@@ -10,7 +10,11 @@ import BatchManufacturingFormPage7 from "./page7";
 import FormHeader from "../../../header/formHeader";
 import BatchManufacturingFormPage8 from "./page8";
 import ProcessBox from "../coated/Coated";
-
+import { usePermissions } from "../../../../hooks/usePermissions";
+import MixingQC from "./qC";
+import FormHeaderQC from "../../../header/formHeaderQCMixing";
+import FormHeaderQCMixing from "../../../header/formHeaderQCMixing";
+import '../dispensing/dispensing.css';
 const Mixing = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,21 +33,92 @@ const Mixing = () => {
     false,
     false,
     false,
+    false,
   ]); // Control which tabs are enabled
+  const { hasPermission } = usePermissions();
+  const permission = {
+    canReadPrecautions: hasPermission('mixing-precautions', 'read'),
+    canReadLineClearance: hasPermission('mixing-line-clearance', 'read'),
+    canReadManufacturingProcess: hasPermission('mixing-manufacturing-process', 'read'),
+    canReadWeightOfGranules: hasPermission('mixing-weight-granules', 'read'),
+    canReadRequestForAnalysis: hasPermission('mixing-analysis', 'read'),
+    canReadQC: hasPermission('mixing-qc', 'read'),
+    canCreate: hasPermission('mixing', 'create'),
+    canCreateQC: hasPermission('mixing-qc', 'create'),
+    canUpdatePrecautions: hasPermission('mixing-precautions', 'update'),
+    canUpdateLineClearance: hasPermission('mixing-line-clearance', 'update'),
+    canUpdateManufacturingProcess: hasPermission('mixing-manufacturing-process', 'update'),
+    canUpdateWeightOfGranules: hasPermission('mixing-weight-Granules', 'update'),
+    canUpdateRequestForAnalysis: hasPermission('mixing-analysis', 'update'),
+    canUpdateQC: hasPermission('mixing-qc', 'update'),
+    canDeletePrecautions: hasPermission('mixing-precautions', 'delete'),
+    canDeleteLineClearance: hasPermission('mixing-line-clearance', 'delete'),
+    canDeleteManufacturingProcess: hasPermission('mixing-manufacturing-process', 'delete'),
+    canDeleteWeightOfGranules: hasPermission('mixing-weight-Granules', 'delete'),
+    canDeleteRequestForAnalysis: hasPermission('mixing-analysis', 'delete'),
+    canDeleteQC: hasPermission('mixing-qc', 'delete'),
+  };
+  // New state to store the fetched record
+const [fetchedMixing, setFetchedMixing] = useState(null);
 
-  useEffect(() => {
-    const storedRecord = JSON.parse(localStorage.getItem("mixingRecord"));
-    if (storedRecord) {
-      dispatch(setMixingRecord(storedRecord));
-    }
-  }, [dispatch]);
+// Fetch existing dispensing record on component mount
+useEffect(() => {
+  const fetchExistingDispensing = async () => {
+    // Ensure we have a batch number
+    if (!batchInfo?.batchNo) return;
 
-  const handleChangeTab = (event, newValue) => {
-    if (tabStatus[newValue]) {
-      setTabValue(newValue);
-      localStorage.setItem("activeTabMixing", JSON.stringify(newValue)); // Save tabValue to localStorage
+    try {
+      const response = await fetch(
+        `${REACT_APP_INTERNAL_API_PATH}/api/mixing/batch/${batchInfo.batchNo}`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        // If no existing record is found, this isn't necessarily an error
+        if (response.status === 404) {
+          console.log('No existing dispensing record found for this batch');
+          return;
+        }
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Update Redux store with fetched data
+      if (data) {
+        dispatch(setMixingRecord(data));
+        setFetchedMixing(data);
+      }
+    } catch (error) {
+      console.error("Error fetching dispensing record:", error);
     }
   };
+
+  fetchExistingDispensing();
+}, [batchInfo?.batchNo, dispatch, REACT_APP_INTERNAL_API_PATH]);
+
+  // useEffect(() => {
+  //   const storedRecord = JSON.parse(localStorage.getItem("mixingRecord"));
+  //   if (storedRecord) {
+  //     dispatch(setMixingRecord(storedRecord));
+  //   }
+  // }, [dispatch]);
+
+  const handleChangeTab = (event, newValue) => {
+    setTabValue(newValue);
+    localStorage.setItem("activeTabMixing", JSON.stringify(newValue)); // Save tabValue to localStorage
+  };
+  // const handleChangeTab = (event, newValue) => {
+  //   if (tabStatus[newValue]) {
+  //     setTabValue(newValue);
+  //     localStorage.setItem("activeTabMixing", JSON.stringify(newValue)); // Save tabValue to localStorage
+  //   }
+  // };
 
   const handlePrint = () => {
     window.print(); // Print the current page
@@ -63,6 +138,8 @@ const Mixing = () => {
       batchManufacturingYield,
       checkboxes,
       requestForAnalysisMixing,
+      batch,
+      testAndResults
     } = record;
 
     switch (tabValue) {
@@ -200,13 +277,37 @@ const Mixing = () => {
           return false;
         }
         break;
+      
+        case 5:
+          if (
+            !batch.productName ||
+            !batch.batchNo ||
+            !batch.qCNo ||
+            !batch.batchSize ||
+            !batch.packsSize ||
+            !batch.mfgDate ||
+            !batch.expiryDate ||
+            !batch.analysisDate||
+            !batch.sampleType ||
+            !testAndResults.parameters.every(
+              (obs) => obs.parameters && obs.specification && obs.results
+            ) ||
+            !testAndResults.checkedByQCA ||
+            !testAndResults.checkedByQCADate ||
+            !testAndResults.checkedByQCM ||
+            !testAndResults.checkedByQCMDate 
+          ) {
+            alert("Please required fields on this page before proceeding.");
+            return false;
+          }
+          break;
     }
 
     return true; // All validations passed
   };
 
   const handleNextTab = () => {
-    if (validateFields()) {
+    // if (validateFields()) {
       dispatch(setMixingRecord(record));
       const newTabValue = tabValue + 1;
       setTabValue(newTabValue);
@@ -216,7 +317,7 @@ const Mixing = () => {
         return updatedStatus;
       });
       localStorage.setItem("activeTabMixing", JSON.stringify(newTabValue)); // Save the updated tabValue
-    }
+    // }
   };
 
   const handleBackTab = () => {
@@ -227,20 +328,26 @@ const Mixing = () => {
     ); // Save the updated tabValue
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateFields()) {
-      return; // Exit if validation fails
-    }
+  const handleSave = async () => {
+    // if (!validateFields()) {
+    //   return; // Exit if validation fails
+    // }
 
     try {
-      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/mixing`, {
+      const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/mixing/save`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...record }),
+        body: JSON.stringify({
+          ...record,
+          batchInfo: {
+            ...batchInfo,
+            batchNo: batchInfo.batchNo,
+            productName: batchInfo.productName
+          },
+          tabValue: tabValue  // Include the current tab value for server-side tracking
+        }),
       });
 
       if (!response.ok) {
@@ -248,12 +355,49 @@ const Mixing = () => {
       }
 
       const data = await response.json();
-      console.log("Batch created:", data);
+      console.log("Mixing saved:", data);
 
-      if (data && data._id) {
-        localStorage.setItem("mixingId", data._id);
-        console.log("MixingID stored in localStorage:", data._id);
-      }
+      // Optional: Show a success message to the user
+      alert(`Data for Tab ${tabValue + 1} saved successfully!`);
+
+    } catch (error) {
+      console.error("Error saving mixing data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // if (!validateFields()) {
+    //   return; // Exit if validation fails
+    // }
+
+    // try {
+    //   const response = await fetch(`${REACT_APP_INTERNAL_API_PATH}/api/mixing`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       ...record, batchInfo: {
+    //         ...batchInfo,
+    //         batchNo: batchInfo.batchNo,
+    //         productName: batchInfo.productName
+    //     }}),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error(`HTTP error! Status: ${response.status}`);
+    //   }
+
+    //   const data = await response.json();
+    //   console.log("Batch created:", data);
+
+    //   if (data && data._id) {
+    //     localStorage.setItem("mixingId", data._id);
+    //     console.log("MixingID stored in localStorage:", data._id);
+    //   }
 
       const processes = JSON.parse(localStorage.getItem("processes"));
       const currentIndex = processes.findIndex(
@@ -277,80 +421,100 @@ const Mixing = () => {
       } else {
         console.log("No next process available.");
       }
-    } catch (error) {
-      console.error("Error creating batch:", error);
-    }
+    // } catch (error) {
+    //   console.error("Error creating batch:", error);
+    // }
   }
 
   return (
     <div>
       <ProcessBox processes={processes} />
-
+<div className="print-container">
       <FormHeader />
-      <h1 className="text-center mt-4">Mixing</h1>
+      <h1 className="text-center mt-4 print-hide">Mixing</h1>
 
-      <Box sx={{ width: "100%", borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ width: "100%", borderBottom: 1, borderColor: "divider" }} className="print-container">
         <Tabs
           value={tabValue}
           onChange={handleChangeTab}
           aria-label="mixing tabs"
+            variant="scrollable" 
+          scrollButtons="auto"
+          className="print-hide"
+        
         >
-          <Tab label="Precautions" disabled={!tabStatus[0]} />
-          <Tab label="Line Clearance" disabled={!tabStatus[1]} />
-          <Tab label="Manufacturing Process" disabled={!tabStatus[2]} />
+          <Tab label="Precautions" />
+          <Tab label="Line Clearance" />
+          <Tab label="Manufacturing Process" />
           <Tab
             label="Weight of granules/bulk & Yield"
-            disabled={!tabStatus[3]}
+            // disabled={!tabStatus[3]}
           />
-          <Tab label="Request for analysis" disabled={!tabStatus[4]} />
+          <Tab label="Request for analysis"  />
+          <Tab label="QC"  />
         </Tabs>
       </Box>
 
       <div>
-        {tabValue === 0 && (
+        {tabValue === 0 &&  (
           <div>
             <BatchManufacturingFormPage4 />
-            <Button variant="contained" onClick={handlePrint} className="mt-3">
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
               Print Page
             </Button>
           </div>
         )}
+      
         {tabValue === 1 && (
           <div className="mt-6">
             <BatchManufacturingFormPage5 />
-            <Button variant="contained" onClick={handlePrint} className="mt-3">
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
               Print Page
             </Button>
           </div>
         )}
+    
         {tabValue === 2 && (
           <div className="mt-6">
             <BatchManufacturingFormPage6 />
-            <Button variant="contained" onClick={handlePrint} className="mt-3">
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
               Print Page
             </Button>
           </div>
         )}
+       
         {tabValue === 3 && (
           <div className="mt-6">
             <BatchManufacturingFormPage7 />
-            <Button variant="contained" onClick={handlePrint} className="mt-3">
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
               Print Page
             </Button>
           </div>
         )}
+      
         {tabValue === 4 && (
-          <div className="mt-6">
+          <div className="mt-2">
             <BatchManufacturingFormPage8 />
-            <Button variant="contained" onClick={handlePrint} className="mt-3">
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
               Print Page
             </Button>
           </div>
         )}
+          
+        {tabValue === 5 && (
+          <div className="mt-6">
+            <MixingQC />
+            <Button variant="contained" onClick={handlePrint} className="mt-3 print-container">
+              Print Page
+            </Button>
+          </div>
+        )}
+     
       </div>
+    
 
       <div
-        className="mt-6"
+        className="mt-6 print-hide"
         style={{ display: "flex", justifyContent: "space-between" }}
       >
         {tabValue > 0 && (
@@ -364,7 +528,16 @@ const Mixing = () => {
           </Button>
         )}
 
-        {tabValue < 4 && (
+<Button
+          variant="contained"
+          color="secondary"
+          onClick={handleSave}
+          className="ml-2"
+        >
+          Save
+        </Button>
+
+        {tabValue < 5 && (
           <Button
             variant="contained"
             color="primary"
@@ -375,13 +548,14 @@ const Mixing = () => {
           </Button>
         )}
 
-        {tabValue === 4 && (
+        {tabValue === 5 && (
           <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Save and Next
+           Next Process
           </Button>
         )}
       </div>
-    </div>
+    </div >
+      </div>
   );
 };
 
