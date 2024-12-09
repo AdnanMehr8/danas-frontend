@@ -102,12 +102,12 @@ const App = () => {
   //   }
   // }, [isAuth, loading, navigate]);
 
-  // useEffect(() => {
-  //   // Redirect to login if the user is not authenticated
-  //   if (!isAuth) {
-  //     navigate("/login");
-  //   }
-  // }, [isAuth, navigate]);
+  useEffect(() => {
+    // Redirect to login if the user is not authenticated
+    if (!isAuth) {
+      navigate("/login");
+    }
+  }, [isAuth, navigate]);
 
   
 
