@@ -103,12 +103,16 @@ const App = () => {
   // }, [isAuth, loading, navigate]);
 
   useEffect(() => {
-    // Redirect to login if the user is not authenticated
-    if (!isAuth) {
-      navigate("/login");
+    // Only navigate if loading is complete
+    if (!loading) {
+      if (!isAuth) {
+        navigate("/login");
+      } else {
+        // Optionally, redirect to dashboard or home when authenticated
+        navigate("/");
+      }
     }
-  }, [isAuth, navigate]);
-
+  }, [isAuth, loading, navigate]);
   
 
   return loading ? (
