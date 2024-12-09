@@ -19,7 +19,7 @@
   }
 
   body, html {
-    width: 312mm !important;
+    width: 304mm !important;
     height: 297mm !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -39,6 +39,8 @@
     border-collapse: collapse !important;
     font-size: 13pt !important;
     margin-bottom: 10px !important;
+   
+
   }
 
   table th, table td {
