@@ -95,12 +95,12 @@ const App = () => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  useEffect(() => {
-    // Redirect to login if not authenticated and not loading
-    if (!loading && !isAuth) {
-      navigate("/login");
-    }
-  }, [isAuth, loading, navigate]);
+  // useEffect(() => {
+  //   // Redirect to login if not authenticated and not loading
+  //   if (!loading && !isAuth) {
+  //     navigate("/login");
+  //   }
+  // }, [isAuth, loading, navigate]);
 
   // useEffect(() => {
   //   // Redirect to login if the user is not authenticated
