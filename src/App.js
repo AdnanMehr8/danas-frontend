@@ -95,24 +95,21 @@ const App = () => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   // Redirect to login if not authenticated and not loading
-  //   if (!loading && !isAuth) {
-  //     navigate("/login");
-  //   }
-  // }, [isAuth, loading, navigate]);
-
   useEffect(() => {
-    // Only navigate if loading is complete
-    if (!loading) {
-      if (!isAuth) {
-        navigate("/login");
-      } else {
-        // Optionally, redirect to dashboard or home when authenticated
-        navigate("/");
-      }
+    // Redirect to login if not authenticated and not loading
+    if (!loading && !isAuth) {
+      navigate("/login");
     }
   }, [isAuth, loading, navigate]);
+
+  // useEffect(() => {
+  //   // Only navigate if loading is complete
+  //   if (!loading) {
+  //     if (!isAuth) {
+  //       navigate("/login");
+  //     }
+  //   }
+  // }, [isAuth, loading, navigate]);
   
 
   return loading ? (
