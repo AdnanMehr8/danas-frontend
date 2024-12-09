@@ -2027,7 +2027,7 @@ const Processes = () => {
     });
   };
 
-  if (loading) return <div>Loading processes...</div>;
+  // if (loading) return <div>Loading processes...</div>;
 
   if (!permission.canRead) {
     console.log('Permission denied for roles read');
