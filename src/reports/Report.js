@@ -109,9 +109,9 @@ const BatchPackingFormPage2 = React.lazy(() =>
 );
 
 
-const BatchPackingFormPage3 = React.lazy(() =>
-  import("../pages/forms/tablet arex 10mg/printing/page3")
-);
+// const BatchPackingFormPage3 = React.lazy(() =>
+//   import("../pages/forms/tablet arex 10mg/printing/page3")
+// );
 
 const BatchPackingFormPage4 = React.lazy(() =>
   import("../pages/forms/tablet arex 10mg/printing/page4")
@@ -125,9 +125,9 @@ const BatchPackingFormPage6 = React.lazy(() =>
   import("../pages/forms/tablet arex 10mg/blistering/page6")
 );
 
-const BatchPackingFormPage7 = React.lazy(() =>
-  import("../pages/forms/tablet arex 10mg/blistering/page7")
-);
+// const BatchPackingFormPage7 = React.lazy(() =>
+//   import("../pages/forms/tablet arex 10mg/blistering/page7")
+// );
 
 const BatchPackingFormPage8 = React.lazy(() =>
   import("../pages/forms/tablet arex 10mg/blistering/page8")
@@ -207,11 +207,11 @@ const Report = () => {
     BatchPackingFormPage0,
     BatchPackingFormPage1,
     BatchPackingFormPage2,
-    BatchPackingFormPage3,
+    // BatchPackingFormPage3,
     BatchPackingFormPage4,
     BatchPackingFormPage5,
     BatchPackingFormPage6,
-    BatchPackingFormPage7,
+    // BatchPackingFormPage7,
     BatchPackingFormPage8,
     BatchPackingFormPage9,
     BatchPackingFormPage10,
