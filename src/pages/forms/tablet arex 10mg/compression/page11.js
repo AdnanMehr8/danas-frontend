@@ -770,7 +770,7 @@ const BatchManufacturingFormPage11 = ({ isReport }) => {
             <th className="border border-gray-300 p-2"></th>
             <th className="border border-gray-300 p-2">Checked By P.O</th>
             <th className="border border-gray-300 p-2">Checked By Q.A.I</th>
-            <th ></th>
+            {/* <th ></th> */}
           </tr>
         </thead>
         <tbody>
