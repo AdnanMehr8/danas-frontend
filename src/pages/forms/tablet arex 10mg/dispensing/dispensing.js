@@ -22,6 +22,7 @@ const Dispensing = () => {
   const batchInfo = useSelector((state) => state.batchInfo.batch);
 
   
+  
   // Load saved tabValue from localStorage or default to 0
   const savedTabValue = JSON.parse(localStorage.getItem("activeTabDispensing")) || 0;
   const [tabValue, setTabValue] = React.useState(savedTabValue); // For controlling the active tab

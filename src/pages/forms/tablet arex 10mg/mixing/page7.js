@@ -622,7 +622,7 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
           width: "100%",
           display: "flex",
           justifyContent: "space-between",
-          gap: "900px",
+          gap: "600px",
         }}
         className="mt-4"
       >
@@ -655,11 +655,11 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
             <th className="border border-gray-300 p-2 text-center">
               Weight (Kg)
             </th>
-            <th className="border border-gray-300 p-2 text-center" colSpan="2">
-              Performed by Production Pharmacist (sign & date)
-            </th>
             <th className="border border-gray-300 p-2 text-center actions-column">
               Actions
+            </th>
+            <th className="border border-gray-300 p-2 text-center" colSpan="2">
+              Performed by Production Pharmacist (sign & date)
             </th>
           </tr>
         </thead>
@@ -671,7 +671,7 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
               </td>
               <td
                 className="border border-gray-300 p-2"
-                style={{ width: "600px" }}
+                style={{ width: "300px" }}
               >
                 <TextField
                   multiline
@@ -685,7 +685,7 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
                     )
                   }
                   className="w-full"
-                  style={{ width: "600px" }}
+                  style={{ width: "300px" }}
                   InputProps={{
                     readOnly: !permission.canEditProduction,
                     disabled: !permission.canEditProduction
@@ -694,7 +694,7 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
               </td>
               <td className="border border-gray-300 p-2 text-center">
                 <input
-                  type="number"
+                  type="text"
                   value={label.weight}
                   onChange={(e) =>
                     handleGranulationChange(index, "weight", e.target.value)
@@ -702,6 +702,14 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
                   disabled={!permission.canEditProduction}
                   className="w-full text-center"
                 />
+              </td>
+              <td className="border border-gray-300 p-2 text-center actions-column">
+                <IconButton 
+                  onClick={() => deleteGranulationLabelRow(index)}
+                  disabled={!permission.canEditProduction}
+                >
+                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
+                </IconButton>
               </td>
               {/* Single centralized input fields for "Performed by Production Pharmacist" */}
               {index === 0 && (
@@ -730,14 +738,6 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
                   />
                 </td>
               )}
-              <td className="border border-gray-300 p-2 text-center actions-column">
-                <IconButton 
-                  onClick={() => deleteGranulationLabelRow(index)}
-                  disabled={!permission.canEditProduction}
-                >
-                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
-                </IconButton>
-              </td>
             </tr>
           ))}
         </tbody>

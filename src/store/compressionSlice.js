@@ -9,6 +9,7 @@ const initialState = {
     specificArea: "",
     sectionInCharge: "",
     precautionsRead: "",
+    precautionsReadDate: "",
   },
   lineClearance: Array(1).fill({
     equipment: "",

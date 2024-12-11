@@ -288,11 +288,11 @@
 // export default BatchManufacturingFormPage2;
 
 import React from "react";
-import { Table, Form, Button  } from "react-bootstrap";
+import { Table, Form  } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setDispensing } from "../../../../store/dispensingSlice";
 import { usePermissions } from "../../../../hooks/usePermissions";
-// import { Button } from "@mui/material";
+import { Button } from "@mui/material";
 import { Plus, Trash2 } from "lucide-react";
 
 const BatchManufacturingFormPage2 = ({ isReport }) => {
@@ -503,7 +503,7 @@ const BatchManufacturingFormPage2 = ({ isReport }) => {
               </td>
               <td className="actions-column">
                 <Button
-                  variant="outline-danger"
+                  color="error"
                   onClick={() => deleteWeighingdispensingRow(index)}
                   disabled={!permission.canEditProduction}
                 >

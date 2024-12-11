@@ -467,7 +467,7 @@ const BatchManufacturingFormPage23 = ({ isReport }) => {
                 
                 >
                   <TextField
-                  
+                  multiline
                     value={observation.parameter}
                     onChange={(e) =>
                       handleObservationChange(
@@ -511,7 +511,7 @@ const BatchManufacturingFormPage23 = ({ isReport }) => {
                 </td>
                 <td className="border border-gray-300 p-2">
                   <TextField
-                  
+                  multiline
                     value={observation.remarks}
                     onChange={(e) =>
                       handleObservationChange(index, "remarks", e.target.value)

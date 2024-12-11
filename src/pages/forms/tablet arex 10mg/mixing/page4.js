@@ -266,6 +266,14 @@ const BatchManufacturingFormPage4 = ({ isReport }) => {
                   readOnly={!permission.canEditProduction}
                   disabled={!permission.canEditProduction}
                 />
+                 <TextField
+                  type="date"
+                  name="precautionsReadDate"
+              value={mixingRecord.precautions.precautionsReadDate }
+              onChange={handleInputChange}
+              readOnly={!permission.canEditProduction}
+              disabled={!permission.canEditProduction}
+            />
               </span>
             </strong>
           </div>
@@ -295,14 +303,14 @@ const BatchManufacturingFormPage4 = ({ isReport }) => {
                   >
                     Equipment ID
                   </TableCell>
-                  <TableCell
+                  {/* <TableCell
                     style={{
                       fontWeight: "bold",
                       borderRight: "1px solid #ccc",
                     }}
                   >
                     Capacity
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell
                     style={{
                       fontWeight: "bold",
@@ -349,23 +357,26 @@ const BatchManufacturingFormPage4 = ({ isReport }) => {
                 {mixingRecord.lineClearance.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
-                      <input
-                        style={{
-                          width: "350px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                        list="equipment-names"
+                      <TextField
+                        // style={{
+                        //   width: "350px",
+                        //   whiteSpace: "nowrap",
+                        //   overflow: "hidden",
+                        //   textOverflow: "ellipsis",
+                        // }}
+                        // list="equipment-names"
+                        fullWidth
+                        multiline
                         name="equipment"
                         className="form-control"
-                        value={item.equipment}
-                        onChange={(e) => handleEquipmentChange(e, index)}
-                        placeholder="Search equipment name..."
+                        value={item.equipment || ""}
+                        onChange={(e) => handleInputChange(e, index)}
+                        placeholder="equipment name..."
                         readOnly={!permission.canEditProduction}
                         disabled={!permission.canEditProduction}
+                        style={{width: "150px"}}
                       />
-                      <datalist id="equipment-names">
+                      {/* <datalist id="equipment-names">
                         {equipmentData
                           .flatMap((equip) => equip.equipmentList)
                           .map((equipItem, index) => (
@@ -376,24 +387,27 @@ const BatchManufacturingFormPage4 = ({ isReport }) => {
                               {`${equipItem.Equipment_Name} (Capacity: ${equipItem.Capacity})`}
                             </option>
                           ))}
-                      </datalist>
+                      </datalist> */}
                     </TableCell>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
                       <TextField
-                        value={item.equipmentId || "N/A"}
                         fullWidth
-                        readOnly
                         multiline
+                        name="equipmentId"
+                        value={item.equipmentId || " "}
+                        onChange={(e) => handleInputChange(e, index)}
+                        readOnly={!permission.canEditProduction}
+                        disabled={!permission.canEditProduction}
                       />
                     </TableCell>
-                    <TableCell style={{ borderRight: "1px solid #ccc" }}>
+                    {/* <TableCell style={{ borderRight: "1px solid #ccc" }}>
                       <TextField
                         value={item.equipmentCapacity || "N/A"}
                         fullWidth
                         readOnly
                         multiline
                       />
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>
                       <TextField
                         name="previousProduct"
@@ -403,6 +417,7 @@ const BatchManufacturingFormPage4 = ({ isReport }) => {
                         onChange={(e) => handleInputChange(e, index)}
                         readOnly={!permission.canEditProduction}
                         disabled={!permission.canEditProduction}
+                        style={{ width: "150px"}}
                       />
                     </TableCell>
                     <TableCell style={{ borderRight: "1px solid #ccc" }}>

@@ -51,13 +51,8 @@
       font-size: 18px;
     }
   
-    /* Ensure form elements print cleanly */
-    .print-container input,
-    .print-container select,
-    .print-container textarea {
-      border: 1px solid #000;
-      width: 100%;
-      margin-bottom: 10px;
+    .actions-column {
+      display: none;
     }
   
     /* Remove any background colors to save ink */

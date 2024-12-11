@@ -336,7 +336,7 @@ const BatchManufacturingFormPage22 = ({ isReport }) => {
           width: "100%",
           display: "flex",
           justifyContent: "space-between",
-          gap: "900px",
+          gap: "600px",
         }}
         className="mt-4"
       >
@@ -373,11 +373,11 @@ const BatchManufacturingFormPage22 = ({ isReport }) => {
               Description
             </th>
             <th className="border border-gray-300 p-2 text-center">Yield</th>
-            <th className="border border-gray-300 p-2 text-center" colSpan="2">
-              Performed by Production Pharmacist (sign & date)
-            </th>
             <th className="border border-gray-300 p-2 text-center actions-column">
               Actions
+            </th>
+            <th className="border border-gray-300 p-2 text-center" colSpan="2">
+              Performed by Production Pharmacist (sign & date)
             </th>
           </tr>
         </thead>
@@ -387,9 +387,13 @@ const BatchManufacturingFormPage22 = ({ isReport }) => {
               <td className="border border-gray-300 p-2 text-center">
                 {index + 1}
               </td>
-              <td className="border border-gray-300 p-2">
-                <input
+              <td
+                style={{ width: "300px" }}
+                className="border border-gray-300 p-2">
+                <TextField
+                  multiline
                   type="text"
+                style={{ width: "300px" }}
                   value={label.description}
                   onChange={(e) =>
                     handleGranulationChange(
@@ -406,7 +410,8 @@ const BatchManufacturingFormPage22 = ({ isReport }) => {
                 />
               </td>
               <td className="border border-gray-300 p-2">
-                <input
+                <TextField
+                  multiline
                   type="text"
                   value={label.yield}
                   onChange={(e) =>

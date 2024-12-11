@@ -1,9 +1,10 @@
 import React from "react";
-import { Table, Form, Button } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setDispensing } from "../../../../store/dispensingSlice";
 import { Plus } from "lucide-react";
 import { usePermissions } from "../../../../hooks/usePermissions";
+import { Button } from "@mui/material";
 
 const BatchManufacturingFormPage3 = ({ isReport }) => {
   const dispatch = useDispatch();
@@ -192,7 +193,7 @@ const BatchManufacturingFormPage3 = ({ isReport }) => {
               </td>
               <td className="actions-column">
                 <Button
-                  variant="outline-danger"
+                  color="error"
                   onClick={() => deleteWeighingRecordRow(index)}
                   disabled={!permission.canEditProduction}
                 >

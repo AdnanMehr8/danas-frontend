@@ -548,12 +548,12 @@ const BatchManufacturingFormPage1 = ({ isReport }) => {
                     ...prev,
                     [section]: e.target.value
                   }))}
-                  className="w-48"
+                  className="w-48 print-hide"
                 />
                 <Button
                   variant="contained"
                   onClick={() => handleAddLabel(section)}
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-blue-500 hover:bg-blue-600 print-hide"
                   startIcon={<Plus className="w-4 h-4" />}
                 >
                   Add

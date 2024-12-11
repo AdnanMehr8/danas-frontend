@@ -266,6 +266,7 @@ export default function CoatingQC({ isReport }) {
         <Table>
           <TableHead>
             <TableRow>
+            <TableCell className="text-center">S.No.</TableCell>
               <TableCell className="text-center">Parameters</TableCell>
               <TableCell className="text-center">Specification</TableCell>
               <TableCell className="text-center">Results</TableCell>
@@ -275,8 +276,15 @@ export default function CoatingQC({ isReport }) {
           <TableBody>
             {coatingState.testAndResults.parameters.map((param, index) => (
               <TableRow key={index}>
-                <TableCell>
+                 <TableCell
+                    className="text-center"
+                
+                >{index + 1}</TableCell>
+                <TableCell
+                    className="text-center"
+                >
                   <TextField
+                    multiline
                     value={param.parameters}
                     onChange={(e) =>
                       handleParameterChange(index, "parameters", e.target.value)
@@ -288,8 +296,11 @@ export default function CoatingQC({ isReport }) {
                     }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell
+                    className="text-center"
+                >
                   <TextField
+                    multiline
                     value={param.specification}
                     onChange={(e) =>
                       handleParameterChange(index, "specification", e.target.value)
@@ -301,8 +312,11 @@ export default function CoatingQC({ isReport }) {
                     }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell
+                    className="text-center"
+                >
                   <TextField
+                    multiline
                     value={param.results}
                     onChange={(e) =>
                       handleParameterChange(index, "results", e.target.value)

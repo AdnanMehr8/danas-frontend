@@ -1851,7 +1851,7 @@ const DraggableList = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-4">
+    <div className=" mx-auto p-4">
       <div className="mb-4 p-2 bg-blue-100 rounded">
         <p>Current Batch Type: {getBatchType()}</p>
       </div>
