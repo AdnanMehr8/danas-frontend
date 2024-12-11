@@ -372,11 +372,11 @@ const BatchManufacturingFormPage17 = ({ isReport }) => {
               Description
             </th>
             <th className="border border-gray-300 p-2 text-center">Yield</th>
-            <th className="border border-gray-300 p-2 text-center actions-column">
-              Actions
-            </th>
             <th className="border border-gray-300 p-2 text-center" colSpan="2">
               Performed by Production Pharmacist (sign & date)
+            </th>
+            <th className="border border-gray-300 p-2 text-center actions-column">
+              Actions
             </th>
           </tr>
         </thead>
@@ -423,19 +423,12 @@ const BatchManufacturingFormPage17 = ({ isReport }) => {
                   }}
                 />
               </td>
-              <td className="border border-gray-300 p-2 text-center actions-column">
-                <IconButton 
-                  onClick={() => deleteGranulationLabelRow(index)}
-                  disabled={!permission.canEditProduction}
-                >
-                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
-                </IconButton>
-              </td>
+              
               {/* Single centralized input fields for "Performed by Production Pharmacist" */}
-              {index === 0 && (
+             
                 <td
                   className="border border-gray-300 p-2 text-center"
-                  rowSpan={compressionYield.labels.length}
+                
                 >
                   <input
                     type="text"
@@ -457,7 +450,15 @@ const BatchManufacturingFormPage17 = ({ isReport }) => {
                     className="text-center w-full"
                   />
                 </td>
-              )}
+              
+              <td className="border border-gray-300 p-2 text-center actions-column">
+                <IconButton 
+                  onClick={() => deleteGranulationLabelRow(index)}
+                  disabled={!permission.canEditProduction}
+                >
+                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
+                </IconButton>
+              </td>
              
             </tr>
           ))}

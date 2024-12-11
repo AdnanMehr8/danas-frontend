@@ -181,7 +181,6 @@ const Report = () => {
     BatchManufacturingFormPage1,
     BatchManufacturingFormPage2,
     BatchManufacturingFormPage3,
-    BatchManufacturingFormPage3,
     BatchManufacturingFormPage4,
     BatchManufacturingFormPage5,
     BatchManufacturingFormPage6,
@@ -392,7 +391,8 @@ const totalPages = formPages.length;
         padding: "15px",
         marginBottom: "20px",
         position: "relative",
-        minHeight: "100vh", // Ensure full-page height for the content
+        minHeight: "100vh", // Ensures full page height
+        pageBreakAfter: "always",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -402,6 +402,7 @@ const totalPages = formPages.length;
           outline: "none",
           backgroundColor: "transparent",
         },
+        
         "& button, & .MuiButton-root": {
           display: "none",
         },

@@ -655,11 +655,12 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
             <th className="border border-gray-300 p-2 text-center">
               Weight (Kg)
             </th>
-            <th className="border border-gray-300 p-2 text-center actions-column">
-              Actions
-            </th>
+          
             <th className="border border-gray-300 p-2 text-center" colSpan="2">
               Performed by Production Pharmacist (sign & date)
+            </th>
+            <th className="border border-gray-300 p-2 text-center actions-column">
+              Actions
             </th>
           </tr>
         </thead>
@@ -703,20 +704,11 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
                   className="w-full text-center"
                 />
               </td>
-              <td className="border border-gray-300 p-2 text-center actions-column">
-                <IconButton 
-                  onClick={() => deleteGranulationLabelRow(index)}
-                  disabled={!permission.canEditProduction}
-                >
-                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
-                </IconButton>
-              </td>
+              
               {/* Single centralized input fields for "Performed by Production Pharmacist" */}
-              {index === 0 && (
-                <td
-                  className="border border-gray-300 p-2 text-center"
-                  rowSpan={granulationYield.labels.length}
-                >
+             
+              <td className="border border-gray-300 p-2 text-center">
+
                   <input
                     type="text"
                     placeholder="Performed by Production Pharmacist"
@@ -737,7 +729,14 @@ const BatchManufacturingFormPage7 = ({ isReport }) => {
                     className="text-center w-full"
                   />
                 </td>
-              )}
+                <td className="border border-gray-300 p-2 text-center actions-column">
+                <IconButton 
+                  onClick={() => deleteGranulationLabelRow(index)}
+                  disabled={!permission.canEditProduction}
+                >
+                  <DeleteIcon color={permission.canEditProduction ? "error" : "disabled"} />
+                </IconButton>
+              </td>
             </tr>
           ))}
         </tbody>

@@ -222,7 +222,7 @@ const FormHeader = () => {
               </div>
             </td>
           </tr>
-          <tr style={{ border: "1px solid #dee2e6" }}>
+          <tr style={{ border: "1px solid black" }}>
             {/* Batch and Tablets Info in the same cell using flexbox */}
             <td
               style={{
