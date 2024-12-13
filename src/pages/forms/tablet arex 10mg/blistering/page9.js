@@ -78,13 +78,19 @@ export default function BatchPackingFormPage9({ isReport }) {
   const handleGeneralInputChange = (field, value) => {
     if (!canEditGeneral) return;
 
+    const updatedData = { [field]: value };
+    if (field === "productionPharmacist") {
+      // Automatically set the current date and time when productionPharmacist is updated
+      updatedData.productionPharmacistDate = new Date().toLocaleString('sv').replace(' ', 'T');
+    }
+    
     dispatch(
       setBlistering({
         ...blisteringState,
-        checkSheet: {
-          ...blisteringState.checkSheet,
-          [field]: value,
-        },
+       checkSheet: {
+        ...blisteringState.checkSheet,
+        ...updatedData,
+      },
       })
     );
   };
@@ -306,6 +312,7 @@ export default function BatchPackingFormPage9({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
+                      style={{width: "100px"}}
                       multiline
                       value={row.text}
                       onChange={(e) =>
@@ -327,6 +334,7 @@ export default function BatchPackingFormPage9({ isReport }) {
                   </TableCell>
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
+                      style={{width: "100px"}}
                       fullWidth
                       multiline
                       value={row.leakTest}
@@ -343,6 +351,15 @@ export default function BatchPackingFormPage9({ isReport }) {
                       value={row.performedByProductionQA}
                       onChange={(e) =>
                         handleInputChange(index, "performedByProductionQA", e.target.value)
+                      }
+                      disabled={!canEditTable}
+                    />
+                     <TextField
+                      fullWidth
+                      type="date"
+                      value={row.performedByProductionQADate}
+                      onChange={(e) =>
+                        handleInputChange(index, "performedByProductionQADate", e.target.value)
                       }
                       disabled={!canEditTable}
                     />
@@ -379,14 +396,16 @@ export default function BatchPackingFormPage9({ isReport }) {
             }
             disabled={!canEditGeneral}
           />
-           <input
-            type="date"
-            value={blisteringState.checkSheet.productionPharmacistDate}
-            onChange={(e) =>
-              handleGeneralInputChange( "productionPharmacistDate", e.target.value)
-            }
-            disabled={!canEditGeneral}
-          />
+          <input
+  type="datetime-local"
+  value={
+    blisteringState.checkSheet.productionPharmacistDate 
+      ? blisteringState.checkSheet.productionPharmacistDate.slice(0, 16) 
+      : ''
+  }
+  disabled={!canEditGeneral}
+  readOnly
+/>
         </div>
       </CardContent>
     </Card>

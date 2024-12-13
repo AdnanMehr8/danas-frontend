@@ -261,21 +261,27 @@ export default function PackingQC({ isReport }) {
 
     
       <h2 className="text-2xl font-bold mb-4 text-center mt-4">Tests and Results</h2>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell className="text-center">Parameters</TableCell>
-              <TableCell className="text-center">Specification</TableCell>
-              <TableCell className="text-center">Results</TableCell>
-              <TableCell className="text-center actions-column">Actions</TableCell> 
-            </TableRow>
-          </TableHead>
-          <TableBody>
+      
+        <table>
+          <thead>
+            <tr>
+            <th className="text-center">S.No.</th>
+              <th className="text-center">Parameters</th>
+              <th className="text-center">Specification</th>
+              <th className="text-center">Results</th>
+              <th className="text-center actions-column">Actions</th> 
+            </tr>
+          </thead>
+          <tbody>
             {packingState.testAndResults.parameters.map((param, index) => (
-              <TableRow key={index}>
-                <TableCell>
+              <tr key={index}>
+                 <td
+                    className="text-center"
+                
+                >{index + 1}</td>
+                <td>
                   <TextField
+                    multiline
                     value={param.parameters}
                     onChange={(e) =>
                       handleParameterChange(index, "parameters", e.target.value)
@@ -286,18 +292,20 @@ export default function PackingQC({ isReport }) {
                     }}
                     fullWidth
                   />
-                </TableCell>
-                <TableCell>
+                </td>
+                <td>
                   <TextField
+                    multiline
                     value={param.specification}
                     onChange={(e) =>
                       handleParameterChange(index, "specification", e.target.value)
                     }
                     fullWidth
                   />
-                </TableCell>
-                <TableCell>
+                </td>
+                <td>
                   <TextField
+                    multiline
                     value={param.results}
                     onChange={(e) =>
                       handleParameterChange(index, "results", e.target.value)
@@ -308,16 +316,16 @@ export default function PackingQC({ isReport }) {
                     }}
                     fullWidth
                   />
-                </TableCell>
-                <TableCell className="actions-column">
+                </td>
+                <td className="actions-column">
           <Button disabled={!permission.canEditQC} onClick={() => handleDeleteParameter(index)} color="error" variant="contained">Delete</Button>
-                            </TableCell>
-              </TableRow>
+                            </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
         <Button onClick={handleAddParameter} color="primary" variant="outlined" disabled={ !permission.canEditQC}>Add Row</Button>
-          </TableContainer>
+       
 
           <div className="mt-4">
           {/* REMARKS: label in bold */}

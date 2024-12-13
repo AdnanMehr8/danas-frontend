@@ -25,6 +25,7 @@ const initialState = {
     previousProduct: "",
     previousProductBatchNo: "",
     signature: "",
+    lineNo: ""
   },
   checkboxes: {
     remnants: {

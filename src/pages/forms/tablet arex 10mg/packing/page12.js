@@ -223,7 +223,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeIn}
                       inputProps={{ style: { minWidth: "25px" } }}
                       onChange={(e) =>
@@ -238,7 +238,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeOut}
                       onChange={(e) =>
                         handleInputChange(index, "timeOut", e.target.value)
@@ -252,7 +252,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeIn2}
                       onChange={(e) =>
                         handleInputChange(index, "timeIn2", e.target.value)
@@ -266,7 +266,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeOut2}
                       onChange={(e) =>
                         handleInputChange(index, "timeOut2", e.target.value)
@@ -280,7 +280,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeIn3}
                       onChange={(e) =>
                         handleInputChange(index, "timeIn3", e.target.value)
@@ -294,7 +294,7 @@ export default function BatchPackingFormPage12({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="time"
                       value={row.timeOut3}
                       onChange={(e) =>
                         handleInputChange(index, "timeOut3", e.target.value)

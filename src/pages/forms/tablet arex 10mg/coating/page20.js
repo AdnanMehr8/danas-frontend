@@ -101,9 +101,9 @@ const BatchManufacturingFormPage20 = ({ isReport }) => {
     const canEditSection = permission.canEditQA;
         
     return (
-      <div className="flex justify-center items-center mb-4">
+      <div className="flex justify-center items-center ">
         <div className="mt-6 w-full">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center ">
             <h5 className="text-lg font-semibold">{title}</h5>
               {canEditSection && (
             <div className="flex gap-2">
@@ -114,12 +114,12 @@ const BatchManufacturingFormPage20 = ({ isReport }) => {
                     ...prev,
                     [section]: e.target.value
                   }))}
-                  className="w-48"
+                  className="w-48 print-hide"
                 />
                 <Button
                   variant="contained"
                   onClick={() => handleAddLabel(section)}
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-blue-500 hover:bg-blue-600 print-hide"
                   startIcon={<Plus className="w-4 h-4" />}
                 >
                   Add
@@ -145,7 +145,11 @@ const BatchManufacturingFormPage20 = ({ isReport }) => {
                     row
                     value={coating.checkboxes[section]?.values?.[label] || ""}
                     onChange={(e) => handleCheckboxChange(section, label, e.target.value)}
-                    style={{ justifyContent: "center" }}
+                    style={{ 
+                      justifyContent: "center",
+                      flexWrap: "nowrap" 
+                    }}
+                    className="print-radio-group"
                     disabled={!canEditSection}
                   >
                     <FormControlLabel
@@ -233,7 +237,7 @@ const BatchManufacturingFormPage20 = ({ isReport }) => {
         {/* <h2 className="text-lg font-bold mb-2 text-center">FOR QUALITY ASSURANCE DEPARTMENT USE ONLY</h2> */}
         {(permission.canReadProduction && permission.canReadQA) && (
           <>
-            <table className="w-full mb-4" style={{ textAlign: "center" }}>
+            <table className="w-full " style={{ textAlign: "center" }}>
               <tbody>
                 <tr>
                   <td><strong>Date & Time:</strong></td>
@@ -335,7 +339,7 @@ const BatchManufacturingFormPage20 = ({ isReport }) => {
               </tbody>
             </table>
 
-            <p className="text-sm text-gray-600 mt-4 text-center">
+            <p className="text-sm text-gray-600 mt-3 text-center">
               <strong>Note:</strong> ✔️ = Satisfactory, ❌ = Unsatisfactory, — = Not
               Applicable
             </p>

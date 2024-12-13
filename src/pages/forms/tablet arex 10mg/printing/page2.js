@@ -117,9 +117,9 @@ const BatchPackingFormPage2 = ({ isReport }) => {
     const canEditSection = permission.canEditQA;
 
     return (
-      <div className="flex justify-center items-center mb-4">
-        <div className="mt-6 w-full">
-          <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-center items-center ">
+        <div className=" w-full">
+          <div className="flex justify-between items-center ">
             <h5 className="text-lg font-semibold">{title}</h5>
             {canEditSection && (
               <div className="flex gap-2">
@@ -131,12 +131,12 @@ const BatchPackingFormPage2 = ({ isReport }) => {
                     [section]: e.target.value
                   }))}
                   // placeholder="Enter new label"
-                  className="w-48"
+                  className="w-48 print-hide"
                 />
                 <Button
                   variant="contained"
                   onClick={() => handleAddLabel(section)}
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-blue-500 hover:bg-blue-600 print-hide"
                   startIcon={<Plus className="w-4 h-4" />}
                 >
                   Add
@@ -158,13 +158,16 @@ const BatchPackingFormPage2 = ({ isReport }) => {
                   </Button>
                 )}
                 
-                <h6 className="mb-2 text-center">{label}</h6>
+                <h6 className=" text-center">{label}</h6>
                 <RadioGroup
                   row
                   value={printing.checkboxes[section]?.values?.[label] || ""}
                   onChange={(e) => handleCheckboxChange(section, label, e.target.value)}
-                  // className="justify-center"
-                  style={{ justifyContent: "center" }}
+                  style={{ 
+                    justifyContent: "center",
+                    flexWrap: "nowrap" 
+                  }}
+                  className="print-radio-group"
                   disabled={!canEditSection}
                 >
                   <FormControlLabel
@@ -249,7 +252,7 @@ const BatchPackingFormPage2 = ({ isReport }) => {
       {/* <h2 className="text-lg font-bold mb-2 text-center">FOR QUALITY ASSURANCE DEPARTMENT USE ONLY</h2> */}
       {(permission.canReadProduction && permission.canReadQA) && (
         <>
-          <table className="w-full mb-4" style={{ textAlign: "center" }}>
+          <table className="w-full" style={{ textAlign: "center" }}>
             <tbody>
               <tr>
                 <td><strong>Date & Time:</strong></td>
@@ -292,7 +295,7 @@ const BatchPackingFormPage2 = ({ isReport }) => {
                 </td>
               </tr>
               <tr>
-                <td><strong>Signature:</strong></td>
+                <td><strong>Production Pharmacist:</strong></td>
                 <td>
                   {renderInputField('signature', printing.batchRecord.signature, 'production')}
                 </td>
@@ -310,7 +313,7 @@ const BatchPackingFormPage2 = ({ isReport }) => {
           )}
       
           <h4>• Check the Temperature & Humidity of the Area:-</h4>
-          <table className="w-full mb-4" style={{ textAlign: "center" }}>
+          <table className="w-full mb-3" style={{ textAlign: "center" }}>
             <tbody>
               <tr>
                 <td><strong>Temperature:</strong></td>
@@ -351,7 +354,7 @@ const BatchPackingFormPage2 = ({ isReport }) => {
             </tbody>
           </table>
 
-          <p className="text-sm text-gray-600 mt-4 text-center">
+          <p className="text-sm text-gray-600 mt-3 text-center">
             <strong>Note:</strong> ✔️ = Satisfactory, ❌ = Unsatisfactory, — = Not
             Applicable
           </p>

@@ -214,7 +214,7 @@ const Report = () => {
     BatchPackingFormPage8,
     BatchPackingFormPage9,
     BatchPackingFormPage10,
-    BatchPackingFormPage11,
+    // BatchPackingFormPage11,
     BatchPackingFormPage12,
     BatchPackingFormPage13,
     BatchPackingFormPage14,
@@ -356,6 +356,7 @@ const globalStyles = {
     pointerEvents: "none",
     opacity: "1",
   },
+
   // Remove table interaction
   "& table": {
     pointerEvents: "none",

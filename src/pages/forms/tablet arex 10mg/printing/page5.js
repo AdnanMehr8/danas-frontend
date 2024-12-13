@@ -311,7 +311,7 @@ export default function BatchPackingFormPage5({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="date"
                       value={row.mfgDate}
                       onChange={(e) =>
                         handleInputChange(index, "mfgDate", e.target.value)
@@ -322,7 +322,7 @@ export default function BatchPackingFormPage5({ isReport }) {
                   <TableCell style={{ borderRight: "1px solid #ddd" }}>
                     <TextField
                       fullWidth
-                      multiline
+                      type="date"
                       value={row.expDate}
                       onChange={(e) =>
                         handleInputChange(index, "expDate", e.target.value)

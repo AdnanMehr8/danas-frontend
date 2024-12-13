@@ -46,16 +46,19 @@
   table th, table td {
     /* border: 1px solid #dee2e6 !important; */
     padding: 4px 6px !important;
-    word-wrap: break-word !important;
+    word-break: break-word !important;
+    /* word-wrap: break-word !important; */
     max-width: 100% !important;
     vertical-align: top !important;
   }
+  
 
   table th {
     background-color: #f0f0f0 !important;
     font-weight: bold !important;
   }
 
+  
   /* Prevent table cell content overflow */
   td, th {
     overflow-wrap: break-word !important;
@@ -74,6 +77,7 @@
   input, textarea, select {
     /* border: 1px solid #ccc !important; */
     width: 100% !important;
+  
     font-size: 13pt !important;
     padding: 2px !important;
   }

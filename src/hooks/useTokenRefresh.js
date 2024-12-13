@@ -15,7 +15,7 @@ const useTokenRefresh = () => {
         // Redirect to login if refresh fails
         navigate('/login');
       }
-    }, 25 * 60 * 1000); // Refresh every 25 minutes
+    }, 5 * 60 * 60 * 1000); // Refresh every 25 minutes
 
     return () => clearInterval(interval);
   }, [navigate]);

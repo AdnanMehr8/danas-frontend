@@ -139,7 +139,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
           <tr>
               <td>
                 
-                <Form.Control
+                <TextField
+                multiline
                   type="date"
                   name="dateStarted"
                   value={packing.checkSheet.dateStarted || ""}
@@ -150,7 +151,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="date"
                   name="dateCompleted"
                   value={packing.checkSheet.dateCompleted || ""}
@@ -210,7 +212,7 @@ const BatchPackingFormPage13 = ({ isReport }) => {
           {packing.checkSheet.labels.map((row, index) => (
             <tr key={index}>
               <td>
-                <Form.Control
+                <TextField
                   type="datetime-local"
                   value={row.dateAndTime}
                   onChange={(e) =>
@@ -224,7 +226,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.blister}
                   onChange={(e) =>
@@ -238,7 +241,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.batchNo}
                   onChange={(e) =>
@@ -252,7 +256,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                
                   type="date"
                   value={row.mfgDate}
                   onChange={(e) =>
@@ -266,7 +271,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                
                   type="date"
                   value={row.expDate}
                   onChange={(e) =>
@@ -280,7 +286,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.mrp}
                   onChange={(e) =>
@@ -294,7 +301,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.packSize}
                   onChange={(e) =>
@@ -308,7 +316,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.directionInsertion}
                   onChange={(e) =>
@@ -322,7 +331,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.inner}
                   onChange={(e) =>
@@ -336,7 +346,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.label}
                   onChange={(e) =>
@@ -350,7 +361,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.bottleOrTube}
                   onChange={(e) =>
@@ -364,7 +376,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.ucOrMc}
                   onChange={(e) =>
@@ -378,7 +391,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.mcNo}
                   onChange={(e) =>
@@ -392,7 +406,8 @@ const BatchPackingFormPage13 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.signedByProductionOrQA}
                   onChange={(e) =>

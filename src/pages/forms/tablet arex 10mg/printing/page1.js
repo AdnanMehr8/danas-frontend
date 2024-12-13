@@ -136,7 +136,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
           {printing.batchQRecord.map((row, index) => (
             <tr key={index}>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.material}
                   onChange={(e) =>
@@ -150,7 +151,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.grnNo}
                   onChange={(e) =>
@@ -164,7 +166,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.units}
                   onChange={(e) =>
@@ -178,7 +181,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.standard}
                   onChange={(e) =>
@@ -192,7 +196,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.actual}
                   onChange={(e) =>
@@ -206,7 +211,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.return}
                   onChange={(e) =>
@@ -220,7 +226,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.vendor}
                   onChange={(e) =>
@@ -234,7 +241,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.inProcess}
                   onChange={(e) =>
@@ -248,7 +256,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.totalRejection}
                   onChange={(e) =>
@@ -262,7 +271,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.packingStoreSupervisor}
                   onChange={(e) =>
@@ -274,7 +284,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                   }
                   disabled={!permission.canEditProduction}
                 />
-                     <Form.Control
+                     <TextField
+                     
                   type="date"
                   name="packingStoreSupervisorDate"
                   value={row.packingStoreSupervisorDate || ""}
@@ -285,7 +296,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                 />
               </td>
               <td>
-                <Form.Control
+                <TextField
+                multiline
                   type="text"
                   value={row.packingSupervisor}
                   onChange={(e) =>
@@ -297,7 +309,8 @@ const BatchPackingFormPage1 = ({ isReport }) => {
                   }
                   disabled={!permission.canEditProduction}
                 />
-                                    <Form.Control
+                                    <TextField
+                                    
                   type="date"
                   name="packingSupervisorDate"
                   value={row.packingSupervisorDate || ""}

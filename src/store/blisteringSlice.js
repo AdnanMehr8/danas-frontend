@@ -105,7 +105,9 @@ checkSheet: {
         text: "",
         sealing: "",
         leakTest: "",
-        performedByProductionQA: "",
+      performedByProductionQA: "",
+      performedByProductionQADate: "",
+        
     })),
     blisterMachineId: "",
     productionPharmacist: "",
